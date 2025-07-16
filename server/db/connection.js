@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 require('dotenv').config(mongoose.connection)
 // connecting db
-mongoose.connect()
+mongoose.connect(process.env.mongodb_URL)
     // 'process.env.MONGODB_URL')
     .then(()=>{
     console.log('Connection established')
