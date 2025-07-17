@@ -4,42 +4,69 @@
 // const jwt = require("jsonwebtoken");
 // const User = require("../model/userData");
 
-// // Login route for both Admin and User
-// router.post("/login", async (req, res) => {
-//   const { email, password } = req.body;
+// // ✅ Middleware: Authenticate user (reuse your existing authenticateUser)
+// function authenticateUser(req, res, next) {
+//   const authHeader = req.headers.authorization;
+
+//   if (!authHeader || !authHeader.startsWith("Bearer ")) {
+//     return res.status(401).json({ message: "Authorization token missing" });
+//   }
+
+//   const token = authHeader.split(" ")[1];
 
 //   try {
-//     // Find user (could be admin or user)
-//     const user = await User.findOne({ email });
+//     const decoded = jwt.verify(token, process.env.JWT_SECRET );
+
+//     if (decoded.role !== "user") {
+//       return res.status(403).json({ message: "Access denied: Users only" });
+//     }
+
+//     req.user = decoded; // Attach user data to request
+//     next();
+//   } catch (err) {
+//     console.error("JWT Verification failed:", err);
+//     return res.status(401).json({ message: "Invalid or expired token" });
+//   }
+// }
+
+// // ✅ Change Password Route
+// router.put("/change-password", authenticateUser, async (req, res) => {
+//   const { currentPassword, newPassword, confirmPassword } = req.body;
+
+//   // ✅ Validate inputs
+//   if (!currentPassword || !newPassword || !confirmPassword) {
+//     return res.status(400).json({ message: "All fields are required" });
+//   }
+
+//   if (newPassword !== confirmPassword) {
+//     return res.status(400).json({ message: "New passwords do not match" });
+//   }
+
+//   try {
+//     // ✅ Find the user from token
+//     const user = await User.findById(req.user.id);
+
 //     if (!user) {
-//       return res.status(404).json({ message: "Account not found" });
+//       return res.status(404).json({ message: "User not found" });
 //     }
 
-//     // Check password
-//     const isMatch = await bcrypt.compare(password, user.password);
+//     // ✅ Verify current password
+//     const isMatch = await bcrypt.compare(currentPassword, user.password);
 //     if (!isMatch) {
-//       return res.status(400).json({ message: "Invalid credentials" });
+//       return res.status(401).json({ message: "Current password is incorrect" });
 //     }
 
-//     // Generate JWT token
-//     const token = jwt.sign(
-//       { id: user._id, role: user.role },
-//       process.env.JWT_SECRET,
-//       { expiresIn: "2h" }
-//     );
+//     // ✅ Hash new password
+//     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-//     res.status(200).json({
-//       message: `${user.role} login successful`,
-//       token,
-//       user: {
-//         id: user._id,
-//         email: user.email,
-//         role: user.role,
-//       },
-//     });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ message: "Server error" });
+//     // ✅ Update password
+//     user.password = hashedPassword;
+//     await user.save();
+
+//     res.status(200).json({ message: "Password changed successfully" });
+//   } catch (err) {
+//     console.error("Change Password Error:", err);
+//     res.status(500).json({ message: "Server error while changing password" });
 //   }
 // });
 
@@ -48,207 +75,82 @@
 
 
 
-// const express = require("express");
-// const router = express.Router();
-// const bcrypt = require("bcryptjs");
-// const jwt = require("jsonwebtoken");
-// const User = require("../model/userData");
-
-// // Login route for both Admin and User
-// router.post("/login", async (req, res) => {
-//   const { email, password } = req.body;
-
-//   try {
-//     // Find user by email
-//     const account = await User.findOne({ email });
-//     if (!account) {
-//       return res.status(404).json({ message: "Account not found" });
-//     }
-
-//     // Check role
-//     if (account.role === "admin") {
-//       // Admin: compare plain password
-//       if (account.password !== password) {
-//         return res.status(400).json({ message: "Invalid admin credentials" });
-//       }
-//     } else {
-//       // User: compare bcrypt hashed password
-//       const isMatch = await bcrypt.compare(password, account.password);
-//       if (!isMatch) {
-//         return res.status(400).json({ message: "Invalid user credentials" });
-//       }
-//     }
-
-//     // Generate JWT token
-//     const token = jwt.sign(
-//       { id: account._id, role: account.role },
-//       process.env.JWT_SECRET,
-      
-//     );
-
-//     res.status(200).json({
-//       message: `${account.role} login successful`,
-//       token,
-//       user: {
-//         id: account._id,
-//         email: account.email,
-//         role: account.role,
-//       },
-//     });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ message: "Server error" });
-//   }
-// });
-
-// module.exports = router;
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const multer = require("multer");
-const XLSX = require("xlsx");
-const nodemailer = require("nodemailer");
 const User = require("../model/userData");
 
-// 🔐 Environment setup (dotenv used in server.js)
-const JWT_SECRET = process.env.JWT_SECRET;
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL; // optional
+/**
+ * ✅ Middleware: Authenticate user or admin
+ */
+function authenticate(req, res, next) {
+  const authHeader = req.headers.authorization;
 
-// Email Transporter
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.SMTP_EMAIL,
-    pass: process.env.SMTP_PASSWORD,
-  },
-});
-
-// ✅ 1. Admin Signup Route
-router.post("/signup", async (req, res) => {
-  try {
-    const { name, email, password, gender, city, country } = req.body;
-
-    const existing = await User.findOne({ email });
-    if (existing) return res.status(400).json({ message: "Email already exists" });
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const adminUser = new User({
-      name,
-      email,
-      password: hashedPassword,
-      gender,
-      city,
-      country,
-      role: "admin"
-    });
-
-    await adminUser.save();
-
-    res.status(201).json({ message: "Admin registered successfully" });
-  } catch (err) {
-    res.status(500).json({ message: "Signup failed" });
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ message: "Authorization token missing" });
   }
-});
 
-// ✅ 2. Admin Login Route
-router.post("/login", async (req, res) => {
-  const { email, password } = req.body;
+  const token = authHeader.split(" ")[1];
 
   try {
-    const account = await User.findOne({ email });
-    if (!account) return res.status(404).json({ message: "Account not found" });
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || "resApp");
 
-    const isMatch = await bcrypt.compare(password, account.password);
-    if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
-
-    account.lastLoginAt = new Date();
-    await account.save();
-
-    const token = jwt.sign({ id: account._id, role: account.role }, JWT_SECRET, {
-      expiresIn: "1d",
-    });
-
-    res.status(200).json({
-      message: `${account.role} login successful`,
-      token,
-      user: { id: account._id, email: account.email, role: account.role },
-    });
-  } catch (error) {
-    res.status(500).json({ message: "Server error" });
-  }
-});
-
-// ✅ 3. Middleware to check admin access
-const verifyAdmin = async (req, res, next) => {
-  const token = req.headers.authorization?.split(" ")[1];
-  if (!token) return res.status(401).json({ message: "Unauthorized" });
-
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    req.user = decoded;
-    if (decoded.role !== "admin") {
-      return res.status(403).json({ message: "Forbidden: Admins only" });
-    }
+    // Attach user data and role to the request
+    req.user = {
+      id: decoded.id,
+      role: decoded.role,
+      email: decoded.email,
+    };
     next();
   } catch (err) {
-    return res.status(401).json({ message: "Invalid token" });
+    console.error("JWT Verification failed:", err);
+    return res.status(401).json({ message: "Invalid or expired token" });
   }
-};
+}
 
-// ✅ 4. Upload Setup
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, "uploads/excels"),
-  filename: (req, file, cb) => cb(null, `${Date.now()}-${file.originalname}`),
-});
-const upload = multer({ storage });
+/**
+ * ✅ Combined Change Password Route (for both user and admin)
+ */
+router.put("/change-password", authenticate, async (req, res) => {
+  const { currentPassword, newPassword, confirmPassword } = req.body;
 
-// ✅ 5. Admin Upload Excel to Create Users
-router.post("/upload-users", verifyAdmin, upload.single("file"), async (req, res) => {
+  // ✅ Validate inputs
+  if (!currentPassword || !newPassword || !confirmPassword) {
+    return res.status(400).json({ message: "All fields are required" });
+  }
+
+  if (newPassword !== confirmPassword) {
+    return res.status(400).json({ message: "New passwords do not match" });
+  }
+
   try {
-    const workbook = XLSX.readFile(req.file.path);
-    const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    const users = XLSX.utils.sheet_to_json(sheet);
+    // ✅ Find the user/admin from token
+    const user = await User.findById(req.user.id);
 
-    const newUsers = [];
-
-    for (const u of users) {
-      const { name, email, gender, city, country } = u;
-
-      if (!email) continue;
-      const existing = await User.findOne({ email });
-      if (existing) continue;
-
-      const plainPassword = Math.random().toString(36).slice(-8);
-      const hashedPassword = await bcrypt.hash(plainPassword, 10);
-
-      const user = new User({
-        name,
-        email,
-        password: hashedPassword,
-        gender,
-        city,
-        country,
-        role: "user",
-      });
-
-      await user.save();
-      newUsers.push(user);
-
-      // Send password via email
-      await transporter.sendMail({
-        from: process.env.SMTP_EMAIL,
-        to: email,
-        subject: "Your Account Credentials",
-        text: `Hi ${name},\n\nYour account has been created.\nEmail: ${email}\nPassword: ${plainPassword}\n\nPlease log in and change your password.`,
-      });
+    if (!user) {
+      return res.status(404).json({ message: "User/Admin not found" });
     }
 
-    res.json({ message: `${newUsers.length} users created and emailed.` });
+    // ✅ Verify current password
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: "Current password is incorrect" });
+    }
+
+    // ✅ Hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // ✅ Update password
+    user.password = hashedPassword;
+    await user.save();
+
+    res.status(200).json({
+      message: `${req.user.role === "admin" ? "Admin" : "User"} password changed successfully`,
+    });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "User import failed" });
+    console.error("Change Password Error:", err);
+    res.status(500).json({ message: "Server error while changing password" });
   }
 });
 

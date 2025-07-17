@@ -1,56 +1,303 @@
+// const express = require("express");
+// const router = express.Router();
+// const multer = require("multer");
+// const xlsx = require("xlsx");
+// const bcrypt = require("bcryptjs");
+// const User = require("../model/userData");
+// const nodemailer = require("nodemailer");
+
+// // Multer config
+// const upload = multer({ dest: "uploads/" });
+
+// // Upload route
+// router.post("/upload-users", upload.single("file"), async (req, res) => {
+//   try {
+//     const workbook = xlsx.readFile(req.file.path);
+//     const sheet = workbook.Sheets[workbook.SheetNames[0]];
+//     const usersData = xlsx.utils.sheet_to_json(sheet);
+
+//     for (let user of usersData) {
+//       const plainPassword = generatePassword(); // generate random password
+//       const hashedPassword = await bcrypt.hash(plainPassword, 10);
+
+//       // Save to DB
+//       const newUser = new User({
+//         name: user.name,
+//         email: user.email,
+//         password: hashedPassword,
+//         gender: user.gender,
+//         city: user.city,
+//         country: user.country,
+//         role: "user"
+//       });
+
+//       await newUser.save();
+
+//       // Send email to user with password
+//       await sendEmail(user.email, plainPassword);
+//     }
+
+//     res.status(201).json({ message: "Users created and passwords sent" });
+
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ message: "Upload failed" });
+//   }
+// });
+
+// // Generate random password
+// function generatePassword(length = 8) {
+//   return Math.random().toString(36).slice(-length);
+// }
+
+// // Email function using nodemailer
+// async function sendEmail(to, password) {
+//   const transporter = nodemailer.createTransport({
+//     service: "gmail",
+//     auth: {
+//       user: process.env.ADMIN_EMAIL,
+//       pass: process.env.ADMIN_EMAIL_PASSWORD,
+//     },
+//   });
+
+//   const mailOptions = {
+//     from: process.env.ADMIN_EMAIL,
+//     to,
+//     subject: "Your Account Password",
+//     text: `Welcome! Your login password is: ${password}`,
+//   };
+
+//   await transporter.sendMail(mailOptions);
+// }
+
+// module.exports = router;
+
+// const express = require("express");
+// const router = express.Router();
+// const multer = require("multer");
+// const xlsx = require("xlsx");
+// const bcrypt = require("bcryptjs");
+// const User = require("../model/userData");
+// const nodemailer = require("nodemailer");
+
+// // Multer config
+// const upload = multer({ dest: "uploads/" });
+
+// // POST /upload-users route
+// router.post("/upload-users", upload.single("file"), async (req, res) => {
+//   try {
+//     // Read Excel file
+//     const workbook = xlsx.readFile(req.file.path);
+//     const sheet = workbook.Sheets[workbook.SheetNames[0]];
+//     const usersData = xlsx.utils.sheet_to_json(sheet);
+
+//     let createdUsers = [];
+//     let skippedUsers = [];
+
+//     for (let user of usersData) {
+//       try {
+//         // Check if user already exists
+//         const existingUser = await User.findOne({ email: user.email });
+//         if (existingUser) {
+//           skippedUsers.push(user.email); // Track skipped emails
+//           continue; // Skip this user
+//         }
+
+//         // Generate and hash password
+//         const plainPassword = generatePassword(); // random password
+//         const hashedPassword = await bcrypt.hash(plainPassword, 10);
+
+//         // Save to DB
+//         const newUser = new User({
+//           name: user.name,
+//           email: user.email,
+//           password: hashedPassword,
+//           gender: user.gender,
+//           city: user.city,
+//           country: user.country,
+//           role: "user"
+//         });
+
+//         await newUser.save();
+
+//         // Send email to user with their password
+//         await sendEmail(user.email, plainPassword);
+
+//         createdUsers.push(user.email); // Track successfully created users
+
+//       } catch (innerError) {
+//         console.error(`Error processing user ${user.email}:`, innerError);
+//         skippedUsers.push(user.email);
+//       }
+//     }
+
+//     res.status(201).json({
+//       message: "Upload completed",
+//       created: createdUsers,
+//       skipped: skippedUsers,
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ message: "Upload failed" });
+//   }
+// });
+
+// // Generate random password
+// function generatePassword(length = 8) {
+//   const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$!";
+//   let password = "";
+//   for (let i = 0; i < length; i++) {
+//     password += chars.charAt(Math.floor(Math.random() * chars.length));
+//   }
+//   return password;
+// }
+
+// // Email function using nodemailer
+// async function sendEmail(to, password) {
+//   const transporter = nodemailer.createTransport({
+//     service: "gmail",
+//     auth: {
+//       user: process.env.ADMIN_EMAIL,
+//       pass: process.env.ADMIN_EMAIL_PASSWORD,
+//     },
+//   });
+
+//   const mailOptions = {
+//     from: `"Admin" <${process.env.ADMIN_EMAIL}>`,
+//     to,
+//     subject: "Your Account Password",
+//     text: `Welcome to Video Gallery! Your login password is: ${password}`,
+//   };
+
+//   await transporter.sendMail(mailOptions);
+// }
+
+// module.exports = router;
+
+
 const express = require("express");
 const router = express.Router();
 const multer = require("multer");
 const xlsx = require("xlsx");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 const User = require("../model/userData");
 const nodemailer = require("nodemailer");
+
+const JWT_SECRET = process.env.JWT_SECRET ; // fallback for development
 
 // Multer config
 const upload = multer({ dest: "uploads/" });
 
-// Upload route
-router.post("/upload-users", upload.single("file"), async (req, res) => {
+/**
+ * ✅ Middleware: Authenticate admin with JWT token
+ */
+function authenticateAdmin(req, res, next) {
+  const authHeader = req.headers.authorization;
+
+  // Check if Authorization header is present
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ message: "Authorization token missing" });
+  }
+
+  const token = authHeader.split(" ")[1];
+
   try {
-    const workbook = xlsx.readFile(req.file.path);
-    const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    const usersData = xlsx.utils.sheet_to_json(sheet);
+    const decoded = jwt.verify(token, JWT_SECRET);
 
-    for (let user of usersData) {
-      const plainPassword = generatePassword(); // generate random password
-      const hashedPassword = await bcrypt.hash(plainPassword, 10);
-
-      // Save to DB
-      const newUser = new User({
-        name: user.name,
-        email: user.email,
-        password: hashedPassword,
-        gender: user.gender,
-        city: user.city,
-        country: user.country,
-        role: "user"
-      });
-
-      await newUser.save();
-
-      // Send email to user with password
-      await sendEmail(user.email, plainPassword);
+    if (decoded.role !== "admin") {
+      return res.status(403).json({ message: "Access denied: Admins only" });
     }
 
-    res.status(201).json({ message: "Users created and passwords sent" });
-
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Upload failed" });
+    req.admin = decoded; // Attach admin data to request
+    next();
+  } catch (err) {
+    console.error("JWT Verification failed:", err);
+    return res.status(401).json({ message: "Invalid or expired token" });
   }
-});
-
-// Generate random password
-function generatePassword(length = 8) {
-  return Math.random().toString(36).slice(-length);
 }
 
-// Email function using nodemailer
+/**
+ * ✅ POST /upload-users (Protected Route)
+ */
+router.post(
+  "/upload-users",
+  authenticateAdmin, // 👈 Only admins with valid token can access
+  upload.single("file"),
+  async (req, res) => {
+    try {
+      // Read Excel file
+      const workbook = xlsx.readFile(req.file.path);
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      const usersData = xlsx.utils.sheet_to_json(sheet);
+
+      let createdUsers = [];
+      let skippedUsers = [];
+
+      for (let user of usersData) {
+        try {
+          // Check if user already exists
+          const existingUser = await User.findOne({ email: user.email });
+          if (existingUser) {
+            skippedUsers.push(user.email); // Track skipped emails
+            continue; // Skip this user
+          }
+
+          // Generate and hash password
+          const plainPassword = generatePassword();
+          const hashedPassword = await bcrypt.hash(plainPassword, 10);
+
+          // Save to DB
+          const newUser = new User({
+            name: user.name,
+            email: user.email,
+            password: hashedPassword,
+            gender: user.gender,
+            city: user.city,
+            country: user.country,
+            role: "user",
+          });
+
+          await newUser.save();
+
+          // Send email to user with their password
+          await sendEmail(user.email, plainPassword);
+
+          createdUsers.push(user.email); // Track successfully created users
+        } catch (innerError) {
+          console.error(`Error processing user ${user.email}:`, innerError);
+          skippedUsers.push(user.email);
+        }
+      }
+
+      res.status(201).json({
+        message: "Upload completed",
+        created: createdUsers,
+        skipped: skippedUsers,
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Upload failed" });
+    }
+  }
+);
+
+/**
+ * ✅ Generate random password
+ */
+function generatePassword(length = 8) {
+  const chars =
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$!";
+  let password = "";
+  for (let i = 0; i < length; i++) {
+    password += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return password;
+}
+
+/**
+ * ✅ Email function using nodemailer
+ */
 async function sendEmail(to, password) {
   const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -61,14 +308,13 @@ async function sendEmail(to, password) {
   });
 
   const mailOptions = {
-    from: process.env.ADMIN_EMAIL,
+    from: `"Admin" <${process.env.ADMIN_EMAIL}>`,
     to,
     subject: "Your Account Password",
-    text: `Welcome! Your login password is: ${password}`,
+    text: `Welcome to Video Gallery! Your login password is: ${password}`,
   };
 
   await transporter.sendMail(mailOptions);
 }
 
 module.exports = router;
-

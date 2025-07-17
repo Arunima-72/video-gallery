@@ -15,10 +15,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true })); 
 
 const uploadroutes = require('./routes/uploadroutes');
-app.use('/upload', uploadroutes);
+const userRoutes= require('./routes/userRoutes')
 
-const userRoutes = require('./routes/userRoutes');
-app.use('/user', userRoutes);
+app.use('/upload', uploadroutes);
+app.use('/change', userRoutes);
+
+const authRoutes = require('./routes/auth');
+app.use('/user', authRoutes);
 app.listen(3000,() => {
     console.log(`Server running on port 3000`);
 });
