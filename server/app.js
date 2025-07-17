@@ -14,7 +14,8 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); 
 
-
+const uploadroutes = require('./routes/uploadroutes');
+app.use('/upload', uploadroutes);
 
 const userRoutes = require('./routes/userRoutes');
 app.use('/user', userRoutes);
