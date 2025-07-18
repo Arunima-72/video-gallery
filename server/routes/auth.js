@@ -3,6 +3,7 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
 const User = require("../model/userData");
+const nodemailer = require("nodemailer");
 
 // ✅ Admin Signup Route
 router.post("/admin/signup", async (req, res) => {
@@ -146,6 +147,103 @@ router.post("/login", async (req, res) => {
     res.status(500).json({ message: "Server error during login" });
   }
 });
+
+
+
+/**
+ * ✅ Forgot Password (Send Reset Link)
+ */
+router.post("/forgot-password", async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ message: "Email is required" });
+  }
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "No user found with this email" });
+    }
+
+    // Generate reset token (valid for 15 min)
+    const resetToken = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, {
+      expiresIn: "15m",
+    });
+
+    const resetLink = `http://localhost:3000/reset-password/${resetToken}`;
+      console.log("RESET LINK:", resetLink); 
+    await sendResetEmail(user.email, resetLink);
+
+    res.status(200).json({ message: "Reset link sent to your email" });
+  } catch (err) {
+    console.error("Forgot Password Error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+/**
+ * ✅ Reset Password (via Reset Link)
+ */
+router.post("/reset-password/:token", async (req, res) => {
+  const { token } = req.params;
+  const { newPassword, confirmPassword } = req.body;
+
+  if (!newPassword || !confirmPassword) {
+    return res.status(400).json({ message: "All fields are required" });
+  }
+
+  if (newPassword !== confirmPassword) {
+    return res.status(400).json({ message: "Passwords do not match" });
+  }
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const user = await User.findById(decoded.id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    user.password = await bcrypt.hash(newPassword, 10);
+    await user.save();
+
+    res.status(200).json({ message: "Password reset successfully" });
+  } catch (err) {
+    console.error("Reset Password Error:", err);
+    if (err.name === "TokenExpiredError") {
+      return res.status(400).json({ message: "Reset link expired" });
+    }
+    res.status(500).json({ message: "Invalid or expired reset token" });
+  }
+});
+
+/**
+ * 📧 Send Reset Email
+ */
+async function sendResetEmail(to, resetLink) {
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.ADMIN_EMAIL,
+      pass: process.env.ADMIN_EMAIL_PASSWORD,
+    },
+  });
+
+  const mailOptions = {
+    from: `"Support" <${process.env.ADMIN_EMAIL}>`,
+    to,
+    subject: "Reset Your Password",
+    html: `
+      <h3>Password Reset</h3>
+      <p>Click below to reset your password:</p>
+      <a href="${resetLink}" target="_blank">${resetLink}</a>
+      <p>This link is valid for 15 minutes.</p>
+    `,
+  };
+
+  await transporter.sendMail(mailOptions);
+}
 
 
 

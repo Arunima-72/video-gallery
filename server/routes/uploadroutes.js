@@ -285,7 +285,7 @@ router.post(
 /**
  * ✅ Generate random password
  */
-function generatePassword(length = 8) {
+function generatePassword(length = 6) {
   const chars =
     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$!";
   let password = "";
