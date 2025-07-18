@@ -100,51 +100,93 @@ const JWT_SECRET = process.env.JWT_SECRET || "resApp"; // Use .env in production
 //   }
 // });
 
-router.post("/login", async (req, res) => {
-  const { email, password, role } = req.body;
+// router.post("/login", async (req, res) => {
+//   const { email, password, role } = req.body;
 
-  // ✅ Validation
-  if (!email || !password || !role) {
-    return res.status(400).json({ message: "Email, password and role are required" });
-  }
+//   // ✅ Validation
+//   if (!email || !password || !role) {
+//     return res.status(400).json({ message: "Email, password and role are required" });
+//   }
 
-  if (!["admin", "user"].includes(role)) {
-    return res.status(400).json({ message: "Role must be either 'admin' or 'user'" });
+//   if (!["admin", "user"].includes(role)) {
+//     return res.status(400).json({ message: "Role must be either 'admin' or 'user'" });
+//   }
+
+//   try {
+//     // ✅ Find user with specified role
+//     const user = await User.findOne({ email, role });
+//     if (!user) {
+//       return res.status(401).json({ message: "Invalid credentials or role" });
+//     }
+
+//     // ✅ Compare password
+//     const isMatch = await bcrypt.compare(password, user.password);
+//     if (!isMatch) {
+//       return res.status(401).json({ message: "Invalid credentials" });
+//     }
+
+//     // ✅ Generate JWT Token
+//     const token = jwt.sign(
+//       {
+//         id: user._id,
+//         email: user.email,
+//         role: user.role, // important for role-based authorization
+//       },
+//       JWT_SECRET,
+//       { expiresIn: "2h" } // token expiry
+//     );
+
+//     res.status(200).json({
+//       message: `${role.charAt(0).toUpperCase() + role.slice(1)} logged in successfully`,
+//       token, // client should store and use this
+//       role: user.role,
+//       userId: user._id,
+//     });
+//   } catch (err) {
+//     console.error("Login Error:", err.message);
+//     res.status(500).json({ message: "Server error during login" });
+//   }
+// });
+
+
+// LOGIN ROUTE                                                       // edited login 18/7
+router.post('/login', async (req, res) => {
+  const { email, password } = req.body;
+
+  // Check if email and password are provided
+  if (!email || !password) {
+    return res.status(400).json({ message: 'Email and password are required' });
   }
 
   try {
-    // ✅ Find user with specified role
-    const user = await User.findOne({ email, role });
+    // Find user by email
+    const user = await User.findOne({ email });
     if (!user) {
-      return res.status(401).json({ message: "Invalid credentials or role" });
+      return res.status(404).json({ message: 'User not found' });
     }
 
-    // ✅ Compare password
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(401).json({ message: "Invalid credentials" });
+    // Compare entered password with hashed password
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: 'Incorrect password' });
     }
 
-    // ✅ Generate JWT Token
+    // Generate JWT with user's email and role
     const token = jwt.sign(
-      {
-        id: user._id,
-        email: user.email,
-        role: user.role, // important for role-based authorization
-      },
+      { email: user.email, role: user.role },
       JWT_SECRET,
-      { expiresIn: "2h" } // token expiry
+      { expiresIn: '1h' } // optional: token expiry time
     );
 
+    // Respond with token and user role
     res.status(200).json({
-      message: `${role.charAt(0).toUpperCase() + role.slice(1)} logged in successfully`,
-      token, // client should store and use this
-      role: user.role,
-      userId: user._id,
+      message: 'Login successful',
+      token,
+      role: user.role, // frontend can use this to redirect
     });
   } catch (err) {
-    console.error("Login Error:", err.message);
-    res.status(500).json({ message: "Server error during login" });
+    console.error('Error during login:', err);
+    res.status(500).json({ message: 'Server error during login' });
   }
 });
 
