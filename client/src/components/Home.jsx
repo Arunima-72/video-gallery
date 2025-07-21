@@ -363,12 +363,13 @@ const Home = () => {
       </Box>
 
       {/* Toast Notification */}
-      <Snackbar
+       <Snackbar
         open={toastOpen}
         autoHideDuration={3000}
         onClose={() => setToastOpen(false)}
         message="Please login to explore videos"
-      />
+      /> 
+      
 
       {/* Confirmation Modal */}
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
