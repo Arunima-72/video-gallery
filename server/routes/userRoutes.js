@@ -109,6 +109,7 @@ function authenticate(req, res, next) {
   }
 }
 
+
 /**
  * ✅ Combined Change Password Route (for both user and admin)
  */
@@ -153,5 +154,18 @@ router.put("/change-password", authenticate, async (req, res) => {
     res.status(500).json({ message: "Server error while changing password" });
   }
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 module.exports = router;

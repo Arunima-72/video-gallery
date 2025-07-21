@@ -16,9 +16,11 @@ app.use(express.urlencoded({ extended: true }));
 
 const uploadroutes = require('./routes/uploadroutes');
 const userRoutes= require('./routes/userRoutes')
+const routesUser = require('./routes/routesUser');
 
 app.use('/upload', uploadroutes);
 app.use('/change', userRoutes);
+app.use('/editprofile', routesUser);
 
 const authRoutes = require('./routes/auth');
 app.use('/user', authRoutes);
