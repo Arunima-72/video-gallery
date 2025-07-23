@@ -317,4 +317,21 @@ async function sendEmail(to, password) {
   await transporter.sendMail(mailOptions);
 }
 
+
+
+/**
+ * ✅ GET /get-users (Protected Route)      //updated on 2025-07-20 fetch all users
+ */
+router.get('/get-users', authenticateAdmin, async (req, res) => {
+  try {
+    const users = await User.find({role:'user'}, 'name email '); // Only needed fields
+    res.json({ users });
+  } catch (err) {
+    console.error('Error fetching users:', err);
+    res.status(500).json({ message: 'Failed to fetch users' });
+  }
+});
+
+
+
 module.exports = router;

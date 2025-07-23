@@ -232,7 +232,157 @@
 // export default Login;
 
 
-import React, { useState } from 'react';
+// import React, { useState } from 'react';
+// import {
+//   Dialog,
+//   DialogContent,
+//   TextField,
+//   Button,
+//   Typography,
+//   Link,
+//   Box,
+//   IconButton,
+//   Alert,
+// } from '@mui/material';
+// import CloseIcon from '@mui/icons-material/Close';
+// import { useNavigate } from 'react-router-dom';
+// import axios from 'axios';
+// import logo from '../assets/download.png'; // Replace with your logo path
+
+// const Login = ({ open, handleClose }) => {
+//   const navigate = useNavigate();
+
+//   const [formData, setFormData] = useState({ email: '', password: '' });
+//   const [error, setError] = useState('');
+
+//   const handleChange = (e) => {
+//     setFormData((prev) => ({
+//       ...prev,
+//       [e.target.name]: e.target.value,
+//     }));
+//   };
+
+//   const handleLogin = async () => {
+//     setError(''); // Clear any previous error
+
+//     if (!formData.email || !formData.password) {
+//       setError('Please enter both email and password.');
+//       return;
+//     }
+
+//     try {
+//       const response = await axios.post('http://localhost:3000/user/login', formData);
+//       const { token, role } = response.data;
+
+//       // Save token and role in localStorage
+//       localStorage.setItem('token', token);
+//       localStorage.setItem('role', role);
+
+//       // Redirect based on role
+//       if (role === 'admin') {
+//         navigate('/admin/dashboard');
+//       } else {
+//         navigate('/user/dashboard');
+//       }
+
+//       handleClose(); // Close the dialog after login
+//     } catch (err) {
+//       setError(err.response?.data?.message || 'Login failed. Please try again.');
+//     }
+//   };
+
+//   return (
+//     <Dialog open={open} onClose={handleClose}>
+//       <DialogContent sx={{ p: 4, width: 400, textAlign: 'center', position: 'relative' }}>
+//         {/* Close Button */}
+//         <IconButton
+//           onClick={handleClose}
+//           sx={{ position: 'absolute', top: 8, right: 8 }}
+//         >
+//           <CloseIcon />
+//         </IconButton>
+
+//         {/* Logo */}
+//         <Box sx={{ mb: 2 }}>
+//           <img
+//             src={logo}
+//             alt="App Logo"
+//             width={100}
+//             height={100}
+//             style={{ borderRadius: '12px' }}
+//           />
+//         </Box>
+
+//         <Typography variant="h5" gutterBottom>
+//           Login
+//         </Typography>
+
+//         {/* Error Message */}
+//         {error && (
+//           <Alert severity="error" sx={{ mb: 2 }}>
+//             {error}
+//           </Alert>
+//         )}
+
+//         {/* Email Input */}
+//         <TextField
+//           label="Email"
+//           name="email"
+//           value={formData.email}
+//           onChange={handleChange}
+//           variant="standard"
+//           fullWidth
+//           sx={{ mb: 2 }}
+//         />
+
+//         {/* Password Input */}
+//         <TextField
+//           label="Password"
+//           name="password"
+//           type="password"
+//           value={formData.password}
+//           onChange={handleChange}
+//           variant="standard"
+//           fullWidth
+//           sx={{ mb: 3 }}
+//         />
+
+//         {/* Login Button */}
+//         <Button
+//           onClick={handleLogin}
+//           variant="contained"
+//           fullWidth
+//           sx={{
+//             mb: 2,
+//             background: 'linear-gradient(to right, #4facfe, #00f2fe)',
+//             borderRadius: 8,
+//           }}
+//         >
+//           Login
+//         </Button>
+
+//         {/* Links */}
+//         <Box
+//           sx={{
+//             display: 'flex',
+//             justifyContent: 'space-between',
+//             fontSize: 14,
+//           }}
+//         >
+//           <Link href="/signup" underline="hover">
+//             Create an account
+//           </Link>
+//           <Link href="/forgot-password" underline="hover">
+//             Forgot password?
+//           </Link>
+//         </Box>
+//       </DialogContent>
+//     </Dialog>
+//   );
+// };
+
+// export default Login;
+import React, { useState } from 'react';   // updated login 20/7
 import {
   Dialog,
   DialogContent,
@@ -243,67 +393,79 @@ import {
   Box,
   IconButton,
   Alert,
+  CircularProgress,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import logo from '../assets/download.png'; // Replace with your logo path
+import logo from '../assets/download.png';
 
 const Login = ({ open, handleClose }) => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({ email: '', password: '' });
-  const [error, setError] = useState('');
+  const [formErrors, setFormErrors] = useState({ email: '', password: '' });
+  const [serverError, setServerError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormErrors((prev) => ({ ...prev, [name]: '' }));
+    setServerError('');
+  };
+
+  const validate = () => {
+    const errors = {};
+    if (!formData.email) errors.email = 'Email is required.';
+    if (!formData.password) errors.password = 'Password is required.';
+    return errors;
   };
 
   const handleLogin = async () => {
-    setError(''); // Clear any previous error
-
-    if (!formData.email || !formData.password) {
-      setError('Please enter both email and password.');
+    const errors = validate();
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
       return;
     }
 
+    setLoading(true);
     try {
       const response = await axios.post('http://localhost:3000/user/login', formData);
       const { token, role } = response.data;
 
-      // Save token and role in localStorage
+      // Store token and role in localStorage (default)
       localStorage.setItem('token', token);
       localStorage.setItem('role', role);
 
-      // Redirect based on role
-      if (role === 'admin') {
-        navigate('/admin/dashboard');
-      } else {
-        navigate('/user/dashboard');
-      }
-
-      handleClose(); // Close the dialog after login
+      handleClose();
+      navigate(role === 'admin' ? '/admin/dashboard' : '/user/dashboard');
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed. Please try again.');
+      const msg = err.response?.data?.message || 'Login failed. Please try again.';
+      setServerError(msg);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <Dialog open={open} onClose={handleClose}>
-      <DialogContent sx={{ p: 4, width: 400, textAlign: 'center', position: 'relative' }}>
+      <DialogContent
+        sx={{
+          p: 4,
+          width: 400,
+          textAlign: 'center',
+          position: 'relative',
+          borderRadius: 4,
+        }}
+      >
         {/* Close Button */}
-        <IconButton
-          onClick={handleClose}
-          sx={{ position: 'absolute', top: 8, right: 8 }}
-        >
+        <IconButton onClick={handleClose} sx={{ position: 'absolute', top: 8, right: 8 }}>
           <CloseIcon />
         </IconButton>
 
         {/* Logo */}
-        <Box sx={{ mb: 2 }}>
+        <Box sx={{ mb: 1 }}>
           <img
             src={logo}
             alt="App Logo"
@@ -313,18 +475,19 @@ const Login = ({ open, handleClose }) => {
           />
         </Box>
 
-        <Typography variant="h5" gutterBottom>
+        {/* Title */}
+        <Typography variant="h4" fontWeight="bold" gutterBottom>
           Login
         </Typography>
 
-        {/* Error Message */}
-        {error && (
+        {/* Server Error */}
+        {serverError && (
           <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
+            {serverError}
           </Alert>
         )}
 
-        {/* Email Input */}
+        {/* Email */}
         <TextField
           label="Email"
           name="email"
@@ -332,10 +495,12 @@ const Login = ({ open, handleClose }) => {
           onChange={handleChange}
           variant="standard"
           fullWidth
+          error={!!formErrors.email}
+          helperText={formErrors.email}
           sx={{ mb: 2 }}
         />
 
-        {/* Password Input */}
+        {/* Password */}
         <TextField
           label="Password"
           name="password"
@@ -344,7 +509,9 @@ const Login = ({ open, handleClose }) => {
           onChange={handleChange}
           variant="standard"
           fullWidth
-          sx={{ mb: 3 }}
+          error={!!formErrors.password}
+          helperText={formErrors.password}
+          sx={{ mb: 2 }}
         />
 
         {/* Login Button */}
@@ -352,26 +519,22 @@ const Login = ({ open, handleClose }) => {
           onClick={handleLogin}
           variant="contained"
           fullWidth
+          disabled={loading}
           sx={{
             mb: 2,
-            background: 'linear-gradient(to right, #4facfe, #00f2fe)',
+            height: 44,
             borderRadius: 8,
+            background: 'linear-gradient(to right, #4facfe, #00f2fe)',
+            '&:hover': {
+              background: 'linear-gradient(to right, #3f88fc, #00d9ea)',
+            },
           }}
         >
-          Login
+          {loading ? <CircularProgress size={24} sx={{ color: '#fff' }} /> : 'Login'}
         </Button>
 
-        {/* Links */}
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            fontSize: 14,
-          }}
-        >
-          <Link href="/signup" underline="hover">
-            Create an account
-          </Link>
+        {/* Forgot Password */}
+        <Box sx={{ textAlign: 'right', fontSize: 14 }}>
           <Link href="/forgot-password" underline="hover">
             Forgot password?
           </Link>
@@ -382,3 +545,4 @@ const Login = ({ open, handleClose }) => {
 };
 
 export default Login;
+
