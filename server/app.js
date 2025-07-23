@@ -24,11 +24,11 @@ const routesUser = require('./routes/routesUser');
 
 app.use('/upload', uploadroutes);
 app.use('/change', userRoutes);
-<<<<<<< HEAD
+
 app.use('/editprofile', routesUser);
-=======
+
 app.use('/admin', adminroutes);
->>>>>>> 350b3766e9c9e12fc5013a75178b57cea1e68689
+
 
 const authRoutes = require('./routes/auth');
 app.use('/user', authRoutes);

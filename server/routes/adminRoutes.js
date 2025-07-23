@@ -11,6 +11,8 @@ const Stack = require("../model/stackData");
 const Video = require("../model/videoData");
 const fs = require("fs");
 const path = require("path");
+const upload = multer({ dest: "uploads/" }); // or your custom storage config
+
 // ------------------ Middleware (Inline) ------------------
 const authenticateAdmin = (req, res, next) => {
   const token = req.headers.authorization?.split(" ")[1];
@@ -81,6 +83,65 @@ router.delete('/stack/:id', authenticateAdmin, async (req, res) => {
   }
 });
 
+// router.put('/edit/stack/:id', authenticateAdmin, async (req, res) => {
+//   try {
+//     const { name, image } = req.body; // Get updated fields from request body
+
+//     const updatedStack = await Stack.findByIdAndUpdate(
+//       req.params.id,
+//       { name, image }, // Update fields
+//       { new: true, runValidators: true } // Return the updated document
+//     );
+
+//     if (!updatedStack) {
+//       return res.status(404).json({ message: 'Stack not found' });
+//     }
+
+//     res.json({ message: 'Stack updated', stack: updatedStack });
+//   } catch (err) {
+//     res.status(400).json({ error: err.message });
+//   }
+// });
+
+
+
+
+
+router.put(
+  '/edit/stack/:id',
+  authenticateAdmin,
+  upload.single("image"), // Handle single image upload
+  async (req, res) => {
+    try {
+      const { name } = req.body; // Text field
+
+      const updateData = { name };
+
+      // If a new image is uploaded, update the image field too
+      if (req.file) {
+        updateData.image = req.file.filename;
+      }
+
+      const updatedStack = await Stack.findByIdAndUpdate(
+        req.params.id,
+        updateData,
+        { new: true, runValidators: true } // Return updated document
+      );
+
+      if (!updatedStack) {
+        return res.status(404).json({ message: "Stack not found" });
+      }
+
+      res.json({ message: "Stack updated", stack: updatedStack });
+    } catch (err) {
+      console.error(err);
+      res.status(400).json({ error: err.message });
+    }
+  }
+);
+
+
+
 // ------------------ Category Routes ------------------
 // router.post('/category', authenticateAdmin, async (req, res) => {
 //   try {
@@ -121,6 +182,41 @@ router.delete('/category/:id', authenticateAdmin, async (req, res) => {
   }
 });
 
+
+router.put(
+  '/edit/category/:id',
+  authenticateAdmin,
+  upload.single("image"),
+  async (req, res) => {
+    try {
+      const { name } = req.body;
+      const updateData = { name };
+
+      if (req.file) {
+        updateData.image = req.file.filename;
+      }
+
+      const updatedCategory = await Category.findByIdAndUpdate(
+        req.params.id,
+        updateData,
+        { new: true, runValidators: true }
+      );
+
+      if (!updatedCategory) {
+        return res.status(404).json({ message: "Category not found" });
+      }
+
+      res.json({ message: "Category updated", category: updatedCategory });
+    } catch (err) {
+      console.error(err);
+      res.status(400).json({ error: err.message });
+    }
+  }
+);
+
+
+
+
 // ------------------ SubCategory Routes ------------------
 // router.post('/sub-category', authenticateAdmin, async (req, res) => {
 //   try {
@@ -160,6 +256,42 @@ router.delete('/sub-category/:id', authenticateAdmin, async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 });
+
+router.put(
+  '/edit/sub-category/:id',
+  authenticateAdmin,
+  upload.single("image"),
+  async (req, res) => {
+    try {
+      const { name } = req.body;
+      const updateData = { name };
+
+      if (req.file) {
+        updateData.image = req.file.filename;
+      }
+
+      const updatedSubCategory = await SubCategory.findByIdAndUpdate(
+        req.params.id,
+        updateData,
+        { new: true, runValidators: true }
+      );
+
+      if (!updatedSubCategory) {
+        return res.status(404).json({ message: "Sub-category not found" });
+      }
+
+      res.json({
+        message: "Sub-category updated",
+        subCategory: updatedSubCategory,
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(400).json({ error: err.message });
+    }
+  }
+);
+
+
 
 // ------------------ Video Routes ------------------
 router.post('/video', authenticateAdmin, uploadVideo.single('file'), async (req, res) => {
@@ -227,5 +359,53 @@ router.get('/sub-category', authenticateAdmin, async (req, res) => {
   const subCategories = await SubCategory.find();
   res.json(subCategories);
 });
+router.get('/stack/:id', authenticateAdmin, async (req, res) => {
+  try {
+    const stack = await Stack.findById(req.params.id);
+
+    if (!stack) {
+      return res.status(404).json({ message: 'Stack not found' });
+    }
+
+    res.json(stack); // Return the stack data
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ error: err.message });
+  }
+});
+
+router.get('/category/:id', authenticateAdmin, async (req, res) => {
+  try {
+    const category = await Category.findById(req.params.id);
+
+    if (!category) {
+      return res.status(404).json({ message: 'Category not found' });
+    }
+
+    res.json(category);
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// GET single Sub-Category by ID
+router.get('/sub-category/:id', authenticateAdmin, async (req, res) => {
+  try {
+    const subCategory = await SubCategory.findById(req.params.id);
+
+    if (!subCategory) {
+      return res.status(404).json({ message: 'Sub-category not found' });
+    }
+
+    res.json(subCategory);
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ error: err.message });
+  }
+});
+
+
+
 
 module.exports= router;
