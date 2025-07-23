@@ -20,10 +20,15 @@ app.use(express.urlencoded({ extended: true, limit: '10gb' }));
 const adminroutes = require('./routes/adminRoutes');
 const uploadroutes = require('./routes/uploadroutes');
 const userRoutes= require('./routes/userRoutes')
+const routesUser = require('./routes/routesUser');
 
 app.use('/upload', uploadroutes);
 app.use('/change', userRoutes);
+
+app.use('/editprofile', routesUser);
+
 app.use('/admin', adminroutes);
+
 
 const authRoutes = require('./routes/auth');
 app.use('/user', authRoutes);

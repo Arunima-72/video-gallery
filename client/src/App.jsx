@@ -6,13 +6,12 @@ import './App.css'
 import Home from './components/Home'
 import { Route, Routes } from 'react-router-dom'
 import Login from './components/Login'
-
 import AdminDashboard from './components/Admin/AdminDashboard'
 import Sidebar from './components/Sidebar'
 import UserDashboard from './components/User/UserDashboard'
 
-import { SnackbarProvider } from 'notistack'
 import AddUsers from './components/Admin/AddUsers'
+import AddFormWrapper from './components/Admin/AddFormWrapper'
 function App() {
   
 
@@ -28,6 +27,10 @@ function App() {
       {/* <Route path="/admin/adduser" element={<AddUsers />} /> */}
       {/* Add more routes as needed */}
     <Route path="/admin/adduser" element={<AddUsers/>} />
+    
+<Route path="/admin/add/:type" element={<AddFormWrapper />} />
+<Route path="/admin/edit/:type/:id" element={<AddFormWrapper />} />
+
     </Routes>
     
   

@@ -54,7 +54,7 @@ router.post("/admin/signup", async (req, res) => {
 // 📂 routes/adminRoutes.js
 const jwt = require("jsonwebtoken");
 
-const JWT_SECRET = process.env.JWT_SECRET || "resApp"; // Use .env in production
+const JWT_SECRET = process.env.JWT_SECRET; // Use .env in production
 
 // ✅ Admin Login Route
 // router.post("/admin/login", async (req, res) => {
@@ -174,8 +174,7 @@ router.post('/login', async (req, res) => {
     // Generate JWT with user's email and role
     const token = jwt.sign(
       { email: user.email, role: user.role },
-      JWT_SECRET,
-      { expiresIn: '1h' } // optional: token expiry time
+      JWT_SECRET 
     );
 
     // Respond with token and user role
