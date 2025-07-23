@@ -385,7 +385,7 @@ const AdminDashboard = ({ children }) => {
           }}
         >
           <Typography variant="h5" fontWeight={700}>
-            Welcome Admin Dashboard
+            Welcome 
           </Typography>
         </Box>
 
