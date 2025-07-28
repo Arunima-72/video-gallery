@@ -524,7 +524,7 @@ const Login = ({ open, handleClose }) => {
             mb: 2,
             height: 44,
             borderRadius: 8,
-            background: 'linear-gradient(to right, #4facfe, #00f2fe)',
+            background: 'linear-gradient(to right, #4facfe, #17d9e4ff)',
             '&:hover': {
               background: 'linear-gradient(to right, #3f88fc, #00d9ea)',
             },
