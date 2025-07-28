@@ -12,6 +12,10 @@ import UserDashboard from './components/User/UserDashboard'
 
 import AddUsers from './components/Admin/AddUsers'
 import AddFormWrapper from './components/Admin/AddFormWrapper'
+import AdminVideo from './components/Admin/AdminVideo'
+import VideoPlayer from './components/Admin/VideoPlayer'
+import VideoForm from './components/Admin/VideoForm'
+
 function App() {
   
 
@@ -30,7 +34,9 @@ function App() {
     
 <Route path="/admin/add/:type" element={<AddFormWrapper />} />
 <Route path="/admin/edit/:type/:id" element={<AddFormWrapper />} />
-
+<Route path="/admin/videos" element={<AdminVideo />} />
+ <Route path="/admin/video/:id" element={<VideoPlayer />} />
+ <Route path="/admin/upload" element={<VideoForm />} />
     </Routes>
     
   
