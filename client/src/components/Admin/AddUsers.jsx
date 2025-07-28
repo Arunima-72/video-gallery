@@ -20,6 +20,7 @@ import {
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import CommonNav from '../CommonNav';
 import Sidebar from '../Sidebar';
+import axiosInstance from '../axiosInterceptor';
 
 const drawerWidthOpen = 240;
 const drawerWidthClosed = 60;
@@ -67,7 +68,7 @@ const AddUser = () => {
     formData.append('file', file);
 
     try {
-      const res = await axios.post('http://localhost:3000/upload/upload-users', formData, {
+      const res = await axiosInstance.post('http://localhost:3000/upload/upload-users', formData, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -89,7 +90,7 @@ const AddUser = () => {
     }
 
     try {
-      const res = await axios.get('http://localhost:3000/upload/get-users', {
+      const res = await axiosInstance.get('http://localhost:3000/upload/get-users', {
         headers: {
           Authorization: `Bearer ${token}`,
         },

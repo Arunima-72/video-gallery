@@ -42,8 +42,25 @@ const imageStorage = multer.diskStorage({
 
 // Video Upload
 const videoStorage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, 'uploads/videos/'),
+  destination: (req, file, cb) => cb(null, 'uploads/'),
   filename: (req, file, cb) => cb(null, `${Date.now()}-${file.originalname}`)
+});
+
+
+// 📄 PDF Upload
+const pdfStorage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, 'uploads/'),
+  filename: (req, file, cb) => cb(null, `${Date.now()}-${file.originalname}`)
+});
+
+const uploadPdf = multer({
+  storage: pdfStorage,
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype !== 'application/pdf') {
+      return cb(new Error('Only PDF format allowed!'), false);
+    }
+    cb(null, true);
+  }
 });
 
 const uploadImage = multer({ storage: imageStorage });
@@ -59,6 +76,10 @@ const uploadVideo = multer({
     cb(null, true);
   }
 });
+const uploadFiles = multer({ storage: videoStorage }).fields([
+  { name: 'file', maxCount: 1 },        // Video
+  { name: 'overviewPdf', maxCount: 1 }  // PDF
+]);
 
 // ------------------ Stack Routes ------------------
 router.post('/stack', authenticateAdmin, uploadImage.single('image'), async (req, res) => {
@@ -294,43 +315,104 @@ router.put(
 
 
 // ------------------ Video Routes ------------------
-router.post('/video', authenticateAdmin, uploadVideo.single('file'), async (req, res) => {
+router.post('/video', authenticateAdmin, uploadFiles, async (req, res) => {
   try {
     const { title, description, stack, category, subCategory } = req.body;
-    const file = req.file;
+    const videoFile = req.files['file']?.[0];
+    const pdfFile = req.files['overviewPdf']?.[0];
+
+    if (!videoFile) return res.status(400).json({ error: 'Video file is required' });
 
     const video = new Video({
       title,
       description,
-      fileUrl: file.path,
-      fileType: file.mimetype,
-      fileSize: file.size,
+      fileUrl: videoFile.path,
+      fileType: videoFile.mimetype,
+      fileSize: videoFile.size,
       uploadedBy: req.adminId,
       stack,
       category,
-      subCategory
+      subCategory,
+      overviewPdf: pdfFile ? pdfFile.path : null
     });
 
     await video.save();
     res.status(201).json(video);
   } catch (err) {
+    console.error(err);
     res.status(400).json({ error: err.message });
   }
 });
 
-router.put('/video/:id', authenticateAdmin, async (req, res) => {
+// router.post('/video', authenticateAdmin, uploadVideo.single('file'), async (req, res) => {
+//   try {
+//     const { title, description, stack, category, subCategory } = req.body;
+//     const file = req.file;
+
+//     const video = new Video({
+//       title,
+//       description,
+//       fileUrl: file.path,
+//       fileType: file.mimetype,
+//       fileSize: file.size,
+//       uploadedBy: req.adminId,
+//       stack,
+//       category,
+//       subCategory
+//     });
+
+//     await video.save();
+//     res.status(201).json(video);
+//   } catch (err) {
+//     res.status(400).json({ error: err.message });
+//   }
+// });
+router.put('/video/:id', authenticateAdmin, uploadFiles, async (req, res) => {
   try {
     const { title, description, stack, category, subCategory } = req.body;
+    const videoFile = req.files['file']?.[0];
+    const pdfFile = req.files['overviewPdf']?.[0];
 
-    const updated = await Video.findByIdAndUpdate(req.params.id, {
-      title, description, stack, category, subCategory
-    }, { new: true });
+    const updateData = {
+      title,
+      description,
+      stack,
+      category,
+      subCategory
+    };
+
+    if (videoFile) {
+      updateData.fileUrl = videoFile.path;
+      updateData.fileType = videoFile.mimetype;
+      updateData.fileSize = videoFile.size;
+    }
+
+    if (pdfFile) {
+      updateData.overviewPdf = pdfFile.path;
+    }
+
+    const updated = await Video.findByIdAndUpdate(req.params.id, updateData, { new: true });
 
     res.json(updated);
   } catch (err) {
+    console.error(err);
     res.status(400).json({ error: err.message });
   }
 });
+
+// router.put('/video/:id', authenticateAdmin, async (req, res) => {
+//   try {
+//     const { title, description, stack, category, subCategory } = req.body;
+
+//     const updated = await Video.findByIdAndUpdate(req.params.id, {
+//       title, description, stack, category, subCategory
+//     }, { new: true });
+
+//     res.json(updated);
+//   } catch (err) {
+//     res.status(400).json({ error: err.message });
+//   }
+// });
 
 router.delete('/video/:id', authenticateAdmin, async (req, res) => {
   try {
@@ -345,6 +427,282 @@ router.delete('/video/:id', authenticateAdmin, async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 });
+router.get('/videos',  async (req, res) => {
+  try {
+    const videos = await Video.find().sort({ createdAt: -1 }); // latest first
+    res.json(videos);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+router.get('/video/:id', async (req, res) => {
+  try {
+    const video = await Video.findById(req.params.id);
+    if (!video) return res.status(404).json({ message: 'Video not found' });
+
+    res.json(video);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+router.get('/public/videos', async (req, res) => {
+  const videos = await Video.find();
+  res.json(videos);
+});
+
+router.get('/public/video/:id', async (req, res) => {
+  const video = await Video.findById(req.params.id);
+  if (!video) return res.status(404).json({ message: 'Video not found' });
+  res.json(video);
+});
+
+// ------------------ Comments and Likes ------------------
+
+// 📌 Add Comment
+// router.post("/:id/comments", async (req, res) => {
+//   const { email, text } = req.body;
+//   const { videoId } = req.params;
+
+//   try {
+//     const video = await Video.findById(videoId);
+//     if (!video) return res.status(404).json({ message: "Video not found" });
+
+//     const newComment = {
+//       user: email,
+//       video: videoId,
+//       text,
+//     };
+
+//     video.comments.push(newComment);
+//     await video.save();
+
+//     res.status(201).json({ message: "Comment added", comment: newComment });
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// });
+router.post("/:id/comments", async (req, res) => {
+  const { email, text } = req.body;
+  const videoId = req.params.id;
+
+  try {
+    const video = await Video.findById(videoId);
+    if (!video) return res.status(404).json({ message: "Video not found" });
+
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const newComment = {
+      user: user._id,
+      video: videoId,
+      text,
+    };
+
+    video.comments.push(newComment);
+    await video.save();
+
+    res.status(201).json({ message: "Comment added", comment: newComment });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// 📌 Get All Comments for a Video
+router.get("/:id/comments", async (req, res) => {
+  try {
+    const video = await Video.findById(req.params.id)
+      .populate("comments.user", "name email")
+      .exec();
+
+    if (!video) return res.status(404).json({ message: "Video not found" });
+
+    res.status(200).json(video.comments);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// router.get("/:id/comments", async (req, res) => {
+//   try {
+//     const video = await Video.findById(req.params.videoId)
+//       .populate("comments.user", "name") // Populate user name
+//       .exec();
+
+//     if (!video) return res.status(404).json({ message: "Video not found" });
+
+//     res.status(200).json(video.comments);
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// });
+
+// 📌 Add Like
+// router.post("/:id/likes", async (req, res) => { //last updated
+//   const { email } = req.body;
+//   const videoId = req.params.id;
+
+//   try {
+//     const user = await User.findOne({ email });
+//     if (!user) return res.status(404).json({ message: "User not found" });
+
+//     const video = await Video.findById(videoId);
+//     if (!video) return res.status(404).json({ message: "Video not found" });
+
+//     const likeIndex = video.likes.findIndex(
+//       (like) => like.user.toString() === user._id.toString()
+//     );
+
+//     if (likeIndex !== -1) {
+//       // ❌ Unlike
+//       video.likes.splice(likeIndex, 1);
+//       await video.save();
+//       return res.status(200).json({ message: "Like removed" });
+//     }
+
+//     // ✅ Like
+//     video.likes.push({ user: user._id });
+//     await video.save();
+//     return res.status(201).json({ message: "Video liked" });
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// });
+router.post("/:id/likes", async (req, res) => {
+  const { email } = req.body;
+  const videoId = req.params.id;
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const video = await Video.findById(videoId);
+    if (!video) return res.status(404).json({ message: "Video not found" });
+
+    const likeIndex = video.likes.findIndex(
+      (like) => like.user.toString() === user._id.toString()
+    );
+
+    if (likeIndex !== -1) {
+      // ❌ Unlike
+      video.likes.splice(likeIndex, 1);
+      await video.save();
+      return res.status(200).json({ message: "Like removed" });
+    }
+
+    // ✅ Like (push with video field)
+    video.likes.push({ user: user._id, video: video._id });
+    await video.save();
+    return res.status(201).json({ message: "Video liked" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// router.post("/:id/likes", async (req, res) => {
+//   const { email } = req.body;
+//   const videoId = req.params.id;
+
+//   try {
+//     // Get user ID by email
+//     const user = await User.findOne({ email });
+//     if (!user) return res.status(404).json({ message: "User not found" });
+
+//     // Get the video
+//     const video = await Video.findById(videoId);
+//     if (!video) return res.status(404).json({ message: "Video not found" });
+
+//     // Check if user already liked
+//     const alreadyLiked = video.likes.some(
+//       (like) => like.user.toString() === user._id.toString()
+//     );
+//     if (alreadyLiked) return res.status(400).json({ message: "Already liked" });
+
+//     // Add like with ObjectId
+//     const newLike = {
+//       user: user._id,
+//       video: video._id,
+//     };
+
+//     video.likes.push(newLike);
+//     await video.save();
+
+//     res.status(201).json({ message: "Video liked", like: newLike });
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// });
+
+
+// 📌 Get Like Count
+// router.get("/:videoId/likes", async (req, res) => {
+//   try {
+//     const video = await Video.findById(req.params.videoId);
+//     if (!video) return res.status(404).json({ message: "Video not found" });
+
+//     res.status(200).json({ likeCount: video.likes.length });
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// });
+router.get("/:videoId/likes", async (req, res) => {
+  try {
+    const video = await Video.findById(req.params.videoId)
+      .populate("likes.user", "name email")
+      .exec();
+
+    if (!video) return res.status(404).json({ message: "Video not found" });
+
+    res.status(200).json(video.likes);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// 📌 Remove Like
+// router.delete("/:videoId/likes/:userId", async (req, res) => {
+//   const { videoId, email } = req.params;
+
+//   try {
+//     const video = await Video.findById(videoId);
+//     if (!video) return res.status(404).json({ message: "Video not found" });
+
+//     video.likes = video.likes.filter(
+//       (like) => like.user.toString() !== email
+//     );
+
+//     await video.save();
+//     res.status(200).json({ message: "Like removed" });
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// });
+
+router.delete("/:videoId/likes/:email", async (req, res) => {
+  const { videoId, email } = req.params;
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const video = await Video.findById(videoId);
+    if (!video) return res.status(404).json({ message: "Video not found" });
+
+    // Remove like by user ID
+    video.likes = video.likes.filter(
+      (like) => like.user.toString() !== user._id.toString()
+    );
+
+    await video.save();
+    res.status(200).json({ message: "Like removed" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
+
+
+
 router.get('/stack', authenticateAdmin, async (req, res) => {
   const stacks = await Stack.find();
   res.json(stacks);

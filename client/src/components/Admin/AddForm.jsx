@@ -1,298 +1,6 @@
-// import React, { useState } from "react";
-// import {
-//   Box,
-//   TextField,
-//   Button,
-//   Typography,
-//   Paper,
-//   CircularProgress,
-// } from "@mui/material";
-// import axios from "axios";
-
-// const AddForm = ({ type, onSuccess }) => {
-//   const [name, setName] = useState("");
-//   const [image, setImage] = useState(null);
-//   const [loading, setLoading] = useState(false);
-//   const [alert, setAlert] = useState("");
-
-//   const token = localStorage.getItem("token");
-//   const headers = { Authorization: `Bearer ${token}` };
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     setLoading(true);
-//     setAlert("");
-
-//     const formData = new FormData();
-//     formData.append("name", name);
-//     if (image) formData.append("image", image);
-
-//     // Dynamic API endpoint
-//     const apiUrl = `http://localhost:3000/admin/${type}`;
-
-//     try {
-//       await axios.post(apiUrl, formData, {
-//         headers: {
-//           ...headers,
-//           "Content-Type": "multipart/form-data",
-//         },
-//       });
-//       setAlert(`${type} added successfully!`);
-//       setName("");
-//       setImage(null);
-//       if (onSuccess) onSuccess(); // callback to refresh list or close form
-//     } catch (err) {
-//       console.error(err);
-//       setAlert(`Failed to add ${type}.`);
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   return (
-//     <Box
-//       sx={{
-//         backgroundColor: "#f5f5f5",
-//         minHeight: "100vh",
-//         display: "flex",
-//         justifyContent: "center",
-//         alignItems: "center",
-//       }}
-//     >
-//       <Paper sx={{ p: 4, width: 400, borderRadius: 3 }}>
-//         <Typography variant="h5" fontWeight={600} mb={3}>
-//           Add {type.charAt(0).toUpperCase() + type.slice(1)}
-//         </Typography>
-
-//         <form onSubmit={handleSubmit} encType="multipart/form-data">
-//           <TextField
-//             label={`Enter ${type} Name`}
-//             fullWidth
-//             margin="normal"
-//             value={name}
-//             onChange={(e) => setName(e.target.value)}
-//             required
-//           />
-
-//           <Box
-//             sx={{
-//               border: "1px dashed #ccc",
-//               p: 2,
-//               my: 2,
-//               textAlign: "center",
-//               cursor: "pointer",
-//             }}
-//             onClick={() => document.getElementById(`${type}ImageUpload`).click()}
-//           >
-//             {image ? image.name : "Upload Image"}
-//             <input
-//               type="file"
-//               id={`${type}ImageUpload`}
-//               accept="image/*"
-//               style={{ display: "none" }}
-//               onChange={(e) => setImage(e.target.files[0])}
-//             />
-//           </Box>
-
-//           {alert && (
-//             <Typography
-//               color={alert.includes("successfully") ? "green" : "red"}
-//               mb={2}
-//             >
-//               {alert}
-//             </Typography>
-//           )}
-
-//           <Button
-//             type="submit"
-//             variant="contained"
-//             color="primary"
-//             fullWidth
-//             disabled={loading}
-//           >
-//             {loading ? <CircularProgress size={24} /> : "Add"}
-//           </Button>
-//         </form>
-//       </Paper>
-//     </Box>
-//   );
-// };
-
-// export default AddForm;
-
 
 
 // import React, { useState, useEffect } from "react";
-// import {
-//   Box,
-//   TextField,
-//   Button,
-//   Typography,
-//   Paper,
-//   CircularProgress,
-// } from "@mui/material";
-// import axios from "axios";
-// import CommonNav from '../CommonNav';
-// import Sidebar from '../Sidebar';
-
-// const AddForm = ({ type, onSuccess, mode = "add", itemId }) => {
-//   const [name, setName] = useState("");
-//   const [image, setImage] = useState(null);
-//   const [currentImage, setCurrentImage] = useState(""); // for showing old image in edit mode
-//   const [loading, setLoading] = useState(false);
-//   const [alert, setAlert] = useState("");
-
-//   const token = localStorage.getItem("token");
-//   const headers = { Authorization: `Bearer ${token}` };
-
-//   useEffect(() => {
-//     if (mode === "edit" && itemId) {
-//       // fetch existing data for edit
-//       const fetchItem = async () => {
-//         try {
-//           const res = await axios.get(
-//             `http://localhost:3000/admin/${type}/${itemId}`,
-//             { headers }
-//           );
-//           setName(res.data.name);
-//           setCurrentImage(`http://localhost:3000/uploads/${res.data.image}`);
-//         } catch (err) {
-//           console.error("Error fetching item:", err);
-//         }
-//       };
-//       fetchItem();
-//     }
-//   }, [mode, itemId, type]);
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     setLoading(true);
-//     setAlert("");
-
-//     const formData = new FormData();
-//     formData.append("name", name);
-//     if (image) formData.append("image", image);
-
-//     const apiUrl =
-//       mode === "add"
-//         ? `http://localhost:3000/admin/${type}`
-//         : `http://localhost:3000/admin/edit/${type}/${itemId}`;
-
-//     try {
-//       if (mode === "add") {
-//         await axios.post(apiUrl, formData, {
-//           headers: { ...headers, "Content-Type": "multipart/form-data" },
-//         });
-//         setAlert(`${type} added successfully!`);
-//       } else {
-//         await axios.put(apiUrl, formData, {
-//           headers: { ...headers, "Content-Type": "multipart/form-data" },
-//         });
-//         setAlert(`${type} updated successfully!`);
-//       }
-//       setName("");
-//       setImage(null);
-//       if (onSuccess) onSuccess();
-//     } catch (err) {
-//       console.error(err);
-//       setAlert(`Failed to ${mode} ${type}.`);
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   return (
-//     <Box
-//       sx={{
-//         backgroundColor: "#f5f5f5",
-//         minHeight: "100vh",
-//         display: "flex",
-//         justifyContent: "center",
-//         alignItems: "center",
-//       }}
-//     >
-//       <Paper sx={{ p: 4, width: 400, borderRadius: 3 }}>
-//         <Typography variant="h5" fontWeight={600} mb={3}>
-//           {mode === "add" ? "Add" : "Edit"}{" "}
-//           {type.charAt(0).toUpperCase() + type.slice(1)}
-//         </Typography>
-
-//         <form onSubmit={handleSubmit} encType="multipart/form-data">
-//           <TextField
-//             label={`Enter ${type} Name`}
-//             fullWidth
-//             margin="normal"
-//             value={name}
-//             onChange={(e) => setName(e.target.value)}
-//             required
-//           />
-
-//           {mode === "edit" && currentImage && (
-//             <Box mb={2} textAlign="center">
-//               <Typography variant="subtitle2" mb={1}>
-//                 Current Image:
-//               </Typography>
-//               <img
-//                 src={currentImage}
-//                 alt="Current"
-//                 style={{ width: "100%", borderRadius: 8 }}
-//               />
-//             </Box>
-//           )}
-
-//           <Box
-//             sx={{
-//               border: "1px dashed #ccc",
-//               p: 2,
-//               my: 2,
-//               textAlign: "center",
-//               cursor: "pointer",
-//             }}
-//             onClick={() => document.getElementById(`${type}ImageUpload`).click()}
-//           >
-//             {image ? image.name : "Upload Image"}
-//             <input
-//               type="file"
-//               id={`${type}ImageUpload`}
-//               accept="image/*"
-//               style={{ display: "none" }}
-//               onChange={(e) => setImage(e.target.files[0])}
-//             />
-//           </Box>
-
-//           {alert && (
-//             <Typography
-//               color={alert.includes("successfully") ? "green" : "red"}
-//               mb={2}
-//             >
-//               {alert}
-//             </Typography>
-//           )}
-
-//           <Button
-//             type="submit"
-//             variant="contained"
-//             color="primary"
-//             fullWidth
-//             disabled={loading}
-//           >
-//             {loading ? (
-//               <CircularProgress size={24} />
-//             ) : mode === "add" ? (
-//               "Add"
-//             ) : (
-//               "Update"
-//             )}
-//           </Button>
-//         </form>
-//       </Paper>
-//     </Box>
-//   );
-// };
-
-// export default AddForm;
-
-// import React, { useState, useEffect } from "react";                       // last edited
 // import {
 //   Box,
 //   TextField,
@@ -312,7 +20,7 @@
 // const AddForm = ({ type, onSuccess, mode = "add", itemId }) => {
 //   const [name, setName] = useState("");
 //   const [image, setImage] = useState(null);
-//   const [currentImage, setCurrentImage] = useState(""); // for showing old image in edit mode
+//   const [currentImage, setCurrentImage] = useState(""); // For edit mode
 //   const [loading, setLoading] = useState(false);
 //   const [alert, setAlert] = useState("");
 //   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -322,7 +30,13 @@
 
 //   const token = localStorage.getItem("token");
 //   const headers = { Authorization: `Bearer ${token}` };
+//   const drawerWidthOpen = 240;
+// const drawerWidthClosed = 60;
+// const appBarHeight = 64;
 
+
+
+//   // Fetch parent options for dropdown
 //   useEffect(() => {
 //     if (type === "category") {
 //       // Fetch stacks for category
@@ -339,9 +53,9 @@
 //     }
 //   }, [type]);
 
+//   // Fetch item for edit mode
 //   useEffect(() => {
 //     if (mode === "edit" && itemId) {
-//       // Fetch existing data for edit
 //       const fetchItem = async () => {
 //         try {
 //           const res = await axios.get(
@@ -360,6 +74,7 @@
 //     }
 //   }, [mode, itemId, type]);
 
+//   // Handle form submission
 //   const handleSubmit = async (e) => {
 //     e.preventDefault();
 //     setLoading(true);
@@ -370,8 +85,8 @@
 //     if (image) formData.append("image", image);
 
 //     // Add parentId for category or sub-category
-//     if (type === "category") formData.append("stackId", parentId);
-//     if (type === "sub-category") formData.append("categoryId", parentId);
+//     if (type === "category") formData.append("stack", parentId); // send stack ID
+//     if (type === "sub-category") formData.append("category", parentId); // send category ID
 
 //     const apiUrl =
 //       mode === "add"
@@ -414,12 +129,16 @@
 //         <Sidebar open={isSidebarOpen} userType="admin" />
 //         <Box
 //           component="main"
-//           sx={{
-//             flexGrow: 1,
-//             p: 3,
-//             transition: "margin 0.3s ease",
-//             marginLeft: isSidebarOpen ? "240px" : "60px",
-//           }}
+//         sx={{
+//           flexGrow: 1,
+//           pt: `${appBarHeight + 24}px`,
+//           pl: isSidebarOpen ? `${drawerWidthOpen + 24}px` : `${drawerWidthClosed + 24}px`,
+//           pr: 4,
+//           pb: 4,
+//           backgroundColor: '#f7f9fa',
+//           minHeight: '100vh',
+//           transition: 'padding 0.3s ease',
+//         }}
 //         >
 //           <Paper sx={{ p: 4, maxWidth: 500, margin: "auto", borderRadius: 3 }}>
 //             <Typography variant="h5" fontWeight={600} mb={3}>
@@ -472,7 +191,7 @@
 //               )}
 
 //               {/* Image Upload */}
-//               <Box
+//               {/* <Box
 //                 sx={{
 //                   border: "1px dashed #ccc",
 //                   p: 2,
@@ -492,7 +211,58 @@
 //                   style={{ display: "none" }}
 //                   onChange={(e) => setImage(e.target.files[0])}
 //                 />
-//               </Box>
+//               </Box> */}
+//                 <Box mb={3}>
+//   <Typography variant="subtitle1" fontWeight={600} mb={1}>
+//     Upload Image
+//   </Typography>
+
+//   <Box
+//     onClick={() => document.getElementById(`${type}ImageUpload`).click()}
+//     sx={{
+//       border: "2px dashed #ccc",
+//       borderRadius: "12px",
+//       height: 180,
+//       display: "flex",
+//       flexDirection: "column",
+//       justifyContent: "center",
+//       alignItems: "center",
+//       cursor: "pointer",
+//       backgroundColor: "#fafafa",
+//       textAlign: "center",
+//       transition: "0.3s",
+//       "&:hover": {
+//         borderColor: "#1976d2",
+//         backgroundColor: "#f0f8ff",
+//       },
+//     }}
+//   >
+//     <img
+//       src="https://cdn-icons-png.flaticon.com/512/126/126477.png"
+//       alt="Upload Icon"
+//       style={{ width: 40, marginBottom: 8, opacity: 0.6 }}
+//     />
+//     <Typography variant="body1" fontWeight={500}>
+//       Browse files
+//     </Typography>
+//     <Typography variant="caption" color="textSecondary">
+//       Drag and drop files here
+//     </Typography>
+//     <input
+//       type="file"
+//       id={`${type}ImageUpload`}
+//       accept="image/*"
+//       style={{ display: "none" }}
+//       onChange={(e) => setImage(e.target.files[0])}
+//     />
+//   </Box>
+
+//   {image && (
+//     <Typography variant="body2" mt={1}>
+//       Selected: <strong>{image.name}</strong>
+//     </Typography>
+//   )}
+// </Box>
 
 //               {/* Alert */}
 //               {alert && (
@@ -530,254 +300,308 @@
 
 // export default AddForm;
 
-import React, { useState, useEffect } from "react";
-import {
-  Box,
-  TextField,
-  Button,
-  Typography,
-  Paper,
-  CircularProgress,
-  MenuItem,
-  Select,
-  InputLabel,
-  FormControl,
-} from "@mui/material";
-import axios from "axios";
-import CommonNav from "../CommonNav";
-import Sidebar from "../Sidebar";
 
-const AddForm = ({ type, onSuccess, mode = "add", itemId }) => {
-  const [name, setName] = useState("");
-  const [image, setImage] = useState(null);
-  const [currentImage, setCurrentImage] = useState(""); // For edit mode
-  const [loading, setLoading] = useState(false);
-  const [alert, setAlert] = useState("");
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+// import React, { useState, useEffect } from "react";
+// import {
+//   Box,
+//   TextField,
+//   Button,
+//   Typography,
+//   Paper,
+//   CircularProgress,
+//   MenuItem,
+//   Select,
+//   InputLabel,
+//   FormControl,
+// } from "@mui/material";
+// import axios from "axios";
+// import CommonNav from "../CommonNav";
+// import Sidebar from "../Sidebar";
 
-  const [parentOptions, setParentOptions] = useState([]); // Stacks or Categories
-  const [parentId, setParentId] = useState(""); // Selected parent ID
+// const AddForm = ({ type, onSuccess, mode = "add", itemId }) => {
+//   const [name, setName] = useState("");
+//   const [image, setImage] = useState(null);
+//   const [currentImage, setCurrentImage] = useState(""); // For edit mode
+//   const [loading, setLoading] = useState(false);
+//   const [alert, setAlert] = useState("");
+//   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
-  const token = localStorage.getItem("token");
-  const headers = { Authorization: `Bearer ${token}` };
-  const drawerWidthOpen = 240;
-const drawerWidthClosed = 60;
-const appBarHeight = 64;
+//   const [parentOptions, setParentOptions] = useState([]); // Stacks or Categories
+//   const [parentId, setParentId] = useState(""); // Selected parent ID
+
+//   const token = localStorage.getItem("token");
+//   const headers = { Authorization: `Bearer ${token}` };
+//   const drawerWidthOpen = 240;
+// const drawerWidthClosed = 60;
+// const appBarHeight = 64;
 
 
 
-  // Fetch parent options for dropdown
-  useEffect(() => {
-    if (type === "category") {
-      // Fetch stacks for category
-      axios
-        .get("http://localhost:3000/admin/stack", { headers })
-        .then((res) => setParentOptions(res.data))
-        .catch((err) => console.error("Error fetching stacks:", err));
-    } else if (type === "sub-category") {
-      // Fetch categories for sub-category
-      axios
-        .get("http://localhost:3000/admin/category", { headers })
-        .then((res) => setParentOptions(res.data))
-        .catch((err) => console.error("Error fetching categories:", err));
-    }
-  }, [type]);
+//   // Fetch parent options for dropdown
+//   useEffect(() => {
+//     if (type === "category") {
+//       // Fetch stacks for category
+//       axios
+//         .get("http://localhost:3000/admin/stack", { headers })
+//         .then((res) => setParentOptions(res.data))
+//         .catch((err) => console.error("Error fetching stacks:", err));
+//     } else if (type === "sub-category") {
+//       // Fetch categories for sub-category
+//       axios
+//         .get("http://localhost:3000/admin/category", { headers })
+//         .then((res) => setParentOptions(res.data))
+//         .catch((err) => console.error("Error fetching categories:", err));
+//     }
+//   }, [type]);
 
-  // Fetch item for edit mode
-  useEffect(() => {
-    if (mode === "edit" && itemId) {
-      const fetchItem = async () => {
-        try {
-          const res = await axios.get(
-            `http://localhost:3000/admin/${type}/${itemId}`,
-            { headers }
-          );
-          setName(res.data.name);
-          setCurrentImage(`http://localhost:3000/uploads/${res.data.image}`);
-          if (type === "category") setParentId(res.data.stack);
-          if (type === "sub-category") setParentId(res.data.category);
-        } catch (err) {
-          console.error("Error fetching item:", err);
-        }
-      };
-      fetchItem();
-    }
-  }, [mode, itemId, type]);
+//   // Fetch item for edit mode
+//   useEffect(() => {
+//     if (mode === "edit" && itemId) {
+//       const fetchItem = async () => {
+//         try {
+//           const res = await axios.get(
+//             `http://localhost:3000/admin/${type}/${itemId}`,
+//             { headers }
+//           );
+//           setName(res.data.name);
+//           setCurrentImage(`http://localhost:3000/uploads/${res.data.image}`);
+//           if (type === "category") setParentId(res.data.stack);
+//           if (type === "sub-category") setParentId(res.data.category);
+//         } catch (err) {
+//           console.error("Error fetching item:", err);
+//         }
+//       };
+//       fetchItem();
+//     }
+//   }, [mode, itemId, type]);
 
-  // Handle form submission
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setAlert("");
+//   // Handle form submission
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+//     setLoading(true);
+//     setAlert("");
 
-    const formData = new FormData();
-    formData.append("name", name);
-    if (image) formData.append("image", image);
+//     const formData = new FormData();
+//     formData.append("name", name);
+//     if (image) formData.append("image", image);
 
-    // Add parentId for category or sub-category
-    if (type === "category") formData.append("stack", parentId); // send stack ID
-    if (type === "sub-category") formData.append("category", parentId); // send category ID
+//     // Add parentId for category or sub-category
+//     if (type === "category") formData.append("stack", parentId); // send stack ID
+//     if (type === "sub-category") formData.append("category", parentId); // send category ID
 
-    const apiUrl =
-      mode === "add"
-        ? `http://localhost:3000/admin/${type}`
-        : `http://localhost:3000/admin/edit/${type}/${itemId}`;
+//     const apiUrl =
+//       mode === "add"
+//         ? `http://localhost:3000/admin/${type}`
+//         : `http://localhost:3000/admin/edit/${type}/${itemId}`;
 
-    try {
-      if (mode === "add") {
-        await axios.post(apiUrl, formData, {
-          headers: { ...headers, "Content-Type": "multipart/form-data" },
-        });
-        setAlert(`${type} added successfully!`);
-      } else {
-        await axios.put(apiUrl, formData, {
-          headers: { ...headers, "Content-Type": "multipart/form-data" },
-        });
-        setAlert(`${type} updated successfully!`);
-      }
-      setTimeout(() => {
-        window.location.href = "/admin/dashboard"; // Redirect after success
-      }, 1000);
-    } catch (err) {
-      console.error(err);
-      setAlert(`Failed to ${mode} ${type}.`);
-    } finally {
-      setLoading(false);
-    }
-  };
+//     try {
+//       if (mode === "add") {
+//         await axios.post(apiUrl, formData, {
+//           headers: { ...headers, "Content-Type": "multipart/form-data" },
+//         });
+//         setAlert(`${type} added successfully!`);
+//       } else {
+//         await axios.put(apiUrl, formData, {
+//           headers: { ...headers, "Content-Type": "multipart/form-data" },
+//         });
+//         setAlert(`${type} updated successfully!`);
+//       }
+//       setTimeout(() => {
+//         window.location.href = "/admin/dashboard"; // Redirect after success
+//       }, 1000);
+//     } catch (err) {
+//       console.error(err);
+//       setAlert(`Failed to ${mode} ${type}.`);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
 
-  return (
-    <Box>
-      <CommonNav onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
-      <Box
-        sx={{
-          display: "flex",
-          backgroundColor: "#f5f5f5",
-          minHeight: "100vh",
-        }}
-      >
-        <Sidebar open={isSidebarOpen} userType="admin" />
-        <Box
-          component="main"
-        sx={{
-          flexGrow: 1,
-          pt: `${appBarHeight + 24}px`,
-          pl: isSidebarOpen ? `${drawerWidthOpen + 24}px` : `${drawerWidthClosed + 24}px`,
-          pr: 4,
-          pb: 4,
-          backgroundColor: '#f7f9fa',
-          minHeight: '100vh',
-          transition: 'padding 0.3s ease',
-        }}
-        >
-          <Paper sx={{ p: 4, maxWidth: 500, margin: "auto", borderRadius: 3 }}>
-            <Typography variant="h5" fontWeight={600} mb={3}>
-              {mode === "add" ? "Add" : "Edit"}{" "}
-              {type.charAt(0).toUpperCase() + type.slice(1)}
-            </Typography>
+//   return (
+//     <Box>
+//       <CommonNav onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
+//       <Box
+//         sx={{
+//           display: "flex",
+//           backgroundColor: "#f5f5f5",
+//           minHeight: "100vh",
+//         }}
+//       >
+//         <Sidebar open={isSidebarOpen} userType="admin" />
+//         <Box
+//           component="main"
+//         sx={{
+//           flexGrow: 1,
+//           pt: `${appBarHeight + 24}px`,
+//           pl: isSidebarOpen ? `${drawerWidthOpen + 24}px` : `${drawerWidthClosed + 24}px`,
+//           pr: 4,
+//           pb: 4,
+//           backgroundColor: '#f7f9fa',
+//           minHeight: '100vh',
+//           transition: 'padding 0.3s ease',
+//         }}
+//         >
+//           <Paper sx={{ p: 4, maxWidth: 500, margin: "auto", borderRadius: 3 }}>
+//             <Typography variant="h5" fontWeight={600} mb={3}>
+//               {mode === "add" ? "Add" : "Edit"}{" "}
+//               {type.charAt(0).toUpperCase() + type.slice(1)}
+//             </Typography>
 
-            <form onSubmit={handleSubmit} encType="multipart/form-data">
-              <TextField
-                label={`Enter ${type} Name`}
-                fullWidth
-                margin="normal"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
+//             <form onSubmit={handleSubmit} encType="multipart/form-data">
+//               <TextField
+//                 label={`Enter ${type} Name`}
+//                 fullWidth
+//                 margin="normal"
+//                 value={name}
+//                 onChange={(e) => setName(e.target.value)}
+//                 required
+//               />
 
-              {/* Parent Dropdown */}
-              {(type === "category" || type === "sub-category") && (
-                <FormControl fullWidth margin="normal">
-                  <InputLabel>
-                    Select {type === "category" ? "Stack" : "Category"}
-                  </InputLabel>
-                  <Select
-                    value={parentId}
-                    onChange={(e) => setParentId(e.target.value)}
-                    required
-                  >
-                    {parentOptions.map((option) => (
-                      <MenuItem key={option._id} value={option._id}>
-                        {option.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              )}
+//               {/* Parent Dropdown */}
+//               {(type === "category" || type === "sub-category") && (
+//                 <FormControl fullWidth margin="normal">
+//                   <InputLabel>
+//                     Select {type === "category" ? "Stack" : "Category"}
+//                   </InputLabel>
+//                   <Select
+//                     value={parentId}
+//                     onChange={(e) => setParentId(e.target.value)}
+//                     required
+//                   >
+//                     {parentOptions.map((option) => (
+//                       <MenuItem key={option._id} value={option._id}>
+//                         {option.name}
+//                       </MenuItem>
+//                     ))}
+//                   </Select>
+//                 </FormControl>
+//               )}
 
-              {/* Current Image in Edit */}
-              {mode === "edit" && currentImage && (
-                <Box mb={2} textAlign="center">
-                  <Typography variant="subtitle2" mb={1}>
-                    Current Image:
-                  </Typography>
-                  <img
-                    src={currentImage}
-                    alt="Current"
-                    style={{ width: "100%", borderRadius: 8 }}
-                  />
-                </Box>
-              )}
+//               {/* Current Image in Edit */}
+//               {mode === "edit" && currentImage && (
+//                 <Box mb={2} textAlign="center">
+//                   <Typography variant="subtitle2" mb={1}>
+//                     Current Image:
+//                   </Typography>
+//                   <img
+//                     src={currentImage}
+//                     alt="Current"
+//                     style={{ width: "100%", borderRadius: 8 }}
+//                   />
+//                 </Box>
+//               )}
 
-              {/* Image Upload */}
-              <Box
-                sx={{
-                  border: "1px dashed #ccc",
-                  p: 2,
-                  my: 2,
-                  textAlign: "center",
-                  cursor: "pointer",
-                }}
-                onClick={() =>
-                  document.getElementById(`${type}ImageUpload`).click()
-                }
-              >
-                {image ? image.name : "Upload Image"}
-                <input
-                  type="file"
-                  id={`${type}ImageUpload`}
-                  accept="image/*"
-                  style={{ display: "none" }}
-                  onChange={(e) => setImage(e.target.files[0])}
-                />
-              </Box>
+//               {/* Image Upload */}
+//               {/* <Box
+//                 sx={{
+//                   border: "1px dashed #ccc",
+//                   p: 2,
+//                   my: 2,
+//                   textAlign: "center",
+//                   cursor: "pointer",
+//                 }}
+//                 onClick={() =>
+//                   document.getElementById(`${type}ImageUpload`).click()
+//                 }
+//               >
+//                 {image ? image.name : "Upload Image"}
+//                 <input
+//                   type="file"
+//                   id={`${type}ImageUpload`}
+//                   accept="image/*"
+//                   style={{ display: "none" }}
+//                   onChange={(e) => setImage(e.target.files[0])}
+//                 />
+//               </Box> */}
+//                 <Box mb={3}>
+//   <Typography variant="subtitle1" fontWeight={600} mb={1}>
+//     Upload Image
+//   </Typography>
 
-              {/* Alert */}
-              {alert && (
-                <Typography
-                  color={alert.includes("successfully") ? "green" : "red"}
-                  mb={2}
-                >
-                  {alert}
-                </Typography>
-              )}
+//   <Box
+//     onClick={() => document.getElementById(`${type}ImageUpload`).click()}
+//     sx={{
+//       border: "2px dashed #ccc",
+//       borderRadius: "12px",
+//       height: 180,
+//       display: "flex",
+//       flexDirection: "column",
+//       justifyContent: "center",
+//       alignItems: "center",
+//       cursor: "pointer",
+//       backgroundColor: "#fafafa",
+//       textAlign: "center",
+//       transition: "0.3s",
+//       "&:hover": {
+//         borderColor: "#1976d2",
+//         backgroundColor: "#f0f8ff",
+//       },
+//     }}
+//   >
+//     <img
+//       src="https://cdn-icons-png.flaticon.com/512/126/126477.png"
+//       alt="Upload Icon"
+//       style={{ width: 40, marginBottom: 8, opacity: 0.6 }}
+//     />
+//     <Typography variant="body1" fontWeight={500}>
+//       Browse files
+//     </Typography>
+//     <Typography variant="caption" color="textSecondary">
+//       Drag and drop files here
+//     </Typography>
+//     <input
+//       type="file"
+//       id={`${type}ImageUpload`}
+//       accept="image/*"
+//       style={{ display: "none" }}
+//       onChange={(e) => setImage(e.target.files[0])}
+//     />
+//   </Box>
 
-              {/* Submit */}
-              <Button
-                type="submit"
-                variant="contained"
-                color="primary"
-                fullWidth
-                disabled={loading}
-              >
-                {loading ? (
-                  <CircularProgress size={24} />
-                ) : mode === "add" ? (
-                  "Add"
-                ) : (
-                  "Update"
-                )}
-              </Button>
-            </form>
-          </Paper>
-        </Box>
-      </Box>
-    </Box>
-  );
-};
+//   {image && (
+//     <Typography variant="body2" mt={1}>
+//       Selected: <strong>{image.name}</strong>
+//     </Typography>
+//   )}
+// </Box>
 
-export default AddForm;
+//               {/* Alert */}
+//               {alert && (
+//                 <Typography
+//                   color={alert.includes("successfully") ? "green" : "red"}
+//                   mb={2}
+//                 >
+//                   {alert}
+//                 </Typography>
+//               )}
+
+//               {/* Submit */}
+//               <Button
+//                 type="submit"
+//                 variant="contained"
+//                 color="primary"
+//                 fullWidth
+//                 disabled={loading}
+//               >
+//                 {loading ? (
+//                   <CircularProgress size={24} />
+//                 ) : mode === "add" ? (
+//                   "Add"
+//                 ) : (
+//                   "Update"
+//                 )}
+//               </Button>
+//             </form>
+//           </Paper>
+//         </Box>
+//       </Box>
+//     </Box>
+//   );
+// };
+
+// export default AddForm;
+
+
 
 
 
@@ -943,3 +767,247 @@ export default AddForm;
 // };
 
 // export default AddForm;
+import React, { useState, useEffect } from "react";
+import {
+  Box,
+  TextField,
+  Button,
+  Typography,
+  Paper,
+  CircularProgress,
+  MenuItem,
+  Select,
+  InputLabel,
+  FormControl,
+} from "@mui/material";
+import axios from "axios";
+import axiosInstance from "../axiosInterceptor";
+
+const AddForm = ({ type, onSuccess, mode = "add", itemId }) => {
+  const [name, setName] = useState("");
+  const [image, setImage] = useState(null);
+  const [currentImage, setCurrentImage] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [alert, setAlert] = useState("");
+  const [parentOptions, setParentOptions] = useState([]);
+  const [parentId, setParentId] = useState("");
+
+  const token = localStorage.getItem("token");
+  const headers = { Authorization: `Bearer ${token}` };
+
+  useEffect(() => {
+    if (type === "category") {
+      axios
+        .get("http://localhost:3000/admin/stack", { headers })
+        .then((res) => setParentOptions(res.data || []))
+        .catch((err) => console.error("Error fetching stacks:", err));
+    } else if (type === "sub-category") {
+      axiosInstance
+        .get("http://localhost:3000/admin/category", { headers })
+        .then((res) => setParentOptions(res.data || []))
+        .catch((err) => console.error("Error fetching categories:", err));
+    }
+  }, [type]);
+
+  useEffect(() => {
+    if (mode === "edit" && itemId) {
+      axios
+        .get(`http://localhost:3000/admin/${type}/${itemId}`, { headers })
+        .then((res) => {
+          setName(res.data.name);
+          setCurrentImage(`http://localhost:3000/uploads/${res.data.image}`);
+          if (type === "category") setParentId(res.data.stack);
+          if (type === "sub-category") setParentId(res.data.category);
+        })
+        .catch((err) => console.error("Error fetching item:", err));
+    }
+  }, [mode, itemId, type]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setAlert("");
+
+    const formData = new FormData();
+    formData.append("name", name);
+    if (image) formData.append("image", image);
+    if (type === "category") formData.append("stack", parentId);
+    if (type === "sub-category") formData.append("category", parentId);
+
+    const apiUrl =
+      mode === "add"
+        ? `http://localhost:3000/admin/${type}`
+        : `http://localhost:3000/admin/edit/${type}/${itemId}`;
+
+    try {
+      const method = mode === "add" ? axios.post : axios.put;
+      await method(apiUrl, formData, {
+        headers: { ...headers, "Content-Type": "multipart/form-data" },
+      });
+      setAlert(`${type} ${mode === "add" ? "added" : "updated"} successfully!`);
+      onSuccess(); // Close modal
+    } catch (err) {
+      console.error(err);
+      setAlert(`Failed to ${mode} ${type}.`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Box display="flex" justifyContent="center">
+      <Paper
+        elevation={0}
+        sx={{
+          width: 350,
+          p: 2,
+        }}
+      >
+        <Typography
+          variant="h6"
+          align="center"
+          fontWeight="bold"
+          mb={2}
+        >
+          {mode === "add" ? `Add ${type}` : `Edit ${type}`}
+        </Typography>
+
+        <form onSubmit={handleSubmit} encType="multipart/form-data">
+          <TextField
+            label={`Enter ${type} Name`}
+            fullWidth
+            size="small"
+            margin="normal"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+
+          {(type === "category" || type === "sub-category") && (
+            <FormControl fullWidth margin="normal" size="small">
+              <InputLabel>
+                {type === "category" ? "Stack" : "Category"}
+              </InputLabel>
+              <Select
+                value={parentId}
+                onChange={(e) => setParentId(e.target.value)}
+                required
+                label={type === "category" ? "Stack" : "Category"}
+              >
+                {parentOptions.map((option) => (
+                  <MenuItem key={option._id} value={option._id}>
+                    {option.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          )}
+
+          {mode === "edit" && currentImage && (
+            <Box mt={2} mb={2} textAlign="center">
+              <Typography variant="subtitle2" mb={1}>
+                Current Image:
+              </Typography>
+              <Box
+                sx={{
+                  width: 350,
+                  height: 120,
+                  mx: "auto",
+                  mb: 1,
+                  borderRadius: 2,
+                  overflow: "hidden",
+                }}
+              >
+                <img
+                  src={currentImage}
+                  alt="Current"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                  }}
+                />
+              </Box>
+            </Box>
+          )}
+
+          {/* Image Upload */}
+          <Box mb={2}>
+            <Typography variant="subtitle2" mb={1}>
+              Upload Image
+            </Typography>
+            <Box
+              onClick={() =>
+                document.getElementById(`${type}ImageUpload`).click()
+              }
+              sx={{
+                border: "2px dashed #ccc",
+                borderRadius: "8px",
+                height: 100,
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+                cursor: "pointer",
+                backgroundColor: "#f9f9f9",
+                "&:hover": {
+                  borderColor: "#1976d2",
+                  backgroundColor: "#f0f8ff",
+                },
+              }}
+            >
+              <img
+                src="https://cdn-icons-png.flaticon.com/512/126/126477.png"
+                alt="Upload Icon"
+                style={{ width: 30, marginBottom: 6, opacity: 0.6 }}
+              />
+              <Typography variant="body2" fontWeight={500}>
+                Browse files
+              </Typography>
+              <input
+                type="file"
+                id={`${type}ImageUpload`}
+                accept="image/*"
+                style={{ display: "none" }}
+                onChange={(e) => setImage(e.target.files[0])}
+              />
+            </Box>
+            {image && (
+              <Typography variant="body2" mt={1}>
+                Selected: <strong>{image.name}</strong>
+              </Typography>
+            )}
+          </Box>
+
+          {alert && (
+            <Typography
+              variant="body2"
+              color={alert.includes("successfully") ? "green" : "red"}
+              mb={2}
+            >
+              {alert}
+            </Typography>
+          )}
+
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            fullWidth
+            disabled={loading}
+          >
+            {loading ? (
+              <CircularProgress size={22} />
+            ) : mode === "add" ? (
+              "Add"
+            ) : (
+              "Update"
+            )}
+          </Button>
+        </form>
+      </Paper>
+    </Box>
+  );
+};
+
+export default AddForm;
