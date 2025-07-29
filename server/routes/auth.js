@@ -150,38 +150,92 @@ const JWT_SECRET = process.env.JWT_SECRET; // Use .env in production
 
 
 // LOGIN ROUTE                                                       // edited login 18/7
+// router.post('/login', async (req, res) => {                        // working login
+//   const { email, password } = req.body;
+
+//   // Check if email and password are provided
+//   if (!email || !password) {
+//     return res.status(400).json({ message: 'Email and password are required' });
+//   }
+
+//   try {
+//     // Find user by email
+//     const user = await User.findOne({ email });
+//     if (!user) {
+//       return res.status(404).json({ message: 'User not found' });
+//     }
+
+//     // Compare entered password with hashed password
+//     const isPasswordValid = await bcrypt.compare(password, user.password);
+//     if (!isPasswordValid) {
+//       return res.status(401).json({ message: 'Incorrect password' });
+//     }
+
+//     // Generate JWT with user's email and role
+//     const token = jwt.sign(
+//       { email: user.email, role: user.role },
+//       JWT_SECRET 
+//     );
+
+//     // Respond with token and user role
+//     res.status(200).json({
+//       message: 'Login successful',
+//       token,
+//       role: user.role, // frontend can use this to redirect
+//     });
+//   } catch (err) {
+//     console.error('Error during login:', err);
+//     res.status(500).json({ message: 'Server error during login' });
+//   }
+// });
+const UserActivity = require('../model/userlogData'); // Import schema
+
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
-  // Check if email and password are provided
   if (!email || !password) {
     return res.status(400).json({ message: 'Email and password are required' });
   }
 
   try {
-    // Find user by email
+    // Find user
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Compare entered password with hashed password
+    // Validate password
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       return res.status(401).json({ message: 'Incorrect password' });
     }
 
-    // Generate JWT with user's email and role
+    // Generate token
     const token = jwt.sign(
-      { email: user.email, role: user.role },
-      JWT_SECRET 
+      { userId: user._id, email: user.email, role: user.role },
+      JWT_SECRET,
+      
     );
 
-    // Respond with token and user role
+    // ✅ Track Login Activity
+    let activity = await UserActivity.findOne({ userId: user._id });
+    if (!activity) {
+      activity = new UserActivity({
+        userId: user._id,
+        name: user.name,
+        email: user.email,
+        sessions: [{ loginAt: new Date() }]
+      });
+    } else {
+      activity.sessions.push({ loginAt: new Date() });
+    }
+    await activity.save();
+
     res.status(200).json({
       message: 'Login successful',
       token,
-      role: user.role, // frontend can use this to redirect
+      role: user.role,
+        userId: user._id 
     });
   } catch (err) {
     console.error('Error during login:', err);
@@ -189,6 +243,24 @@ router.post('/login', async (req, res) => {
   }
 });
 
+router.post('/logout', async (req, res) => {
+  const { userId } = req.body;
+
+  try {
+    const activity = await UserActivity.findOne({ userId });
+
+    if (activity && activity.sessions.length > 0) {
+      // Update the last session's logout time
+      activity.sessions[activity.sessions.length - 1].logoutAt = new Date();
+      await activity.save();
+    }
+
+    res.status(200).json({ message: 'Logout successful' });
+  } catch (err) {
+    console.error('Error during logout:', err);
+    res.status(500).json({ message: 'Server error during logout' });
+  }
+});
 
 
 /**

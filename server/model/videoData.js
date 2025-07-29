@@ -126,7 +126,7 @@ const videoSchema = new Schema({
   overviewPdf: {
   type: String // URL or file path of uploaded PDF
 },
-
+videoUrl:String,
 
   // 💬 Comments and ❤️ Likes (embedded)
   comments: [commentSchema],

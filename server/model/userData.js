@@ -21,14 +21,14 @@ const userSchema = new mongoose.Schema({
     enum: ['user', 'admin'],
     default: 'user',
   },
-  lastLoginAt: {
-    type: Date,
-    default: null,
-  },
-  lastLogoutAt: {
-    type: Date,
-    default: null,
-  },
+  // lastLoginAt: {
+  //   type: Date,
+  //   default: null,
+  // },
+  // lastLogoutAt: {
+  //   type: Date,
+  //   default: null,
+  // },
 }, {
   timestamps: true, // adds createdAt and updatedAt automatically
 });

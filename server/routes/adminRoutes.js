@@ -13,6 +13,63 @@ const fs = require("fs");
 const path = require("path");
 const upload = multer({ dest: "uploads/" }); // or your custom storage config
 
+// function authenticate(req, res, next) {
+//   const authHeader = req.headers.authorization;
+
+//   if (!authHeader || !authHeader.startsWith("Bearer ")) {
+//     return res.status(401).json({ message: "Authorization token missing" });
+//   }
+
+//   const token = authHeader.split(" ")[1];
+
+//   try {
+//     const decoded = jwt.verify(token, process.env.JWT_SECRET );
+
+//     // Attach user data and role to the request
+//     req.user = {
+//       id: decoded.id,
+//       role: decoded.role,
+//       email: decoded.email,
+//     };
+//     next();
+//   } catch (err) {
+//     console.error("JWT Verification failed:", err);
+//     return res.status(401).json({ message: "Invalid or expired token" });
+//   }
+// }
+
+
+
+function authenticate(req, res, next) {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ message: "Authorization token missing" });
+  }
+
+  const token = authHeader.split(" ")[1];
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    req.user = {
+      id: decoded.userId,
+      role: decoded.role, // can be 'admin' or 'user'
+      email: decoded.email,
+    };
+
+    // ❌ Don't restrict only admins
+    next();
+  } catch (err) {
+    console.error("JWT Verification failed:", err);
+    return res.status(401).json({ message: "Invalid or expired token" });
+  }
+}
+
+
+
+
+
 // ------------------ Middleware (Inline) ------------------
 const authenticateAdmin = (req, res, next) => {
   const token = req.headers.authorization?.split(" ")[1];
@@ -78,7 +135,8 @@ const uploadVideo = multer({
 });
 const uploadFiles = multer({ storage: videoStorage }).fields([
   { name: 'file', maxCount: 1 },        // Video
-  { name: 'overviewPdf', maxCount: 1 }  // PDF
+  { name: 'overviewPdf', maxCount: 1 } , // PDF
+    { name: 'image', maxCount: 1 }
 ]);
 
 // ------------------ Stack Routes ------------------
@@ -315,36 +373,47 @@ router.put(
 
 
 // ------------------ Video Routes ------------------
-router.post('/video', authenticateAdmin, uploadFiles, async (req, res) => {
-  try {
-    const { title, description, stack, category, subCategory } = req.body;
-    const videoFile = req.files['file']?.[0];
-    const pdfFile = req.files['overviewPdf']?.[0];
+router.post(
+  '/video',
+  authenticateAdmin,
+  uploadFiles, // should handle 'file', 'overviewPdf', and 'thumbnail'
+  async (req, res) => {
+    try {
+      const { title, description, stack, category, subCategory } = req.body;
 
-    if (!videoFile) return res.status(400).json({ error: 'Video file is required' });
+      const videoFile = req.files['file']?.[0];
+      const pdfFile = req.files['overviewPdf']?.[0];
+      const thumbFile = req.files['image']?.[0];
 
-    const video = new Video({
-      title,
-      description,
-      fileUrl: videoFile.path,
-      fileType: videoFile.mimetype,
-      fileSize: videoFile.size,
-      uploadedBy: req.adminId,
-      stack,
-      category,
-      subCategory,
-      overviewPdf: pdfFile ? pdfFile.path : null
-    });
+      if (!videoFile) {
+        return res.status(400).json({ error: 'Video file is required' });
+      }
 
-    await video.save();
-    res.status(201).json(video);
-  } catch (err) {
-    console.error(err);
-    res.status(400).json({ error: err.message });
+      const video = new Video({
+        title,
+        description,
+        fileUrl: videoFile.path,
+        fileType: videoFile.mimetype,
+        fileSize: videoFile.size,
+        uploadedBy: req.adminId,
+        stack,
+        category,
+        subCategory,
+        
+        image: thumbFile ? thumbFile.path : null,
+        overviewPdf: pdfFile ? pdfFile.path : null
+      });
+
+      await video.save();
+      res.status(201).json(video);
+    } catch (err) {
+      console.error(err);
+      res.status(400).json({ error: err.message });
+    }
   }
-});
+);
 
-// router.post('/video', authenticateAdmin, uploadVideo.single('file'), async (req, res) => {
+// router.post('/video', authenticateAdmin, uploadVideo.single('file'), async (req, res) => {         // backed worked for video uploading
 //   try {
 //     const { title, description, stack, category, subCategory } = req.body;
 //     const file = req.file;
@@ -367,38 +436,161 @@ router.post('/video', authenticateAdmin, uploadFiles, async (req, res) => {
 //     res.status(400).json({ error: err.message });
 //   }
 // });
+
+
+
+// router.put('/video/:id', authenticateAdmin, uploadFiles, async (req, res) => {
+//   try {
+//     const { title, description, stack, category, subCategory } = req.body;
+//     const videoFile = req.files['file']?.[0];
+//     const pdfFile = req.files['overviewPdf']?.[0];
+
+//     const updateData = {
+//       title,
+//       description,
+//       stack,
+//       category,
+//       subCategory
+//     };
+
+//     if (videoFile) {
+//       updateData.fileUrl = videoFile.path;
+//       updateData.fileType = videoFile.mimetype;
+//       updateData.fileSize = videoFile.size;
+//     }
+
+//     if (pdfFile) {
+//       updateData.overviewPdf = pdfFile.path;
+//     }
+
+//     const updated = await Video.findByIdAndUpdate(req.params.id, updateData, { new: true });
+
+//     res.json(updated);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(400).json({ error: err.message });
+//   }
+// });
+
+
+// router.put('/video/:id', authenticateAdmin, uploadFiles, async (req, res) => {
+//   try {
+//     const { title, description, stack, category, subCategory, videoUrl } = req.body;
+
+//     const videoFile = req.files['file']?.[0];
+//     const pdfFile = req.files['overviewPdf']?.[0];
+//     const thumbFile = req.files['image']?.[0];
+
+//     const updateData = {
+//       title,
+//       description,
+//       stack,
+//       category,
+//       subCategory,
+//       videoUrl
+//     };
+
+//     if (videoFile) {
+//       updateData.fileUrl = videoFile.path;
+//       updateData.fileType = videoFile.mimetype;
+//       updateData.fileSize = videoFile.size;
+//     }
+//     if (pdfFile) {
+//       updateData.overviewPdf = pdfFile.path;
+//     }
+//     if (thumbFile) {
+//       updateData.image = thumbFile.path;
+//     }
+
+//     const updatedVideo = await Video.findByIdAndUpdate(req.params.id, updateData, { new: true });
+//     res.json({ message: "Video updated successfully", updatedVideo });
+//   } catch (err) {
+//     console.error(err);
+//     res.status(400).json({ error: err.message });
+//   }
+// });
+
+// router.put('/video/:id', authenticateAdmin, uploadFiles, async (req, res) => {            // edited successfull without image and url
+//   try {
+//     const updateData = { ...req.body };
+
+//     if (req.files['file']) {
+//       updateData.fileUrl = req.files['file'][0].path;
+//       updateData.fileType = req.files['file'][0].mimetype;
+//       updateData.fileSize = req.files['file'][0].size;
+//     }
+//     if (req.files['overviewPdf']) {
+//       updateData.overviewPdf = req.files['overviewPdf'][0].path;
+//     }
+//     if (req.files['image']) {
+//       updateData.image = req.files['image'][0].path;
+//     }
+
+//     const updated = await Video.findByIdAndUpdate(req.params.id, updateData, { new: true });
+//     if (!updated) return res.status(404).json({ error: "Video not found" });
+
+//     res.json(updated);
+//   } catch (err) {
+//     console.error("Video update error:", err);
+//     res.status(500).json({ error: "Server error during video update" });
+//   }
+// });
+
+
 router.put('/video/:id', authenticateAdmin, uploadFiles, async (req, res) => {
   try {
-    const { title, description, stack, category, subCategory } = req.body;
-    const videoFile = req.files['file']?.[0];
-    const pdfFile = req.files['overviewPdf']?.[0];
+    const {
+      title,
+      description,
+      stack,
+      category,
+      subCategory,
+      videoUrl
+    } = req.body;
 
     const updateData = {
       title,
       description,
       stack,
       category,
-      subCategory
+      subCategory,
+      videoUrl
     };
 
-    if (videoFile) {
-      updateData.fileUrl = videoFile.path;
-      updateData.fileType = videoFile.mimetype;
-      updateData.fileSize = videoFile.size;
+    if (req.files['file']) {
+      updateData.fileUrl = req.files['file'][0].path;
+      updateData.fileType = req.files['file'][0].mimetype;
+      updateData.fileSize = req.files['file'][0].size;
     }
 
-    if (pdfFile) {
-      updateData.overviewPdf = pdfFile.path;
+    if (req.files['overviewPdf']) {
+      updateData.overviewPdf = req.files['overviewPdf'][0].path;
     }
 
-    const updated = await Video.findByIdAndUpdate(req.params.id, updateData, { new: true });
+    if (req.files['image']) {
+      updateData.image = req.files['image'][0].path;
+    }
 
-    res.json(updated);
+    const updatedVideo = await Video.findByIdAndUpdate(req.params.id, updateData, { new: true });
+
+    if (!updatedVideo) {
+      return res.status(404).json({ error: "Video not found" });
+    }
+
+    res.json({ message: "Video updated successfully", updatedVideo });
   } catch (err) {
-    console.error(err);
-    res.status(400).json({ error: err.message });
+    console.error("Video update error:", err);
+    res.status(500).json({ error: "Server error during video update" });
   }
 });
+
+
+
+
+
+
+
+
 
 // router.put('/video/:id', authenticateAdmin, async (req, res) => {
 //   try {
@@ -414,19 +606,44 @@ router.put('/video/:id', authenticateAdmin, uploadFiles, async (req, res) => {
 //   }
 // });
 
+// router.delete('/video/:id', authenticateAdmin, async (req, res) => {
+//   try {
+//     const video = await Video.findById(req.params.id);
+//     if (!video) return res.status(404).json({ message: 'Video not found' });
+
+//     if (fs.existsSync(video.fileUrl)) fs.unlinkSync(video.fileUrl);
+
+//     await Video.findByIdAndDelete(req.params.id);
+//     res.json({ message: 'Video deleted' });
+//   } catch (err) {
+//     res.status(400).json({ error: err.message });
+//   }
+// });
+
+
 router.delete('/video/:id', authenticateAdmin, async (req, res) => {
   try {
-    const video = await Video.findById(req.params.id);
+    const video = await Video.findByIdAndDelete(req.params.id);
     if (!video) return res.status(404).json({ message: 'Video not found' });
 
-    if (fs.existsSync(video.fileUrl)) fs.unlinkSync(video.fileUrl);
+    if (video.fileUrl && fs.existsSync(video.fileUrl)) fs.unlinkSync(video.fileUrl);
+    if (video.image && fs.existsSync(video.image)) fs.unlinkSync(video.image);
+    if (video.overviewPdf && fs.existsSync(video.overviewPdf)) fs.unlinkSync(video.overviewPdf);
 
-    await Video.findByIdAndDelete(req.params.id);
-    res.json({ message: 'Video deleted' });
+    res.json({ message: 'Video deleted successfully' });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    console.error('Delete error:', err);
+    res.status(500).json({ error: 'Server error during video deletion' });
   }
 });
+
+
+
+
+
+
+
+
 router.get('/videos',  async (req, res) => {
   try {
     const videos = await Video.find().sort({ createdAt: -1 }); // latest first
@@ -458,17 +675,20 @@ router.get('/public/video/:id', async (req, res) => {
 
 // ------------------ Comments and Likes ------------------
 
-// 📌 Add Comment
-// router.post("/:id/comments", async (req, res) => {
+
+// router.post("/:id/comments",authenticate, async (req, res) => {                                             // working for admin
 //   const { email, text } = req.body;
-//   const { videoId } = req.params;
+//   const videoId = req.params.id;
 
 //   try {
 //     const video = await Video.findById(videoId);
 //     if (!video) return res.status(404).json({ message: "Video not found" });
 
+//     const user = await User.findOne({ email });
+//     if (!user) return res.status(404).json({ message: "User not found" });
+
 //     const newComment = {
-//       user: email,
+//       user: user._id,
 //       video: videoId,
 //       text,
 //     };
@@ -481,16 +701,32 @@ router.get('/public/video/:id', async (req, res) => {
 //     res.status(500).json({ error: error.message });
 //   }
 // });
-router.post("/:id/comments", async (req, res) => {
-  const { email, text } = req.body;
+
+// // 📌 Get All Comments for a Video
+// router.get("/:id/comments",authenticate, async (req, res) => {                                                   // working for admin
+//   try {
+//     const video = await Video.findById(req.params.id)
+//       .populate("comments.user", "name email")
+//       .exec();
+
+//     if (!video) return res.status(404).json({ message: "Video not found" });
+
+//     res.status(200).json(video.comments);
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// });
+
+router.post("/:id/comments", authenticate, async (req, res) => {
+  const { text } = req.body;
   const videoId = req.params.id;
 
   try {
+    const user = await User.findOne({ email: req.user.email });
+    if (!user) return res.status(404).json({ message: "User not found" });
+
     const video = await Video.findById(videoId);
     if (!video) return res.status(404).json({ message: "Video not found" });
-
-    const user = await User.findOne({ email });
-    if (!user) return res.status(404).json({ message: "User not found" });
 
     const newComment = {
       user: user._id,
@@ -507,8 +743,9 @@ router.post("/:id/comments", async (req, res) => {
   }
 });
 
-// 📌 Get All Comments for a Video
-router.get("/:id/comments", async (req, res) => {
+
+
+router.get("/:id/comments", authenticate, async (req, res) => {
   try {
     const video = await Video.findById(req.params.id)
       .populate("comments.user", "name email")
@@ -516,58 +753,64 @@ router.get("/:id/comments", async (req, res) => {
 
     if (!video) return res.status(404).json({ message: "Video not found" });
 
+    // ✅ Return all comments (not just user's)
     res.status(200).json(video.comments);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-// router.get("/:id/comments", async (req, res) => {
+// router.delete("/:id/comments/:commentId", authenticate, async (req, res) => {
 //   try {
-//     const video = await Video.findById(req.params.videoId)
-//       .populate("comments.user", "name") // Populate user name
-//       .exec();
-
+//     const video = await Video.findById(req.params.id);
 //     if (!video) return res.status(404).json({ message: "Video not found" });
 
-//     res.status(200).json(video.comments);
-//   } catch (error) {
-//     res.status(500).json({ error: error.message });
-//   }
-// });
+//     const comment = video.comments.id(req.params.commentId);
+//     if (!comment) return res.status(404).json({ message: "Comment not found" });
 
-// 📌 Add Like
-// router.post("/:id/likes", async (req, res) => { //last updated
-//   const { email } = req.body;
-//   const videoId = req.params.id;
-
-//   try {
-//     const user = await User.findOne({ email });
-//     if (!user) return res.status(404).json({ message: "User not found" });
-
-//     const video = await Video.findById(videoId);
-//     if (!video) return res.status(404).json({ message: "Video not found" });
-
-//     const likeIndex = video.likes.findIndex(
-//       (like) => like.user.toString() === user._id.toString()
-//     );
-
-//     if (likeIndex !== -1) {
-//       // ❌ Unlike
-//       video.likes.splice(likeIndex, 1);
-//       await video.save();
-//       return res.status(200).json({ message: "Like removed" });
+//     // ✅ Check permissions
+//     if (req.user.role !== 'admin' && comment.user.toString() !== req.user.id) {
+//       return res.status(403).json({ message: "Not allowed to delete this comment" });
 //     }
 
-//     // ✅ Like
-//     video.likes.push({ user: user._id });
+//     comment.remove();
 //     await video.save();
-//     return res.status(201).json({ message: "Video liked" });
+
+//     res.status(200).json({ message: "Comment deleted" });
 //   } catch (error) {
 //     res.status(500).json({ error: error.message });
 //   }
 // });
-router.post("/:id/likes", async (req, res) => {
+
+router.delete("/:id/comments/:commentId", authenticate, async (req, res) => {
+  try {
+    const { id, commentId } = req.params;
+    const video = await Video.findById(id);
+
+    if (!video) return res.status(404).json({ message: "Video not found" });
+
+    // ✅ Find the comment
+    const comment = video.comments.id(commentId);
+    if (!comment) return res.status(404).json({ message: "Comment not found" });
+
+    // ✅ Allow deletion if admin OR comment owner
+    if (req.user.role !== "admin" && comment.user.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
+
+    // ✅ Remove comment
+    video.comments.pull({ _id: commentId });
+    await video.save();
+
+    res.status(200).json({ message: "Comment deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
+
+router.post("/:id/likes",authenticate, async (req, res) => {
   const { email } = req.body;
   const videoId = req.params.id;
 
@@ -598,65 +841,37 @@ router.post("/:id/likes", async (req, res) => {
   }
 });
 
-// router.post("/:id/likes", async (req, res) => {
-//   const { email } = req.body;
-//   const videoId = req.params.id;
-
+// router.get("/:videoId/likes",authenticate, async (req, res) => {
 //   try {
-//     // Get user ID by email
-//     const user = await User.findOne({ email });
-//     if (!user) return res.status(404).json({ message: "User not found" });
+//     const video = await Video.findById(req.params.videoId)
+//       .populate("likes.user", "name email")
+//       .exec();
 
-//     // Get the video
-//     const video = await Video.findById(videoId);
 //     if (!video) return res.status(404).json({ message: "Video not found" });
 
-//     // Check if user already liked
-//     const alreadyLiked = video.likes.some(
-//       (like) => like.user.toString() === user._id.toString()
-//     );
-//     if (alreadyLiked) return res.status(400).json({ message: "Already liked" });
-
-//     // Add like with ObjectId
-//     const newLike = {
-//       user: user._id,
-//       video: video._id,
-//     };
-
-//     video.likes.push(newLike);
-//     await video.save();
-
-//     res.status(201).json({ message: "Video liked", like: newLike });
+//     res.status(200).json(video.likes);
 //   } catch (error) {
 //     res.status(500).json({ error: error.message });
 //   }
 // });
 
-
-// 📌 Get Like Count
-// router.get("/:videoId/likes", async (req, res) => {
-//   try {
-//     const video = await Video.findById(req.params.videoId);
-//     if (!video) return res.status(404).json({ message: "Video not found" });
-
-//     res.status(200).json({ likeCount: video.likes.length });
-//   } catch (error) {
-//     res.status(500).json({ error: error.message });
-//   }
-// });
-router.get("/:videoId/likes", async (req, res) => {
+router.get("/:id/likes", authenticate, async (req, res) => {
   try {
-    const video = await Video.findById(req.params.videoId)
-      .populate("likes.user", "name email")
+    const video = await Video.findById(req.params.id)
+      .populate("likes.user", "name email") // ✅ populate user info
       .exec();
 
     if (!video) return res.status(404).json({ message: "Video not found" });
 
+    // ✅ Return all likes
     res.status(200).json(video.likes);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
+
+
+
 
 // 📌 Remove Like
 // router.delete("/:videoId/likes/:userId", async (req, res) => {
@@ -762,6 +977,30 @@ router.get('/sub-category/:id', authenticateAdmin, async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 });
+
+
+// Get all stacks
+router.get('/stacks', authenticateAdmin, async (req, res) => {
+  const stacks = await Stack.find();
+  res.json(stacks);
+});
+
+// Get categories by stack
+router.get('/categories', authenticateAdmin, async (req, res) => {
+  const { stackId } = req.query;
+  const categories = await Category.find({ stack: stackId });
+  res.json(categories);
+});
+
+// Get subcategories by category
+router.get('/sub-categories', authenticateAdmin, async (req, res) => {
+  const { categoryId } = req.query;
+  const subCategories = await SubCategory.find({ category: categoryId });
+  res.json(subCategories);
+});
+
+
+
 
 
 

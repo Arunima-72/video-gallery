@@ -22,6 +22,8 @@ const adminroutes = require('./routes/adminRoutes');
 const uploadroutes = require('./routes/uploadroutes');
 const userRoutes= require('./routes/userRoutes')
 const routesUser = require('./routes/routesUser');
+const authRoutes = require('./routes/auth');
+const activityRoutes = require('./routes/userActivity');
 
 app.use('/upload', uploadroutes);
 app.use('/change', userRoutes);
@@ -29,9 +31,9 @@ app.use('/change', userRoutes);
 app.use('/editprofile', routesUser);
 
 app.use('/admin', adminroutes);
+app.use('/activity', activityRoutes);
 
 
-const authRoutes = require('./routes/auth');
 app.use('/user', authRoutes);
 app.listen(3000,() => {
     console.log(`Server running on port 3000`);
