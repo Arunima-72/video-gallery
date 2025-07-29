@@ -123,27 +123,98 @@
 // };
 
 // export default CommonNav;
+
+
+// import React from 'react';
+// import { AppBar, Toolbar, IconButton, Button, Box } from '@mui/material';             //working
+// import MenuIcon from '@mui/icons-material/Menu';
+// import HomeIcon from '@mui/icons-material/Home';
+// import LogoutIcon from '@mui/icons-material/Logout';
+// import { useNavigate } from 'react-router-dom';
+// import logo from "../assets/download.png";
+
+// const CommonNav = ({ onToggleSidebar }) => {
+//   const navigate = useNavigate();
+
+//   const handleLogout = () => {
+//     localStorage.removeItem('token');
+//     navigate('/');
+//   };
+
+//   return (
+//     <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 ,backgroundColor: "#B2E0FB"}}>
+//       <Toolbar>
+
+//         {/* Menu Button */}
+//         <IconButton edge="start" color="inherit" onClick={onToggleSidebar} sx={{ mr: 2 }}>
+//           <MenuIcon />
+//         </IconButton>
+
+//         {/* Logo */}
+//         <img
+//           src={logo}
+//           alt="ICT Academy"
+//           style={{ height: 40, marginRight: 16 }}
+//         />
+
+//         {/* Spacer to push other items to the right */}
+//         <Box sx={{ flexGrow: 1 }} />
+
+//         {/* Home and Logout Buttons */}
+//         <Button startIcon={<HomeIcon />} onClick={() => navigate('/')}>
+//           Home
+//         </Button>
+//         <Button  startIcon={<LogoutIcon />} onClick={handleLogout}>                  
+//           Logout
+//         </Button>
+//       </Toolbar>
+//     </AppBar>
+//   );
+// };
+
+// export default CommonNav;
+
+
 import React from 'react';
 import { AppBar, Toolbar, IconButton, Button, Box } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import HomeIcon from '@mui/icons-material/Home';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import logo from "../assets/download.png";
 
 const CommonNav = ({ onToggleSidebar }) => {
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/');
+  const handleLogout = async () => {
+    const token = localStorage.getItem('token');
+    const userId = localStorage.getItem('userId');
+
+    try {
+      await axios.post('http://localhost:3000/user/logout', { userId }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      // ✅ Clear all session data
+      localStorage.clear();
+
+      navigate('/'); // Redirect to login
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
   };
 
   return (
-    <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 ,backgroundColor: "#B2E0FB"}}>
+    <AppBar
+      position="fixed"
+      sx={{
+        zIndex: (theme) => theme.zIndex.drawer + 1,
+        backgroundColor: "#B2E0FB"
+      }}
+    >
       <Toolbar>
-
-        {/* Menu Button */}
+        {/* Sidebar Menu Button */}
         <IconButton edge="start" color="inherit" onClick={onToggleSidebar} sx={{ mr: 2 }}>
           <MenuIcon />
         </IconButton>
@@ -155,14 +226,16 @@ const CommonNav = ({ onToggleSidebar }) => {
           style={{ height: 40, marginRight: 16 }}
         />
 
-        {/* Spacer to push other items to the right */}
+        {/* Spacer */}
         <Box sx={{ flexGrow: 1 }} />
 
-        {/* Home and Logout Buttons */}
+        {/* Home Button */}
         <Button startIcon={<HomeIcon />} onClick={() => navigate('/')}>
           Home
         </Button>
-        <Button  startIcon={<LogoutIcon />} onClick={handleLogout}>
+
+        {/* Logout Button */}
+        <Button startIcon={<LogoutIcon />} onClick={handleLogout}>
           Logout
         </Button>
       </Toolbar>

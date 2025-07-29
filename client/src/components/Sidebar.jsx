@@ -322,7 +322,7 @@ const Sidebar = ({ open, userType }) => {
   ];
 
   const userLinks = [
-    { text: 'My Videos', icon: <VideoIcon />, path: '/user/videos' },
+    { text: 'My Videos', icon: <VideoIcon />, path: '/admin/videos' },
     { text: 'Saved Videos', icon: <SaveIcon />, path: '/user/bookmarks' },
     { text: 'Change Password', icon: <PasswordIcon />, path: '/user/password' },
   ];

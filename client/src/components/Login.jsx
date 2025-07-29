@@ -437,9 +437,9 @@ const Login = ({ open, handleClose }) => {
       // Store token and role in localStorage (default)
       localStorage.setItem('token', token);
       localStorage.setItem('role', role);
-
+localStorage.setItem('userId', response.data.userId);
       handleClose();
-      navigate(role === 'admin' ? '/admin/dashboard' : '/user/dashboard');
+      navigate(role === 'admin' ? '/admin/dashboard' : '/admin/videos');
     } catch (err) {
       const msg = err.response?.data?.message || 'Login failed. Please try again.';
       setServerError(msg);

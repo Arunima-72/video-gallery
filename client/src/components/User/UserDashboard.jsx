@@ -136,143 +136,143 @@
 
 // export default UserDashboard;
 
-import React, { useEffect, useState } from 'react';//updated dashboard 20/7
-import CommonNav from '../CommonNav';
-import Sidebar from '../Sidebar';
-import { useNavigate } from 'react-router-dom';
-import {
-  Box,
-  Typography,
-  TextField,
-  Button,
-  Stack,
-  Collapse,
-} from '@mui/material';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+// import React, { useEffect, useState } from 'react';//updated dashboard 20/7
+// import CommonNav from '../CommonNav';
+// import Sidebar from '../Sidebar';
+// import { useNavigate } from 'react-router-dom';
+// import {
+//   Box,
+//   Typography,
+//   TextField,
+//   Button,
+//   Stack,
+//   Collapse,
+// } from '@mui/material';
+// import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 
-const drawerWidthOpen = 240;
-const drawerWidthClosed = 60;
-const appBarHeight = 64;
+// const drawerWidthOpen = 240;
+// const drawerWidthClosed = 60;
+// const appBarHeight = 64;
 
-const UserDashboard = ({ children }) => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [videos, setVideos] = useState([]);
-  const [stacks, setStacks] = useState([]);
-  const [showStacks, setShowStacks] = useState(false);
-  const [search, setSearch] = useState('');
-  const [username, setUsername] = useState('');
+// const UserDashboard = ({ children }) => {
+//   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+//   const [videos, setVideos] = useState([]);
+//   const [stacks, setStacks] = useState([]);
+//   const [showStacks, setShowStacks] = useState(false);
+//   const [search, setSearch] = useState('');
+//   const [username, setUsername] = useState('');
 
-  const navigate = useNavigate();
-  const onToggleSidebar = () => setIsSidebarOpen((prev) => !prev);
+//   const navigate = useNavigate();
+//   const onToggleSidebar = () => setIsSidebarOpen((prev) => !prev);
 
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    const userRole = localStorage.getItem('role');
-    const name = localStorage.getItem('username') || 'User';
+//   useEffect(() => {
+//     const token = localStorage.getItem('token');
+//     const userRole = localStorage.getItem('role');
+//     const name = localStorage.getItem('username') || 'User';
 
-    if (!token || userRole !== 'user') {
-      navigate('/');
-    }
+//     if (!token || userRole !== 'user') {
+//       navigate('/');
+//     }
 
-    setUsername(name);
+//     setUsername(name);
 
-    // Simulate fetching videos/stacks (replace with real APIs)
-    setVideos([]); // e.g., fetch('/api/videos')
-    setStacks([]); // e.g., fetch('/api/stacks')
-  }, [navigate]);
+//     // Simulate fetching videos/stacks (replace with real APIs)
+//     setVideos([]); // e.g., fetch('/api/videos')
+//     setStacks([]); // e.g., fetch('/api/stacks')
+//   }, [navigate]);
 
-  return (
-    <Box sx={{ display: 'flex' }}>
-      {/* Navbar */}
-      <CommonNav onToggleSidebar={onToggleSidebar} />
+//   return (
+//     <Box sx={{ display: 'flex' }}>
+//       {/* Navbar */}
+//       <CommonNav onToggleSidebar={onToggleSidebar} />
 
-      {/* Sidebar */}
-      <Sidebar open={isSidebarOpen} userType="user" />
+//       {/* Sidebar */}
+//       <Sidebar open={isSidebarOpen} userType="user" />
 
-      {/* Main Content */}
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          pt: `${appBarHeight + 24}px`,
-          pl: isSidebarOpen ? `${drawerWidthOpen + 24}px` : `${drawerWidthClosed + 24}px`,
-          pr: 4,
-          pb: 4,
-          backgroundColor: '#f7f9fa',
-          minHeight: '100vh',
-          transition: 'padding 0.3s ease',
-          boxShadow: '0 0 10px rgba(0,0,0,0.1)',
-          borderRadius: 2,
-        }}
-      >
-        {/* Welcome Message */}
-        <Typography variant="h5" fontWeight="bold" mb={3}>
-          Welcome {username}
-        </Typography>
+//       {/* Main Content */}
+//       <Box
+//         component="main"
+//         sx={{
+//           flexGrow: 1,
+//           pt: `${appBarHeight + 24}px`,
+//           pl: isSidebarOpen ? `${drawerWidthOpen + 24}px` : `${drawerWidthClosed + 24}px`,
+//           pr: 4,
+//           pb: 4,
+//           backgroundColor: '#f7f9fa',
+//           minHeight: '100vh',
+//           transition: 'padding 0.3s ease',
+//           boxShadow: '0 0 10px rgba(0,0,0,0.1)',
+//           borderRadius: 2,
+//         }}
+//       >
+//         {/* Welcome Message */}
+//         <Typography variant="h5" fontWeight="bold" mb={3}>
+//           Welcome {username}
+//         </Typography>
 
-        {/* Search Bar */}
-        <TextField
-          placeholder="Search videos..."
-          variant="outlined"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          sx={{
-            width: '100%',
-            maxWidth: 400,
-            mb: 2,
-            '& .MuiOutlinedInput-root': {
-              borderRadius: '50px',
-            },
-          }}
-        />
+//         {/* Search Bar */}
+//         <TextField
+//           placeholder="Search videos..."
+//           variant="outlined"
+//           value={search}
+//           onChange={(e) => setSearch(e.target.value)}
+//           sx={{
+//             width: '100%',
+//             maxWidth: 400,
+//             mb: 2,
+//             '& .MuiOutlinedInput-root': {
+//               borderRadius: '50px',
+//             },
+//           }}
+//         />
 
-        {/* Filter Buttons */}
-        <Stack direction="row" spacing={2} mb={3}>
-          <Button
-            variant={!showStacks ? 'contained' : 'outlined'}
-            onClick={() => setShowStacks(false)}
-          >
-            All
-          </Button>
-          <Button
-            variant={showStacks ? 'contained' : 'outlined'}
-            endIcon={<KeyboardArrowDownIcon />}
-            onClick={() => setShowStacks((prev) => !prev)}
-          >
-            Stack
-          </Button>
-        </Stack>
+//         {/* Filter Buttons */}
+//         <Stack direction="row" spacing={2} mb={3}>
+//           <Button
+//             variant={!showStacks ? 'contained' : 'outlined'}
+//             onClick={() => setShowStacks(false)}
+//           >
+//             All
+//           </Button>
+//           <Button
+//             variant={showStacks ? 'contained' : 'outlined'}
+//             endIcon={<KeyboardArrowDownIcon />}
+//             onClick={() => setShowStacks((prev) => !prev)}
+//           >
+//             Stack
+//           </Button>
+//         </Stack>
 
-        {/* Conditional Content */}
-        <Collapse in={showStacks}>
-          {stacks.length > 0 ? (
-            <Stack spacing={1}>
-              {stacks.map((stack, index) => (
-                <Typography key={index}>{stack}</Typography>
-              ))}
-            </Stack>
-          ) : (
-            <Typography>No stacks found</Typography>
-          )}
-        </Collapse>
+//         {/* Conditional Content */}
+//         <Collapse in={showStacks}>
+//           {stacks.length > 0 ? (
+//             <Stack spacing={1}>
+//               {stacks.map((stack, index) => (
+//                 <Typography key={index}>{stack}</Typography>
+//               ))}
+//             </Stack>
+//           ) : (
+//             <Typography>No stacks found</Typography>
+//           )}
+//         </Collapse>
 
-        {!showStacks && (
-          videos.length > 0 ? (
-            <Stack spacing={1}>
-              {videos.map((video, index) => (
-                <Typography key={index}>{video.title}</Typography>
-              ))}
-            </Stack>
-          ) : (
-            <Typography>No videos found</Typography>
-          )
-        )}
+//         {!showStacks && (
+//           videos.length > 0 ? (
+//             <Stack spacing={1}>
+//               {videos.map((video, index) => (
+//                 <Typography key={index}>{video.title}</Typography>
+//               ))}
+//             </Stack>
+//           ) : (
+//             <Typography>No videos found</Typography>
+//           )
+//         )}
 
-        {/* Extra content */}
-        {children}
-      </Box>
-    </Box>
-  );
-};
+//         {/* Extra content */}
+//         {children}
+//       </Box>
+//     </Box>
+//   );
+// };
 
-export default UserDashboard;
+// export default UserDashboard;
