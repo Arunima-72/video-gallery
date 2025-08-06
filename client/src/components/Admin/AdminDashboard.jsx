@@ -1974,9 +1974,11 @@ const AdminDashboard = () => {
     return (
       <Box mb={6}>
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-          <Typography variant="h6" fontWeight={600}>{title}</Typography>
+          <Typography variant="h6" fontWeight={600} style={{fontFamily:'Poppins'}}>{title}</Typography>
           <Box display="flex" alignItems="center" gap={2}>
-            <Button variant="contained" startIcon={<AddCircleIcon />} size="small" onClick={() => handleAdd(type)}>
+            <Button variant="contained"  sx={{
+    fontFamily: 'Poppins',
+    color: '"#41596eff"',  }} startIcon={<AddCircleIcon />} size="small" onClick={() => handleAdd(type)}>
               Add
             </Button>
             <Button endIcon={<ArrowForwardIcon />} onClick={scrollRight} size="small">
@@ -1998,10 +2000,10 @@ const AdminDashboard = () => {
         >
           {items.length > 0 ? items.map((item) => (
             <Card key={item._id}
-              sx={{ width: 160, minWidth: 160, height: 180, flexShrink: 0, borderRadius: 2, boxShadow: 3 }}>
+              sx={{ width: 200, minWidth: 160, height: 180, flexShrink: 0, borderRadius: 2, boxShadow: 3 }}>
               <CardMedia
                 component="img"
-                height="100"
+                height="140"
                 image={`http://localhost:3000/uploads/${item.image}`}
                 alt={item.name}
                 sx={{ objectFit: 'cover' }}
@@ -2015,7 +2017,7 @@ const AdminDashboard = () => {
                   alignItems: 'center',
                 }}
               >
-                <Typography variant="body2" fontWeight={500} noWrap sx={{ maxWidth: '80%' }}>
+                <Typography variant="body2"  style={{fontFamily:'Poppins'}} fontWeight={500} noWrap sx={{ maxWidth: '80%' }}>
                   {item.name}
                 </Typography>
                 <IconButton
@@ -2058,9 +2060,9 @@ const AdminDashboard = () => {
           transition: 'padding 0.3s ease',
         }}
       >
-        <Box sx={{ backgroundColor: '#fff', p: 3, mb: 4, borderRadius: 2, boxShadow: 2 }}>
+        {/* <Box sx={{ backgroundColor: '#fff', p: 3, mb: 4, borderRadius: 2, boxShadow: 2 }}>
           <Typography variant="h5" fontWeight={700}>Welcome</Typography>
-        </Box>
+        </Box> */}
 
         {renderSection('Stacks', stacks, 'stack')}
         {renderSection('Categories', categories, 'category')}

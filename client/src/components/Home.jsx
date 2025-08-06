@@ -1,424 +1,4 @@
-// import React from "react";
-// import {
-//   Box,
-//   Button,
-//   Typography,
-//   Container,
-//   Paper,
-//   useTheme,
-//   useMediaQuery,
-// } from "@mui/material";
 
-// const Home = () => {
-//   const theme = useTheme();
-//   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-
-//   return (
-//     <Box
-//       sx={{
-//         bgcolor: "#f5f5f5",
-//         minHeight: "100vh",
-//         display: "flex",
-//         alignItems: "center",
-//         justifyContent: "center",
-//         py: 4,
-//       }}
-//     >
-//       <Container maxWidth="md">
-//         <Paper
-//           elevation={3}
-//           sx={{
-//             p: { xs: 3, sm: 4, md: 6 },
-//             textAlign: "center",
-//             backgroundColor: "white",
-//             borderRadius: 2,
-//           }}
-//         >
-//           <Typography
-//             variant={isMobile ? "h5" : "h4"}
-//             fontWeight="bold"
-//             color="primary"
-//             gutterBottom
-//           >
-//             FSD VIDEO GALLERY
-//           </Typography>
-
-//           <Typography
-//             variant="body1"
-//             sx={{ mb: 4, fontSize: isMobile ? "0.95rem" : "1.1rem" }}
-//           >
-//             Subheading that sets up context, shares more info about the website,
-//             or generally gets people psyched to keep scrolling.
-//           </Typography>
-
-//           <Button
-//             variant="contained"
-//             color="primary"
-//             sx={{
-//               px: isMobile ? 3 : 5,
-//               py: 1.5,
-//               fontSize: isMobile ? "0.9rem" : "1rem",
-//             }}
-//           >
-//             Explore Videos
-//           </Button>
-
-//           <Box mt={6} display="flex" justifyContent="center">
-//             <img
-//               src="/logo-placeholder.png"
-//               alt="ICT Academy Kerala"
-//               style={{
-//                 maxWidth: isMobile ? "120px" : "200px",
-//                 opacity: 0.08,
-//               }}
-//             />
-//           </Box>
-//         </Paper>
-//       </Container>
-//     </Box>
-//   );
-// };
-
-// export default Home;
-// pages/Home.jsx
-// import React from "react";
-// import { Box, Button, Typography } from "@mui/material";
-// import { useNavigate } from "react-router-dom";
-
-// const Home = ({ isLoggedIn }) => {
-//   const navigate = useNavigate();
-
-//   const handleExplore = () => {
-//     if (isLoggedIn) {
-//       navigate("/user/dashboard");
-//     }
-//   };
-
-//   return (
-//     <Box sx={{ textAlign: "center", mt: 8 }}>
-//       <Typography variant="h3" gutterBottom>
-//         Welcome to FSD Video Gallery
-//       </Typography>
-//       <Typography variant="body1" sx={{ mb: 3 }}>
-//         Explore various full stack development videos
-//       </Typography>
-
-//       {isLoggedIn ? (
-//         <Button variant="contained" onClick={handleExplore}>
-//           Explore Videos
-//         </Button>
-//       ) : (
-//         <Typography color="error" fontWeight="bold">
-//           Only logged-in users can explore videos.
-//         </Typography>
-//       )}
-//     </Box>
-//   );
-// };
-
-// export default Home;
-// import React from "react";
-// import {
-//   Box,
-//   Button,
-//   Typography,
-//   Grid,
-//   AppBar,
-//   Toolbar,
-//   IconButton,
-//   Snackbar,
-//   Modal,
-// } from "@mui/material";
-
-// import { useNavigate } from "react-router-dom";
-// import { useState } from "react";
-//  // 📌 Add your ICT logo in src/assets folder
-
-// const Home = ({ isLoggedIn, handleLogout }) => {
-//   const navigate = useNavigate();
-//   const [toastOpen, setToastOpen] = useState(false);
-//   const [modalOpen, setModalOpen] = useState(false);
-
-//   const handleExplore = () => {
-//     if (isLoggedIn) {
-//       setModalOpen(true);
-//     } else {
-//       setToastOpen(true);
-//     }
-//   };
-
-//   const handleModalConfirm = () => {
-//     setModalOpen(false);
-//     navigate("/user/dashboard");
-//   };
-
-//   return (
-//     <Box>
-//       {/* Navbar */}
-//       <AppBar position="static" sx={{ backgroundColor: "#B2E0FB" }}>
-//             <Toolbar>
-//               <img
-//                 src={logo}
-//                 alt="ICT Academy"
-//                 style={{ height: 40, marginRight: 16 }}
-//               />
-//               <Box sx={{ flexGrow: 1 }} />
-//               <Button startIcon={<HomeIcon />} >
-//                 Home
-//               </Button>
-//               <Button startIcon={<InfoIcon />} >
-//                 About
-//               </Button>
-//               <Button startIcon={<ContactMailIcon />} >
-//                 Contact
-//               </Button>
-//               <Button startIcon={<LoginIcon />}  component={Link} to="/login">Login</Button>
-//             </Toolbar>
-//           </AppBar>
-   
-
-//       {/* Hero Section */}
-//       <Box
-//         sx={{
-//           p: { xs: 2, md: 4 },
-//           mt: 5,
-//           display: "flex",
-//           justifyContent: "center",
-//           alignItems: "center",
-//           flexDirection: "column",
-//           animation: "fadeIn 2s ease-in-out",
-//           textAlign: "center",
-//         }}
-//       >
-//         <Typography variant="h4" fontWeight="bold" gutterBottom>
-//           FSD VIDEO GALLERY
-//         </Typography>
-//         <Typography variant="subtitle1" sx={{ mb: 3 }}>
-//           Subheading that sets up context, shares more info about the website,
-//           or generally gets people psyched to keep scrolling.
-//         </Typography>
-
-//         {isLoggedIn ? (
-//           <Button variant="contained" onClick={handleExplore}>
-//             Explore Videos
-//           </Button>
-//         ) : (
-//           <Typography color="error" fontWeight="bold">
-//             Only logged-in users can explore videos.
-//           </Typography>
-//         )}
-//       </Box>
-
-//       {/* Toast Notification */}
-//       <Snackbar
-//         open={toastOpen}
-//         autoHideDuration={3000}
-//         onClose={() => setToastOpen(false)}
-//         message="Please login to explore videos"
-//       />
-
-//       {/* Confirmation Modal */}
-//       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
-//         <Box
-//           sx={{
-//             width: 300,
-//             bgcolor: "background.paper",
-//             p: 4,
-//             mx: "auto",
-//             my: "20%",
-//             borderRadius: 2,
-//             boxShadow: 24,
-//             textAlign: "center",
-//           }}
-//         >
-//           <Typography variant="h6" gutterBottom>
-//             Ready to explore videos?
-//           </Typography>
-//           <Button
-//             variant="contained"
-//             sx={{ mr: 1 }}
-//             onClick={handleModalConfirm}
-//           >
-//             Yes
-//           </Button>
-//           <Button
-//             variant="outlined"
-//             onClick={() => setModalOpen(false)}
-//           >
-//             Cancel
-//           </Button>
-//         </Box>
-//       </Modal>
-
-//       {/* Fade-in animation keyframes */}
-//       <style>{`
-//         @keyframes fadeIn {
-//           from { opacity: 0; transform: translateY(30px); }
-//           to { opacity: 1; transform: translateY(0); }
-//         }
-//       `}</style>
-//     </Box>
-//   );
-// };
-
-// export default Home;
-// import React, { useState } from "react";
-// import {
-//   AppBar,
-//   Toolbar,
-//   Button,
-//   Typography,
-//   Box,
-//   Snackbar,
-//   Modal,
-//   IconButton,
-// } from "@mui/material";
-// import HomeIcon from "@mui/icons-material/Home";
-// import InfoIcon from "@mui/icons-material/Info";
-// import ContactMailIcon from "@mui/icons-material/ContactMail";
-// import LoginIcon from "@mui/icons-material/Login";
-
-// import logo from "../assets/download.png"; // make sure logo exists
-// import { useNavigate } from "react-router-dom";
-// import Login from "../components/Login"; // path to your dialog component
-
-// const Home = () => {
-//   const navigate = useNavigate();
-//   const [isLoggedIn, setIsLoggedIn] = useState(false);
-//   const [userRole, setUserRole] = useState(null);
-
-//   const [toastOpen, setToastOpen] = useState(false);
-//   const [modalOpen, setModalOpen] = useState(false);
-//   const [loginDialogOpen, setLoginDialogOpen] = useState(false);
-
-//   const handleExplore = () => {
-//     if (isLoggedIn) {
-//       setModalOpen(true);
-//     } else {
-//       setToastOpen(true);
-//     }
-//   };
-
-//   const handleModalConfirm = () => {
-//     setModalOpen(false);
-//     if (userRole === "admin") {
-//       navigate("/admin/dashboard");
-//     } else {
-//       navigate("/user/dashboard");
-//     }
-//   };
-
-//   const handleLogin = ({ username, role }) => {
-//     setIsLoggedIn(true);
-//     setUserRole(role);
-//   };
-
-//   return (
-//     <Box>
-//       {/* Navbar */}
-//       <AppBar position="static" sx={{ backgroundColor: "#B2E0FB" }}>
-//         <Toolbar>
-//           <img
-//             src={logo}
-//             alt="ICT Academy"
-//             style={{ height: 40, marginRight: 16 }}
-//           />
-//           <Box sx={{ flexGrow: 1 }} />
-//           <Button startIcon={<HomeIcon />}>Home</Button>
-//           <Button startIcon={<InfoIcon />}>About</Button>
-//           <Button startIcon={<ContactMailIcon />}>Contact</Button>
-//           <Button
-//             startIcon={<LoginIcon />}
-//             onClick={() => setLoginDialogOpen(true)}
-//           >
-//             Login
-//           </Button>
-//         </Toolbar>
-//       </AppBar>
-
-//       {/* Hero Section */}
-//       <Box
-//         sx={{
-//           p: { xs: 2, md: 4 },
-//           mt: 5,
-//           display: "flex",
-//           justifyContent: "center",
-//           alignItems: "center",
-//           flexDirection: "column",
-//           animation: "fadeIn 1.5s ease-in-out",
-//           textAlign: "center",
-//         }}
-//       >
-//         <Typography variant="h4" fontWeight="bold" gutterBottom>
-//           FSD VIDEO GALLERY
-//         </Typography>
-//         <Typography variant="subtitle1" sx={{ mb: 3 }}>
-//           Subheading that sets up context, shares more info about the website,
-//           or generally gets people psyched to keep scrolling.
-//         </Typography>
-
-//         <Button variant="contained" onClick={handleExplore}>
-//           Explore Videos
-//         </Button>
-//       </Box>
-
-//       {/* Toast Notification */}
-//       <Snackbar
-//         open={toastOpen}
-//         autoHideDuration={3000}
-//         onClose={() => setToastOpen(false)}
-//         message="Please login to explore videos"
-//       />
-
-//       {/* Confirmation Modal */}
-//       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
-//         <Box
-//           sx={{
-//             width: 300,
-//             bgcolor: "background.paper",
-//             p: 4,
-//             mx: "auto",
-//             my: "20%",
-//             borderRadius: 2,
-//             boxShadow: 24,
-//             textAlign: "center",
-//           }}
-//         >
-//           <Typography variant="h6" gutterBottom>
-//             Ready to explore videos?
-//           </Typography>
-//           <Button
-//             variant="contained"
-//             sx={{ mr: 1 }}
-//             onClick={handleModalConfirm}
-//           >
-//             Yes
-//           </Button>
-//           <Button variant="outlined" onClick={() => setModalOpen(false)}>
-//             Cancel
-//           </Button>
-//         </Box>
-//       </Modal>
-
-//       {/* Login Dialog */}
-//       <Login
-//         open={loginDialogOpen}
-//         handleClose={() => setLoginDialogOpen(false)}
-//         handleLogin={handleLogin}
-//       />
-
-//       {/* Animation styles */}
-//       <style>{`
-//         @keyframes fadeIn {
-//           from { opacity: 0; transform: translateY(20px); }
-//           to { opacity: 1; transform: translateY(0); }
-//         }
-//       `}</style>
-//     </Box>
-//   );
-// };
-
-// export default Home;
 
 
 
@@ -775,7 +355,458 @@
 // };
 
 // export default Home;
-import React, { useState, useEffect } from "react"; // updated on 2025-07-20
+// import React, { useState, useEffect } from "react"; // updated on 2025-07-20
+// import {
+//   AppBar,
+//   Toolbar,
+//   Button,
+//   Typography,
+//   Box,
+//   Snackbar,
+//   Modal,
+//   IconButton,
+//   Grid,
+//   Card,
+//   CardMedia,
+//   CardContent,
+// } from "@mui/material";
+// import HomeIcon from "@mui/icons-material/Home";
+// import InfoIcon from "@mui/icons-material/Info";
+// import MailIcon from "@mui/icons-material/Mail";
+// import LoginIcon from "@mui/icons-material/Login";
+// import LocationOnIcon from "@mui/icons-material/LocationOn";
+// import LinkedInIcon from "@mui/icons-material/LinkedIn";
+// import FacebookIcon from "@mui/icons-material/Facebook";
+// import InstagramIcon from "@mui/icons-material/Instagram";
+// import YouTubeIcon from "@mui/icons-material/YouTube";
+// import { motion } from "framer-motion";
+// import logo from "../assets/download.png";
+// import img1 from "../assets/techstack1.jpg";
+// import img2 from "../assets/techstack1.jpg";
+// import img3 from "../assets/techstack1.jpg";
+// import img4 from "../assets/techstack1.jpg";
+// import { useNavigate } from "react-router-dom";
+// import Login from "../components/Login";
+
+// const Home = () => {
+//   const navigate = useNavigate();
+//   const [isLoggedIn, setIsLoggedIn] = useState(false);
+//   const [userRole, setUserRole] = useState(null);
+//   const [toastOpen, setToastOpen] = useState(false);
+//   const [modalOpen, setModalOpen] = useState(false);
+//   const [loginDialogOpen, setLoginDialogOpen] = useState(false);
+
+//   const [galleryImages, setGalleryImages] = useState([
+//     { src: img1, title: "MERN Stack" },
+//     { src: img2, title: "Spring Boot" },
+//     // { src: img3, title: "Django Web App" },
+//     // { src: img4, title: "MEAN Stack" },
+//   ]);
+
+//   const handleExplore = () => {
+//     if (isLoggedIn) {
+//       setModalOpen(true);
+//     } else {
+//       setToastOpen(true);
+//     }
+//   };
+
+//   const handleModalConfirm = () => {
+//     setModalOpen(false);
+//     navigate(userRole === "admin" ? "/admin/dashboard" : "/user/dashboard");
+//   };
+
+//   const handleLogin = ({ username, role }) => {
+//     setIsLoggedIn(true);
+//     setUserRole(role);
+//   };
+
+//   const branchBgColor = "#f0f7fb";
+//   const branchHoverColor = "#d6eaf7";
+
+//   return (
+//     <Box>
+    
+//        {/* AppBar - modern layout */}
+//         <AppBar
+//   position="static"
+//   sx={{
+//     background: "linear-gradient(to right, #4886b8ff, #21CBF3)",
+//     color: "#fff",
+//     boxShadow: "0 3px 10px rgba(0,0,0,0.1)",
+//   }}
+// >
+//   <Toolbar sx={{ px: 3 }}>
+//     {/* Logo + Title */}
+//     <Box
+//       sx={{ display: "flex", alignItems: "center", cursor: "pointer" }}
+//       onClick={() => navigate("/")}
+//     >
+//       <img src={logo} alt="ICT Academy" style={{ height: 40, marginRight: 10 }} />
+//       <Typography variant="h6" sx={{ fontWeight: "bold", color: "#fff", fontFamily: 'Arial, sans-serif' }}>
+      
+//       </Typography>
+//     </Box>
+
+//     {/* Spacer */}
+//     <Box sx={{ flexGrow: 1 }} />
+
+//     {/* Home Button */}
+//     <Button
+//       startIcon={<HomeIcon />}
+//       onClick={() => navigate("/")}
+//       sx={{
+//         color: "#fff",
+//         textTransform: "none",
+//         fontSize: "16px",
+//         "&:hover": { backgroundColor: "rgba(255,255,255,0.15)" },
+//       }}
+//     >
+//       Home
+//     </Button>
+
+//     {/* About Button */}
+//     <Button
+//       startIcon={<InfoIcon />}
+//       sx={{
+//         color: "#fff",
+//         textTransform: "none",
+//         fontSize: "16px",
+//         "&:hover": { backgroundColor: "rgba(255,255,255,0.15)" },
+//       }}
+//     >
+//       About
+//     </Button>
+
+//     {/* Contact Button */}
+//     <Button
+//       startIcon={<MailIcon />}
+//       sx={{
+//         color: "#fff",
+//         textTransform: "none",
+//         fontSize: "16px",
+//         "&:hover": { backgroundColor: "rgba(255,255,255,0.15)" },
+//       }}
+//     >
+//       Contact
+//     </Button>
+
+//     {/* Login Button */}
+//     <Button
+//       startIcon={<LoginIcon />}
+//       onClick={() => setLoginDialogOpen(true)}
+//       sx={{
+//         color: "#fff",
+//         textTransform: "none",
+//         fontSize: "16px",
+//         ml: 1,
+//         "&:hover": { backgroundColor: "rgba(255,255,255,0.15)" },
+//       }}
+//     >
+//       Login
+//     </Button>
+//   </Toolbar>
+// </AppBar>
+
+    
+
+// <Box
+//   sx={{
+//     px: { xs: 3, md: 10 },
+//     py: 10,
+//     backgroundColor: "#f8fbfd",
+//     display: "flex",
+//     flexDirection: { xs: "column", md: "row" },
+//     alignItems: "center",
+//     justifyContent: "space-between",
+//     gap: 4,
+//   }}
+// >
+//   {/* Left content */}
+//   <Box sx={{ flex: 1 }}>
+//     <Typography
+//       variant="h4"
+//       fontWeight="bold"
+//       sx={{ color: "#002b5c", mb: 2 }}
+//     >
+//           FSD VIDEO GALLERY
+//     </Typography>
+//     <Typography
+//       variant="body1"
+//       sx={{ color: "#555", mb: 3, maxWidth: 500 }}
+//     >
+//  Explore alumni project video presentations using stacks like MERN, MEAN, Django,
+//           Spring Boot, and more. Learn from practical applications and real-world scenarios.
+//     </Typography>
+//     <Button
+//       variant="contained"
+//       sx={{
+//         backgroundColor: "#007bff",
+//         color: "#fff",
+//         textTransform: "none",
+//         fontWeight: 600,
+//         px: 4,
+//         py: 1.2,
+//         ":hover": { backgroundColor: "#0056b3" },
+//       }}
+//       onClick={handleExplore}
+//     >
+//       Get started
+//     </Button>
+//   </Box>
+
+//   {/* Right image */}
+//   <Box sx={{ flex: 1, display: "flex", justifyContent: "center" }}>
+//     <img
+//       src={img1}
+//       alt="Illustration"
+//       style={{ maxWidth: "100%", height: "auto", borderRadius: 12 }}
+//     />
+//   </Box>
+// </Box>
+
+     
+//       {/* <Box sx={{ px: { xs: 3, md: 10 }, py: 6, backgroundColor: "#ffffff" }}>
+//         <Typography
+//           variant="h4"
+//           fontWeight="bold"
+//           sx={{ color: "#004b8d", mb: 4, textAlign: "center" ,fontFamily:'-moz-initial'}}
+//         >
+//           FSD VIDEO GALLERY
+//         </Typography>
+//         <Typography
+//           variant="body1"
+//           sx={{ color: "#333", mb: 5, textAlign: "center", maxWidth: 800, mx: "auto" ,fontFamily:'-moz-initial'}}
+//         >
+//           Explore alumni project video presentations using stacks like MERN, MEAN, Django,
+//           Spring Boot, and more. Learn from practical applications and real-world scenarios.
+//         </Typography>
+
+
+        
+   
+
+// <Grid container spacing={3}>
+//   {galleryImages.map((img, index) => (
+//     <Grid item xs={12} sm={6} md={3} key={index}>
+//       <motion.div
+//         whileHover={{ scale: 1.05 }}
+//         initial={{ opacity: 0, y: 40 }}
+//         whileInView={{ opacity: 1, y: 0 }}
+//         transition={{ duration: 0.5, delay: index * 0.1 }}
+//         viewport={{ once: true }}
+//       >
+//         <Card sx={{ borderRadius: 2, boxShadow: 3 }}>
+//           <CardMedia
+//             component="img"
+//             height="180"
+//             image={img.src}
+//             alt={img.title}
+//             sx={{
+//               objectFit: "cover",
+//               transition: "transform 0.4s ease-in-out",
+//               "&:hover": {
+//                 transform: "scale(1.1)",
+//               },
+//             }}
+//           />
+//           <CardContent>
+//             <Typography
+//               variant="subtitle1"
+//               fontWeight="bold"
+//               textAlign="center"
+//               sx={{ color: "#003b6f" }}
+//             >
+//               {img.title}
+//             </Typography>
+//           </CardContent>
+//         </Card>
+//       </motion.div>
+//     </Grid>
+//   ))}
+// </Grid>
+
+
+
+//         <Box sx={{ textAlign: "center", mt: 5 }}>
+//           <Button
+//             variant="contained"
+//             onClick={handleExplore}
+//             sx={{
+//               backgroundColor: "#0056b3",
+//               color: "white",
+//               fontWeight: "bold",
+//               px: 4,
+//               py: 1.5,
+//               ":hover": { backgroundColor: "#007bff" },
+//               fontFamily: '-moz-initial',
+//             }}
+//           >
+//             Explore Videos
+//           </Button>
+//         </Box>
+//       </Box> */}
+
+//       {/* Branch Info */}
+//       <Box
+//         sx={{
+//           backgroundColor: branchBgColor,
+//           px: { xs: 3, md: 10 },
+//           py: 5,
+//           display: "flex",
+//           flexDirection: { xs: "column", md: "row" },
+//           gap: 4,
+//           justifyContent: "space-between",
+//         }}
+//       >
+//         {/* <Box sx={{ minWidth: 200 }}>
+//           <img src={logo} alt="ICT Logo" style={{ height: 60 }} />
+//           <Typography fontWeight="bold" mt={1} sx={{ color: "#003b6f" }}>
+//             ICT ACADEMY OF KERALA
+//           </Typography>
+//         </Box> */}
+//         <Box sx={{ display: "flex", alignItems: "center", minWidth: 200 }}>
+//   {/* Logo on the left */}
+//   <img src={logo} alt="ICT Logo" style={{ height: 60 }} />
+
+//   {/* Vertical word stack on the right */}
+//   <Box sx={{ display: "flex", flexDirection: "column", marginLeft: 1 }}>
+//     <Typography fontWeight="bold" sx={{ color: "#003b6f" }}>
+//       ICT
+//     </Typography>
+//     <Typography fontWeight="bold" sx={{ color: "#003b6f" }}>
+//       ACADEMY
+//     </Typography>
+//     <Typography fontWeight="bold" sx={{ color: "#003b6f" }}>
+//      OF KERALA
+//     </Typography>
+//   </Box>
+// </Box>
+
+
+//         {[
+//           {
+//             title: "Head Quarters",
+//             address:
+//               "G1, Ground Floor, Thejaswini, Technopark Campus, Thiruvananthapuram, Kerala – 695 581",
+//             phone: "+91 471 270 0811",
+//           },
+//           {
+//             title: "Regional Centre (Central)",
+//             address:
+//               "B-Wing, Kanikonna Villa, Infopark Campus, Koratty, Thrissur, Kerala – 680 308",
+//             phone: "+91 480 273 1050",
+//           },
+//           {
+//             title: "Regional Centre (North)",
+//             address:
+//               "2nd Floor, UL Cyberpark Building, Nellikode Post, Kozhikode, Kerala – 673 016",
+//             phone: "+91 495 243 1432",
+//           },
+//         ].map((branch, index) => (
+//           <Box
+//             key={index}
+//             sx={{
+//               p: 2,
+//               transition: "all 0.3s",
+//               ":hover": { backgroundColor: branchHoverColor },
+//               backgroundColor: branchBgColor,
+//               flex: 1,
+//               color: "#003b6f",
+//               borderRadius: 2,
+//             }}
+//           >
+//             <Typography fontWeight="bold" gutterBottom>
+//               <LocationOnIcon sx={{ verticalAlign: "middle", mr: 1 }} />
+//               {branch.title}
+//             </Typography>
+//             <Typography fontSize={14}>{branch.address}</Typography>
+//             <Typography fontSize={14} sx={{ mt: 1 }}>
+//               Phone: {branch.phone}
+//             </Typography>
+//           </Box>
+//         ))}
+//       </Box>
+
+//       {/* Footer */}
+//       <Box sx={{ backgroundColor: "#031E34", color: "white", py: 3 }}>
+//         <Typography align="center" fontSize={14}>
+//           © 2024 ICT Academy of Kerala
+//         </Typography>
+//         <Typography align="center" fontSize={13}>
+//           Terms of Use | Privacy & Security | Cookie Policy
+//         </Typography>
+//         <Box sx={{ mt: 2, display: "flex", justifyContent: "center", gap: 2 }}>
+//           <IconButton href="https://www.linkedin.com" target="_blank" color="inherit">
+//             <LinkedInIcon />
+//           </IconButton>
+//           <IconButton href="https://www.facebook.com" target="_blank" color="inherit">
+//             <FacebookIcon />
+//           </IconButton>
+//           <IconButton href="https://www.instagram.com" target="_blank" color="inherit">
+//             <InstagramIcon />
+//           </IconButton>
+//           <IconButton href="https://www.youtube.com" target="_blank" color="inherit">
+//             <YouTubeIcon />
+//           </IconButton>
+//         </Box>
+//       </Box>
+
+//       {/* Toast */}
+//       <Snackbar
+//         open={toastOpen}
+//         anchorOrigin={{ vertical: "top", horizontal: "center" }}
+//         onClose={() => setToastOpen(false)}
+//         message="Please login to explore videos"
+//         autoHideDuration={3000}
+//         sx={{
+//           "& .MuiSnackbarContent-root": {
+//             backgroundColor: "#e0f2ff",
+//             color: "#004b8d",
+//             fontWeight: 500,
+//             boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+//           },
+//         }}
+//       />
+
+//       {/* Modal */}
+//       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
+//         <Box
+//           sx={{
+//             width: 300,
+//             bgcolor: "background.paper",
+//             p: 4,
+//             mx: "auto",
+//             my: "20%",
+//             borderRadius: 2,
+//             boxShadow: 24,
+//             textAlign: "center",
+//           }}
+//         >
+//           <Typography variant="h6" gutterBottom>
+//             Ready to explore videos?
+//           </Typography>
+//           <Button variant="contained" sx={{ mr: 1 }} onClick={handleModalConfirm}>
+//             Yes
+//           </Button>
+//           <Button variant="outlined" onClick={() => setModalOpen(false)}>
+//             Cancel
+//           </Button>
+//         </Box>
+//       </Modal>
+
+//       {/* Login Dialog */}
+//       <Login
+//         open={loginDialogOpen}
+//         handleClose={() => setLoginDialogOpen(false)}
+//         handleLogin={handleLogin}
+//       />
+//     </Box>
+//   );
+// };
+
+// export default Home;
+import React, { useState, useEffect, useRef } from "react";
 import {
   AppBar,
   Toolbar,
@@ -799,15 +830,14 @@ import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import YouTubeIcon from "@mui/icons-material/YouTube";
-   import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import logo from "../assets/download.png";
 import img1 from "../assets/techstack1.jpg";
-import img2 from "../assets/techstack1.jpg";
-import img3 from "../assets/techstack1.jpg";
-import img4 from "../assets/techstack1.jpg";
+import img2 from "../assets/img1.jpg"; // Add a second image
 import { useNavigate } from "react-router-dom";
 import Login from "../components/Login";
-
+import ContactMailIcon from "@mui/icons-material/ContactMail";
+import ContactModal from "../components/ContactModal"; 
 const Home = () => {
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -815,22 +845,47 @@ const Home = () => {
   const [toastOpen, setToastOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [loginDialogOpen, setLoginDialogOpen] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const images = [img1, img2];
 
-  const [galleryImages, setGalleryImages] = useState([
-    { src: img1, title: "MERN Stack" },
-    { src: img2, title: "Spring Boot" },
-    { src: img3, title: "Django Web App" },
-    { src: img4, title: "MEAN Stack" },
-  ]);
+  const aboutRef = useRef(null);
+  const contactRef = useRef(null);
 
-  const handleExplore = () => {
-    if (isLoggedIn) {
-      setModalOpen(true);
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentImageIndex((prev) => (prev + 1) % images.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // const handleExplore = () => {
+  //       const token = localStorage.getItem("token");
+  //   if (token) {
+  //     navigate("/");
+  //   } else {
+  //     navigate("/login");
+  //   }
+  // };
+const handleExplore = () => {
+  const token = localStorage.getItem("token");
+  const role = localStorage.getItem("role");
+
+  if (token) {
+    if (role === "admin") {
+      navigate("/admin/dashboard");
+    } else if (role === "user") {
+      navigate("/admin/videos");
     } else {
-      setToastOpen(true);
+      navigate("/"); // fallback
     }
-  };
+  } else {
+    // navigate("/login");
+      alert("Please log in to explore the gallery.");
+  }
+};
 
+const [contactModalOpen, setContactModalOpen] = useState(false);
+const [openModal, setOpenModal] = useState(false);
   const handleModalConfirm = () => {
     setModalOpen(false);
     navigate(userRole === "admin" ? "/admin/dashboard" : "/user/dashboard");
@@ -841,229 +896,367 @@ const Home = () => {
     setUserRole(role);
   };
 
+  const scrollToSection = (ref) => {
+    ref.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
   const branchBgColor = "#f0f7fb";
   const branchHoverColor = "#d6eaf7";
 
   return (
     <Box>
-      {/* Navbar */}
-      <AppBar position="static" sx={{ backgroundColor: "#B2E0FB" }}>
-        <Toolbar>
-          <img src={logo} alt="ICT Academy" style={{ height: 40, marginRight: 16 }} />
+      {/* AppBar */}
+      <AppBar
+        position="static"
+        sx={{
+          background: "linear-gradient(to right, #4886b8ff, #21CBF3)",
+          color: "#fff",
+          boxShadow: "0 3px 10px rgba(0,0,0,0.1)",
+        }}
+      >
+        <Toolbar sx={{ px: 3 }}>
+          <Box
+            sx={{ display: "flex", alignItems: "center", cursor: "pointer" }}
+            onClick={() => navigate("/")}
+          >
+            <img src={logo} alt="ICT Academy" style={{ height: 40, marginRight: 10 }} />
+            <Typography variant="h6" sx={{ fontWeight: "bold", color: "#fff" }}>
+         
+            </Typography>
+          </Box>
+
           <Box sx={{ flexGrow: 1 }} />
-          <Button startIcon={<HomeIcon />}>Home</Button>
-          <Button startIcon={<InfoIcon />}>About</Button>
-          <Button startIcon={<MailIcon />}>Contact</Button>
-          <Button startIcon={<LoginIcon />} onClick={() => setLoginDialogOpen(true)}>
+
+          <Button startIcon={<HomeIcon />} onClick={() => navigate("/")} sx={{ color: "#fff" }}>
+            Home
+          </Button>
+          <Button startIcon={<InfoIcon />} onClick={() => scrollToSection(aboutRef)} sx={{ color: "#fff" }}>
+            About
+          </Button>
+          {/* <Button startIcon={<MailIcon />} onClick={() => scrollToSection(contactRef)} sx={{ color: "#fff" }}>
+            Contact
+          </Button> */}
+              {/* <Button startIcon={<MailIcon />}  sx={{ color: "#fff" }}>
+            Contact
+          </Button> */}
+              <Button
+        startIcon={<MailIcon />}
+        onClick={() => setOpenModal(true)}
+        
+        sx={{  color: "#fff",borderRadius: "20px",}}
+      >
+        Contact
+      </Button>
+
+      <ContactModal open={openModal} onClose={() => setOpenModal(false)} />
+          <Button startIcon={<LoginIcon />} onClick={() => setLoginDialogOpen(true)} sx={{ color: "#fff", ml: 1 }}>
             Login
           </Button>
         </Toolbar>
       </AppBar>
 
-      {/* Hero Section with Cards */}
-      <Box sx={{ px: { xs: 3, md: 10 }, py: 6, backgroundColor: "#ffffff" }}>
-        <Typography
-          variant="h4"
-          fontWeight="bold"
-          sx={{ color: "#004b8d", mb: 4, textAlign: "center" ,fontFamily:'-moz-initial'}}
-        >
-          FSD VIDEO GALLERY
-        </Typography>
-        <Typography
-          variant="body1"
-          sx={{ color: "#333", mb: 5, textAlign: "center", maxWidth: 800, mx: "auto" ,fontFamily:'-moz-initial'}}
-        >
-          Explore alumni project video presentations using stacks like MERN, MEAN, Django,
-          Spring Boot, and more. Learn from practical applications and real-world scenarios.
-        </Typography>
-
-
-        
-   
-
-<Grid container spacing={3}>
-  {galleryImages.map((img, index) => (
-    <Grid item xs={12} sm={6} md={3} key={index}>
-      <motion.div
-        whileHover={{ scale: 1.05 }}
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: index * 0.1 }}
-        viewport={{ once: true }}
+      {/* Hero Section */}
+      <Box
+        sx={{
+          px: { xs: 3, md: 10 },
+          py: 10,
+          backgroundColor: "white",
+          display: "flex",
+          flexDirection: { xs: "column", md: "row" },
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 4,
+        }}
       >
-        <Card sx={{ borderRadius: 2, boxShadow: 3 }}>
-          <CardMedia
-            component="img"
-            height="180"
-            image={img.src}
-            alt={img.title}
-            sx={{
-              objectFit: "cover",
-              transition: "transform 0.4s ease-in-out",
-              "&:hover": {
-                transform: "scale(1.1)",
-              },
-            }}
-          />
-          <CardContent>
-            <Typography
-              variant="subtitle1"
-              fontWeight="bold"
-              textAlign="center"
-              sx={{ color: "#003b6f" }}
-            >
-              {img.title}
-            </Typography>
-          </CardContent>
-        </Card>
-      </motion.div>
-    </Grid>
-  ))}
-</Grid>
-
-{/* 
-        <Grid container spacing={3}>
-          {galleryImages.map((img, index) => (
-            <Grid item xs={12} sm={6} md={3} key={index}>
-              <Card sx={{ borderRadius: 2, boxShadow: 3 }}>
-                <CardMedia
-                  component="img"
-                  height="180"
-                  image={img.src}
-                  alt={img.title}
-                  sx={{ objectFit: "cover" }}
-                />
-                <CardContent>
-                  <Typography variant="subtitle1" fontWeight="bold" textAlign="center">
-                    {img.title}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid> */}
-
-        <Box sx={{ textAlign: "center", mt: 5 }}>
-          <Button
-            variant="contained"
-            onClick={handleExplore}
-            sx={{
-              backgroundColor: "#0056b3",
-              color: "white",
-              fontWeight: "bold",
-              px: 4,
-              py: 1.5,
-              ":hover": { backgroundColor: "#007bff" },
-              fontFamily: '-moz-initial',
-            }}
+        <Box sx={{ flex: 1 }}>
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.7 }}
           >
-            Explore Videos
-          </Button>
+   
+{/* <Typography
+  variant="h3"
+  fontWeight="bold"
+  sx={{
+    color: "#1a5292ff",
+    mb: 2,
+    fontSize: { xs: "1.8rem", sm: "2.5rem", md: "3rem" },
+    textShadow: `
+      1px 1px 0 #ccc,
+      2px 2px 0 #bbb,
+      3px 3px 0 #aaa
+    `,
+    letterSpacing: "1px",
+    lineHeight: 1.2,
+  }}
+>
+  Explore. Learn. Grow.
+</Typography> */}
+<Typography
+  variant="h3"
+  fontWeight="bold"
+  sx={{
+    mb: 2,
+    fontSize: { xs: "1.8rem", sm: "2.5rem", md: "3rem" },
+    background: "linear-gradient(90deg, #1a5292, #3b82f6, #06b6d4)",
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent",
+    textShadow: `
+      3px 2px 4px rgba(51, 96, 133, 0.2),
+      6px 4px 7px rgba(12, 9, 9, 0.15)
+    `,
+    letterSpacing: "1px",
+    lineHeight: 1.2,
+  }}
+>
+  Explore. Learn. Grow.
+</Typography>
+
+            <Typography variant="h5" fontWeight={500} sx={{ color: "#004080", mb: 2 ,fontFamily:'Poppins'}}>
+              FSD VIDEO GALLERY
+            </Typography>
+            <Typography variant="body1" sx={{ color: "#555", mb: 3, maxWidth: 500 ,fontFamily:'Poppins'}}>
+              Explore alumni project video presentations using stacks like MERN, MEAN, Django,
+              Spring Boot, and more. Learn from real-world applications and build your skills.
+            </Typography>
+            {/* <Button
+              variant="contained"
+              onClick={handleExplore}
+              sx={{
+                backgroundColor: "#007bff",
+                color: "#fff",
+                textTransform: "none",
+                fontWeight: 600,
+                px: 4,
+                py: 1.2,
+                ":hover": { backgroundColor: "#0056b3" },
+              }}
+            >
+              Explore Videos
+            </Button> */}
+            <Button
+  variant="contained"
+  onClick={handleExplore}
+  sx={{
+    backgroundColor: "#4187d8ff",
+    color: "#fff",
+    textTransform: "none",
+    fontWeight: 600,
+    px: 4,
+    py: 1.2,
+    borderRadius: "50px", // 👈 Rounded button
+    ":hover": {
+      backgroundColor: "#3271b9ff",
+      fontFamily: 'Poppins',
+    },
+  }}
+>
+  Explore Videos
+</Button>
+
+          </motion.div>
+        </Box>
+
+        {/* Animated Image Slider */}
+        <Box sx={{ flex: 1, display: "flex", justifyContent: "center", minHeight: 300 }}>
+          <AnimatePresence mode="wait">
+            <motion.img
+              key={currentImageIndex}
+              src={images[currentImageIndex]}
+              alt="hero"
+              initial={{ opacity: 0, x: 100 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -100 }}
+              transition={{ duration: 0.8 }}
+              style={{
+                maxWidth: "100%",
+                height: "auto",
+                borderRadius: 12,
+                boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+              }}
+            />
+          </AnimatePresence>
         </Box>
       </Box>
 
-      {/* Branch Info */}
+      {/* About Section */}
+      {/* <Box ref={aboutRef} sx={{ px: { xs: 3, md: 10 }, py: 8, backgroundColor: "#ffffff" }}>
+        <Typography variant="h4" fontWeight="bold" sx={{ color: "#003b6f", mb: 2 }}>
+          About Us
+        </Typography>
+        <Typography variant="body1" sx={{ maxWidth: 800, color: "#333" }}>
+          The FSD Video Gallery is a curated platform showcasing real-world projects by alumni,
+          developed using various full-stack technologies. It empowers learners to gain practical
+          insights and motivation through peer-built solutions and presentations.
+        </Typography>
+      </Box> */}
+      {/* About Section */}
+<Box
+  ref={aboutRef}
+  sx={{
+    px: { xs: 2, sm: 4, md: 10 },
+    py: 10,
+    backgroundColor: "white",
+    position: "relative",
+  }}
+>
+  <Card
+    sx={{
+      display: "flex",
+      flexDirection: { xs: "column", md: "row" },
+      alignItems: "center",
+      p: { xs: 2, sm: 4 },
+      boxShadow: "0 6px 20px rgba(0,0,0,0.15)",
+      overflow: "visible",
+      position: "relative",
+    }}
+  >
+    {/* Left Image */}
+    <motion.div
+      initial={{ opacity: 0, x: -50 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.6 }}
+      viewport={{ once: true }}
+      style={{
+        flex: 1,
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        position: "relative",
+        marginBottom: { xs: "2rem", md: 0 },
+      }}
+    >
       <Box
         sx={{
-          backgroundColor: branchBgColor,
-          px: { xs: 3, md: 10 },
-          py: 5,
-          display: "flex",
-          flexDirection: { xs: "column", md: "row" },
-          gap: 4,
-          justifyContent: "space-between",
+          width: { xs: "90%", sm: "70%", md: "100%" },
+          position: { md: "absolute" },
+          left: { md: "-60px" },
+          top: { md: "50%" },
+          transform: { md: "translateY(-50%)" },
         }}
       >
-        {/* <Box sx={{ minWidth: 200 }}>
-          <img src={logo} alt="ICT Logo" style={{ height: 60 }} />
-          <Typography fontWeight="bold" mt={1} sx={{ color: "#003b6f" }}>
-            ICT ACADEMY OF KERALA
-          </Typography>
-        </Box> */}
-        <Box sx={{ display: "flex", alignItems: "center", minWidth: 200 }}>
-  {/* Logo on the left */}
-  <img src={logo} alt="ICT Logo" style={{ height: 60 }} />
+        <img
+          src={img1}
+          alt="About FSD"
+          style={{
+            width: "80%",
+            height: "auto",
+            borderRadius: "16px",
+            boxShadow: "0 8px 30px rgba(0,0,0,0.2)",
+          }}
+        />
+      </Box>
+    </motion.div>
 
-  {/* Vertical word stack on the right */}
-  <Box sx={{ display: "flex", flexDirection: "column", marginLeft: 1 }}>
-    <Typography fontWeight="bold" sx={{ color: "#003b6f" }}>
-      ICT
-    </Typography>
-    <Typography fontWeight="bold" sx={{ color: "#003b6f" }}>
-      ACADEMY
-    </Typography>
-    <Typography fontWeight="bold" sx={{ color: "#003b6f" }}>
-     OF KERALA
-    </Typography>
-  </Box>
+    {/* Right Text Content */}
+    <motion.div
+      initial={{ opacity: 0, x: 50 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.6 }}
+      viewport={{ once: true }}
+      style={{ flex: 1 }}
+    >
+      <CardContent>
+        <Typography
+          variant="h4"
+          fontWeight="bold"
+          sx={{ color: "#3c88caff", mb: 2 ,fontFamily:'Poppins'}}
+        >
+          About the Gallery
+        </Typography>
+        <Typography variant="body1" sx={{ color: "black", mb: 2 ,fontFamily:'Poppins'}}>
+          The <strong>FSD Video Gallery</strong> is a learning hub that showcases
+          real-world project presentations from full-stack development alumni.
+          Projects cover major tech stacks such as <strong>MERN, MEAN, Django, Spring Boot</strong>,
+          and more.
+        </Typography>
+        <Typography variant="body1" sx={{ color: "#333",fontFamily:'Poppins' }}>
+          Whether you're an aspiring developer or seasoned professional, these
+          video resources offer practical insights, coding best practices, and
+          project workflows straight from the classroom to production-level
+          applications.
+        </Typography>
+      </CardContent>
+    </motion.div>
+  </Card>
 </Box>
 
 
-        {[
-          {
-            title: "Head Quarters",
-            address:
-              "G1, Ground Floor, Thejaswini, Technopark Campus, Thiruvananthapuram, Kerala – 695 581",
-            phone: "+91 471 270 0811",
-          },
-          {
-            title: "Regional Centre (Central)",
-            address:
-              "B-Wing, Kanikonna Villa, Infopark Campus, Koratty, Thrissur, Kerala – 680 308",
-            phone: "+91 480 273 1050",
-          },
-          {
-            title: "Regional Centre (North)",
-            address:
-              "2nd Floor, UL Cyberpark Building, Nellikode Post, Kozhikode, Kerala – 673 016",
-            phone: "+91 495 243 1432",
-          },
-        ].map((branch, index) => (
-          <Box
-            key={index}
-            sx={{
-              p: 2,
-              transition: "all 0.3s",
-              ":hover": { backgroundColor: branchHoverColor },
-              backgroundColor: branchBgColor,
-              flex: 1,
-              color: "#003b6f",
-              borderRadius: 2,
-            }}
-          >
-            <Typography fontWeight="bold" gutterBottom>
-              <LocationOnIcon sx={{ verticalAlign: "middle", mr: 1 }} />
-              {branch.title}
-            </Typography>
-            <Typography fontSize={14}>{branch.address}</Typography>
-            <Typography fontSize={14} sx={{ mt: 1 }}>
-              Phone: {branch.phone}
-            </Typography>
+      {/* Contact Section */}
+      <Box ref={contactRef}>
+        {/* Branch Info (already styled in your code) */}
+        <Box
+          sx={{
+            backgroundColor: branchBgColor,
+            px: { xs: 3, md: 10 },
+            py: 5,
+            display: "flex",
+            flexDirection: { xs: "column", md: "row" },
+            gap: 4,
+            justifyContent: "space-between",
+          }}
+        >
+          <Box sx={{ display: "flex", alignItems: "center", minWidth: 200 }}>
+            <img src={logo} alt="ICT Logo" style={{ height: 60 }} />
+            <Box sx={{ display: "flex", flexDirection: "column", marginLeft: 1 }}>
+              <Typography fontWeight="bold" sx={{ color: "#003b6f" }}>ICT</Typography>
+              <Typography fontWeight="bold" sx={{ color: "#003b6f" }}>ACADEMY</Typography>
+              <Typography fontWeight="bold" sx={{ color: "#003b6f" }}>OF KERALA</Typography>
+            </Box>
           </Box>
-        ))}
+
+          {[
+            {
+              title: "Head Quarters",
+              address: "G1, Ground Floor, Thejaswini, Technopark Campus, Thiruvananthapuram, Kerala – 695 581",
+              phone: "+91 471 270 0811",
+            },
+            {
+              title: "Regional Centre (Central)",
+              address: "B-Wing, Kanikonna Villa, Infopark Campus, Koratty, Thrissur, Kerala – 680 308",
+              phone: "+91 480 273 1050",
+            },
+            {
+              title: "Regional Centre (North)",
+              address: "2nd Floor, UL Cyberpark Building, Nellikode Post, Kozhikode, Kerala – 673 016",
+              phone: "+91 495 243 1432",
+            },
+          ].map((branch, index) => (
+            <Box
+              key={index}
+              sx={{
+                p: 2,
+                transition: "all 0.3s",
+                ":hover": { backgroundColor: branchHoverColor },
+                backgroundColor: branchBgColor,
+                flex: 1,
+                color: "#003b6f",
+                borderRadius: 2,
+              }}
+            >
+              <Typography fontWeight="bold" gutterBottom>
+                <LocationOnIcon sx={{ verticalAlign: "middle", mr: 1 }} />
+                {branch.title}
+              </Typography>
+              <Typography fontSize={14}>{branch.address}</Typography>
+              <Typography fontSize={14} sx={{ mt: 1 }}>
+                Phone: {branch.phone}
+              </Typography>
+            </Box>
+          ))}
+        </Box>
       </Box>
 
       {/* Footer */}
       <Box sx={{ backgroundColor: "#031E34", color: "white", py: 3 }}>
-        <Typography align="center" fontSize={14}>
-          © 2024 ICT Academy of Kerala
-        </Typography>
-        <Typography align="center" fontSize={13}>
-          Terms of Use | Privacy & Security | Cookie Policy
-        </Typography>
+        <Typography align="center" fontSize={14}>© 2024 ICT Academy of Kerala</Typography>
+        <Typography align="center" fontSize={13}>Terms of Use | Privacy & Security | Cookie Policy</Typography>
         <Box sx={{ mt: 2, display: "flex", justifyContent: "center", gap: 2 }}>
-          <IconButton href="https://www.linkedin.com" target="_blank" color="inherit">
-            <LinkedInIcon />
-          </IconButton>
-          <IconButton href="https://www.facebook.com" target="_blank" color="inherit">
-            <FacebookIcon />
-          </IconButton>
-          <IconButton href="https://www.instagram.com" target="_blank" color="inherit">
-            <InstagramIcon />
-          </IconButton>
-          <IconButton href="https://www.youtube.com" target="_blank" color="inherit">
-            <YouTubeIcon />
-          </IconButton>
+          <IconButton href="https://www.linkedin.com" target="_blank" color="inherit"><LinkedInIcon /></IconButton>
+          <IconButton href="https://www.facebook.com" target="_blank" color="inherit"><FacebookIcon /></IconButton>
+          <IconButton href="https://www.instagram.com" target="_blank" color="inherit"><InstagramIcon /></IconButton>
+          <IconButton href="https://www.youtube.com" target="_blank" color="inherit"><YouTubeIcon /></IconButton>
         </Box>
       </Box>
 
@@ -1098,15 +1291,9 @@ const Home = () => {
             textAlign: "center",
           }}
         >
-          <Typography variant="h6" gutterBottom>
-            Ready to explore videos?
-          </Typography>
-          <Button variant="contained" sx={{ mr: 1 }} onClick={handleModalConfirm}>
-            Yes
-          </Button>
-          <Button variant="outlined" onClick={() => setModalOpen(false)}>
-            Cancel
-          </Button>
+          <Typography variant="h6" gutterBottom>Ready to explore videos?</Typography>
+          <Button variant="contained" sx={{ mr: 1 }} onClick={handleModalConfirm}>Yes</Button>
+          <Button variant="outlined" onClick={() => setModalOpen(false)}>Cancel</Button>
         </Box>
       </Modal>
 

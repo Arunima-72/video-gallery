@@ -476,7 +476,7 @@ localStorage.setItem('userId', response.data.userId);
         </Box>
 
         {/* Title */}
-        <Typography variant="h4" fontWeight="bold" gutterBottom>
+        <Typography variant="h4" fontWeight="bold" style={{fontFamily:'-moz-initial',color:'#3e91daff'}} gutterBottom>
           Login
         </Typography>
 

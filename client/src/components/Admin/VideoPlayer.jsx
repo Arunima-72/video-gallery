@@ -1,255 +1,17 @@
 
-
-// export default VideoPlayer;
-// import React, { useEffect, useState } from 'react';                                       // working one
+// import React, { useEffect, useState } from 'react'; //last working code 2/08/2025 8.06 pm
 // import {
-//   Box, Typography, CircularProgress, IconButton,
-//   Avatar, TextField, Button, Toolbar
+//   Box, Typography, CircularProgress, IconButton, Avatar,
+//   TextField, Button, Toolbar, Tooltip, Card, CardMedia,
+//   Menu, MenuItem, Divider
 // } from '@mui/material';
 // import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 // import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 // import DeleteIcon from '@mui/icons-material/Delete';
-// import { useParams } from 'react-router-dom';
-// import axios from 'axios';
-// import jwt_decode from 'jwt-decode';
-// import dayjs from 'dayjs';
-// import relativeTime from 'dayjs/plugin/relativeTime';
-
-// import Sidebar from '../Sidebar';
-// import CommonNav from '../CommonNav';
-// import axiosInstance from '../axiosInterceptor';
-
-// dayjs.extend(relativeTime);
-
-// const drawerWidthOpen = 240;
-// const drawerWidthClosed = 60;
-
-// const VideoPlayer = () => {
-//   const { id } = useParams();
-//   const [video, setVideo] = useState(null);
-//   const [loading, setLoading] = useState(true);
-//   const [likes, setLikes] = useState([]);
-//   const [comments, setComments] = useState([]);
-//   const [showLikes, setShowLikes] = useState(false);
-//   const [showComments, setShowComments] = useState(false);
-//   const [sidebarOpen, setSidebarOpen] = useState(true);
-//   const [commentText, setCommentText] = useState('');
-//   const [currentTime, setCurrentTime] = useState(Date.now());
-
-//   // ✅ Decode token to get user email
-//   const token = localStorage.getItem('token');
-//   let currentUserEmail = '';
-//   try {
-//     const decoded = jwt_decode(token);
-//     currentUserEmail = decoded.email;
-//   } catch (err) {
-//     console.error('Invalid token');
-//   }
-
-//   // ⏳ Update time every 30 seconds for live comment time
-//   useEffect(() => {
-//     const interval = setInterval(() => setCurrentTime(Date.now()), 30000);
-//     return () => clearInterval(interval);
-//   }, []);
-
-//   useEffect(() => {
-//     fetchVideo();
-//     fetchLikes();
-//     fetchComments();
-//   }, [id]);
-
-//   const fetchVideo = async () => {
-//     try {
-//       const res = await axiosInstance.get(`http://localhost:3000/admin/video/${id}`);
-//       setVideo(res.data);
-//     } catch (err) {
-//       console.error('Failed to load video:', err);
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   const fetchLikes = async () => {
-//     try {
-//       const res = await axiosInstance.get(`http://localhost:3000/admin/${id}/likes`);
-//       setLikes(res.data);
-//     } catch (err) {
-//       console.error('Failed to load likes:', err);
-//     }
-//   };
-
-//   const fetchComments = async () => {
-//     try {
-//       const res = await axiosInstance.get(`http://localhost:3000/admin/${id}/comments`);
-//       setComments(res.data);
-//     } catch (err) {
-//       console.error('Failed to load comments:', err);
-//     }
-//   };
-
-//   const userLiked = likes.some((like) => like.user?.email === currentUserEmail);
-
-//   // ✅ Toggle like/unlike
-//   const handleLike = async () => {
-//     try {
-//       if (userLiked) {
-//         const userLike = likes.find((like) => like.user?.email === currentUserEmail);
-//         await axiosInstance.delete(`http://localhost:3000/admin/${id}/likes/${currentUserEmail}`);
-//       } else {
-//         await axiosInstance.post(`http://localhost:3000/admin/${id}/likes`, {
-//           email: currentUserEmail,
-//         });
-//       }
-//       fetchLikes();
-//     } catch (err) {
-//       console.error('Like/unlike error:', err);
-//     }
-//   };
-
-//   const handleCommentSubmit = async () => {
-//     if (!commentText.trim()) return;
-//     try {
-//       await axiosInstance.post(`http://localhost:3000/admin/${id}/comments`, {
-//         email: currentUserEmail,
-//         text: commentText.trim(),
-//       });
-//       setCommentText('');
-//       fetchComments();
-//     } catch (err) {
-//       console.error('Comment post error:', err);
-//     }
-//   };
-
-//   const handleDeleteComment = async (commentId) => {
-//     try {
-//       await axiosInstance.delete(`http://localhost:3000/admin/${id}/comments/${commentId}`, {
-//         data: { email: currentUserEmail },
-//       });
-//       fetchComments();
-//     } catch (err) {
-//       console.error('Delete comment failed:', err);
-//     }
-//   };
-
-//   if (loading) return <CircularProgress sx={{ mt: 10, ml: 10 }} />;
-//   if (!video) return <Typography mt={10} ml={10}>Video not found</Typography>;
-
-//   const videoUrl = `http://localhost:3000/${video.fileUrl.replace(/\\/g, '/')}`;
-
-//   return (
-//     <Box sx={{ display: 'flex' }}>
-//       <Sidebar open={sidebarOpen} userType="admin" />
-//       <Box
-//         sx={{
-//           flexGrow: 1,
-//           ml: sidebarOpen ? `${drawerWidthOpen}px` : `${drawerWidthClosed}px`,
-//           transition: 'margin 0.3s'
-//         }}
-//       >
-//         <CommonNav onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
-//         <Toolbar />
-//         <Box sx={{ display: 'flex', p: 3 }}>
-//           {/* Left: Video and actions */}
-//           <Box sx={{ flex: 3 }}>
-//             <Typography variant="h5">{video.title}</Typography>
-//             {videoUrl && (
-//               <video width="100%" height="auto" controls src={videoUrl} />
-//             )}
-//             <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
-//               <IconButton
-//                 onClick={() => {
-//                   handleLike();
-//                   setShowLikes((prev) => !prev);
-//                   setShowComments(false);
-//                 }}
-//               >
-//                 <ThumbUpIcon color={userLiked ? 'primary' : 'action'} />
-//                 <Typography ml={1}>{likes.length}</Typography>
-//               </IconButton>
-//               <IconButton
-//                 onClick={() => {
-//                   setShowComments((prev) => !prev);
-//                   setShowLikes(false);
-//                 }}
-//               >
-//                 <ChatBubbleOutlineIcon color={showComments ? 'primary' : 'action'} />
-//                 <Typography ml={1}>{comments.length}</Typography>
-//               </IconButton>
-//             </Box>
-//             <Typography mt={2}>{video.description}</Typography>
-//           </Box>
-
-//           {/* Right: Likes or Comments */}
-//           <Box sx={{ flex: 2, ml: 4 }}>
-//             {showLikes && (
-//               <Box>
-//                 <Typography variant="h6">Liked by</Typography>
-//                 {likes.map((like, idx) => (
-//                   <Box key={idx} sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
-//                     <Avatar />
-//                     <Typography ml={1}>
-//                       {like.user?.name || like.user?.email || 'Unknown'}
-//                     </Typography>
-//                   </Box>
-//                 ))}
-//               </Box>
-//             )}
-
-//             {showComments && (
-//               <Box>
-//                 <Typography variant="h6">{comments.length} Comments</Typography>
-//                 <TextField
-//                   fullWidth
-//                   size="small"
-//                   placeholder="Add a comment"
-//                   value={commentText}
-//                   onChange={(e) => setCommentText(e.target.value)}
-//                   sx={{ my: 1 }}
-//                 />
-//                 <Button variant="contained" size="small" onClick={handleCommentSubmit}>
-//                   Post
-//                 </Button>
-//                 {comments.map((cm) => (
-//                   <Box key={cm._id} sx={{ mt: 2 }}>
-//                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
-//                       <Avatar sx={{ width: 30, height: 30 }} />
-//                       <Typography ml={1} fontWeight="bold">
-//                         {cm.user?.name || cm.user?.email || 'Unknown'}
-//                       </Typography>
-//                       <Typography ml={1} variant="caption" color="text.secondary">
-//                         • {dayjs(cm.createdAt).from(currentTime)}
-//                       </Typography>
-//                       {cm.user?.email === currentUserEmail && (
-//                         <IconButton
-//                           size="small"
-//                           onClick={() => handleDeleteComment(cm._id)}
-//                         >
-//                           <DeleteIcon fontSize="small" />
-//                         </IconButton>
-//                       )}
-//                     </Box>
-//                     <Typography ml={4}>{cm.text}</Typography>
-//                   </Box>
-//                 ))}
-//               </Box>
-//             )}
-//           </Box>
-//         </Box>
-//       </Box>
-//     </Box>
-//   );
-// };
-
-// export default VideoPlayer;
-
-// import React, { useEffect, useState } from 'react';                                       // working for admin user comment like,delete
-// import {
-//   Box, Typography, CircularProgress, IconButton,
-//   Avatar, TextField, Button, Toolbar
-// } from '@mui/material';
-// import ThumbUpIcon from '@mui/icons-material/ThumbUp';
-// import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
-// import DeleteIcon from '@mui/icons-material/Delete';
+// import EditIcon from '@mui/icons-material/Edit';
+// import MoreVertIcon from '@mui/icons-material/MoreVert';
+// import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
+// import BookmarkIcon from '@mui/icons-material/Bookmark';
 // import { useParams } from 'react-router-dom';
 // import jwt_decode from 'jwt-decode';
 // import dayjs from 'dayjs';
@@ -270,33 +32,29 @@
 //   const [loading, setLoading] = useState(true);
 //   const [likes, setLikes] = useState([]);
 //   const [comments, setComments] = useState([]);
+//   const [saved, setSaved] = useState(false);
 //   const [showLikes, setShowLikes] = useState(false);
 //   const [showComments, setShowComments] = useState(false);
 //   const [sidebarOpen, setSidebarOpen] = useState(true);
 //   const [commentText, setCommentText] = useState('');
-//   const [currentTime, setCurrentTime] = useState(Date.now());
+//   const [editingCommentId, setEditingCommentId] = useState(null);
+//   const [anchorEls, setAnchorEls] = useState({});
 
-//   // ✅ Get user role and email
 //   const token = localStorage.getItem('token');
-//   const userType = localStorage.getItem('role'); // admin or user
-//   let currentUserEmail = '';
+//   const userType = localStorage.getItem('role');
+//   let currentUserEmail = '', currentUserId = '';
+
 //   try {
 //     const decoded = jwt_decode(token);
 //     currentUserEmail = decoded.email;
-//   } catch (err) {
-//     console.error('Invalid token');
-//   }
-
-//   // ⏳ Update relative comment time
-//   useEffect(() => {
-//     const interval = setInterval(() => setCurrentTime(Date.now()), 30000);
-//     return () => clearInterval(interval);
-//   }, []);
+//     currentUserId = decoded.userId || decoded.id;
+//   } catch {}
 
 //   useEffect(() => {
 //     fetchVideo();
 //     fetchLikes();
 //     fetchComments();
+//     checkIfSaved();
 //   }, [id]);
 
 //   const fetchVideo = async () => {
@@ -328,6 +86,15 @@
 //     }
 //   };
 
+//   const checkIfSaved = async () => {
+//     try {
+//       const res = await axiosInstance.get(`save/saved/check/${id}`);
+//       setSaved(res.data.isSaved);
+//     } catch (err) {
+//       console.error('Failed to check saved status:', err);
+//     }
+//   };
+
 //   const userLiked = likes.some((like) => like.user?.email === currentUserEmail);
 
 //   const handleLike = async () => {
@@ -336,6 +103,7 @@
 //         await axiosInstance.delete(`/admin/${id}/likes/${currentUserEmail}`);
 //       } else {
 //         await axiosInstance.post(`/admin/${id}/likes`, { email: currentUserEmail });
+//         await axiosInstance.post(`/activity/like/${id}`);
 //       }
 //       fetchLikes();
 //     } catch (err) {
@@ -345,15 +113,23 @@
 
 //   const handleCommentSubmit = async () => {
 //     if (!commentText.trim()) return;
+
 //     try {
-//       await axiosInstance.post(`/admin/${id}/comments`, {
-//         email: currentUserEmail,
-//         text: commentText.trim(),
-//       });
+//       if (editingCommentId) {
+//         await axiosInstance.put(`/admin/${id}/comments/${editingCommentId}`, { text: commentText.trim() });
+//         setEditingCommentId(null);
+//       } else {
+//         await axiosInstance.post(`/admin/${id}/comments`, {
+//           email: currentUserEmail,
+//           text: commentText.trim(),
+//         });
+//         await axiosInstance.post(`/activity/comment/${id}`, { text: commentText.trim() });
+//       }
+
 //       setCommentText('');
 //       fetchComments();
 //     } catch (err) {
-//       console.error('Comment post error:', err);
+//       console.error('Comment error:', err);
 //     }
 //   };
 
@@ -362,124 +138,160 @@
 //       await axiosInstance.delete(`/admin/${id}/comments/${commentId}`, {
 //         data: { email: currentUserEmail },
 //       });
-// //       await axiosInstance.delete(`/admin/${id}/comments/${commentId}`, {
-// //   headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-// // });
 //       fetchComments();
 //     } catch (err) {
 //       console.error('Delete comment failed:', err);
 //     }
 //   };
 
+//   const handleEditComment = (comment) => {
+//     setEditingCommentId(comment._id);
+//     setCommentText(comment.text);
+//   };
+
+//   const handleToggleSave = async () => {
+//     try {
+//       if (saved) {
+//         await axiosInstance.delete(`save/saved/${id}`);
+//       } else {
+//         await axiosInstance.post(`save/saved/${id}`);
+//       }
+//       setSaved(!saved);
+//     } catch (err) {
+//       console.error('Failed to toggle save:', err);
+//     }
+//   };
+
+//   const handleMenuOpen = (event, commentId) => {
+//     setAnchorEls((prev) => ({ ...prev, [commentId]: event.currentTarget }));
+//   };
+
+//   const handleMenuClose = (commentId) => {
+//     setAnchorEls((prev) => ({ ...prev, [commentId]: null }));
+//   };
+
 //   if (loading) return <CircularProgress sx={{ mt: 10, ml: 10 }} />;
 //   if (!video) return <Typography mt={10} ml={10}>Video not found</Typography>;
 
 //   const videoUrl = `http://localhost:3000/${video.fileUrl.replace(/\\/g, '/')}`;
-
+//   const pdfUrl = `http://localhost:3000/${video.overviewPdf}`;
+  
 //   return (
 //     <Box sx={{ display: 'flex' }}>
-//       {/* ✅ Role-based Sidebar */}
 //       <Sidebar open={sidebarOpen} userType={userType} />
-//       <Box
-//         sx={{
-//           flexGrow: 1,
-//           ml: sidebarOpen ? `${drawerWidthOpen}px` : `${drawerWidthClosed}px`,
-//           transition: 'margin 0.3s'
-//         }}
-//       >
+//       <Box sx={{
+//         flexGrow: 1,
+//         ml: sidebarOpen ? `${drawerWidthOpen}px` : `${drawerWidthClosed}px`,
+//         transition: 'margin 0.3s'
+//       }}>
 //         <CommonNav onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
 //         <Toolbar />
-//         <Box sx={{ display: 'flex', p: 3 }}>
-//           {/* Left: Video and actions */}
-//           <Box sx={{ flex: 3 }}>
-//             <Typography variant="h5">{video.title}</Typography>
-//             {videoUrl && (
-//               <video
-//                 width="100%"
-//                 height="auto"
-//                 controls
-//                 controlsList="nodownload"   // 🚫 disable download
-//                 onContextMenu={(e) => e.preventDefault()} // 🚫 disable right-click
-//                 src={videoUrl}
-//               />
+//         <Box sx={{ display: 'flex', p: 3, gap: 3 }}>
+//           {/* Left: Video Card */}
+//           <Card sx={{ width: '55%', padding: 2, borderRadius: 2, background: '#fefefe' }}>
+//             <Typography variant="h6" fontWeight="bold" mb={1}>{video.title}</Typography>
+//             <CardMedia
+//               component="video"
+//               src={videoUrl}
+//               controls
+//               controlsList="nodownload"
+//               onContextMenu={(e) => e.preventDefault()}
+//               onPlay={() => axiosInstance.post(`/activity/watched/${id}`)}
+//               sx={{ borderRadius: 2 }}
+//             />
+         
+//             <Typography mt={1}>{video.description}</Typography>
+//             {video.overviewPdf && (
+//               <Typography mt={1}>
+//                 PDF: <a href={pdfUrl} target="_blank" rel="noreferrer">{video.overviewPdf.split('/').pop()}</a>
+//               </Typography>
 //             )}
-//             <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
-//               <IconButton
-//                 onClick={() => {
-//                   handleLike();
-//                   setShowLikes((prev) => !prev);
-//                   setShowComments(false);
-//                 }}
-//               >
-//                 <ThumbUpIcon color={userLiked ? 'primary' : 'action'} />
-//                 <Typography ml={1}>{likes.length}</Typography>
-//               </IconButton>
-//               <IconButton
-//                 onClick={() => {
-//                   setShowComments((prev) => !prev);
-//                   setShowLikes(false);
-//                 }}
-//               >
-//                 <ChatBubbleOutlineIcon color={showComments ? 'primary' : 'action'} />
-//                 <Typography ml={1}>{comments.length}</Typography>
-//               </IconButton>
+//             <Divider sx={{ my: 2 }} />
+//             <Box display="flex" alignItems="center" gap={2}>
+//               <Box display="flex" alignItems="center" onClick={() => { setShowLikes(true); setShowComments(false); }}>
+//                 <IconButton onClick={handleLike}>
+//                   <ThumbUpIcon color={userLiked ? 'primary' : 'action'} />
+//                 </IconButton>
+//                 <Typography>{likes.length}</Typography>
+//               </Box>
+//               <Box display="flex" alignItems="center" onClick={() => { setShowComments(true); setShowLikes(false); }}>
+//                 <IconButton>
+//                   <ChatBubbleOutlineIcon color={showComments ? 'primary' : 'action'} />
+//                 </IconButton>
+//                 <Typography>{comments.length}</Typography>
+//               </Box>
 //             </Box>
-//             <Typography mt={2}>{video.description}</Typography>
-//           </Box>
+//                {userType === 'user' && (
+//               <Box textAlign="right" mt={1}>
+//                 <Tooltip title={saved ? 'Unsave' : 'Save'}>
+//                   <IconButton onClick={handleToggleSave}>
+//                     {saved ? <BookmarkIcon color="primary" /> : <BookmarkBorderIcon />}
+//                   </IconButton>
+//                 </Tooltip>
+//               </Box>
+//             )}
+//           </Card>
 
-//           {/* Right: Likes or Comments */}
-//           <Box sx={{ flex: 2, ml: 4 }}>
+//           {/* Right: Likes / Comments */}
+//           <Box sx={{ flex: 1 }}>
 //             {showLikes && (
-//               <Box>
+//               <>
 //                 <Typography variant="h6">Liked by</Typography>
-//                 {likes.map((like, idx) => (
-//                   <Box key={idx} sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
-//                     <Avatar />
-//                     <Typography ml={1}>
-//                       {like.user?.name || like.user?.email || 'Unknown'}
-//                     </Typography>
+//                 {likes.map((like, i) => (
+//                   <Box key={i} display="flex" alignItems="center" mt={1}>
+//                     <Avatar sx={{ width: 30, height: 30 }} />
+//                     <Typography ml={1}>{like.user?.name || like.user?.email}</Typography>
 //                   </Box>
 //                 ))}
-//               </Box>
+//               </>
 //             )}
 
 //             {showComments && (
-//               <Box>
+//               <>
 //                 <Typography variant="h6">{comments.length} Comments</Typography>
 //                 <TextField
 //                   fullWidth
+//                   placeholder="Add a comment..."
 //                   size="small"
-//                   placeholder="Add a comment"
 //                   value={commentText}
 //                   onChange={(e) => setCommentText(e.target.value)}
 //                   sx={{ my: 1 }}
 //                 />
-//                 <Button variant="contained" size="small" onClick={handleCommentSubmit}>
-//                   Post
+//                 <Button onClick={handleCommentSubmit} variant="contained" size="small">
+//                   {editingCommentId ? 'Update' : 'Post'}
 //                 </Button>
 //                 {comments.map((cm) => (
-//                   <Box key={cm._id} sx={{ mt: 2 }}>
-//                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
-//                       <Avatar sx={{ width: 30, height: 30 }} />
-//                       <Typography ml={1} fontWeight="bold">
-//                         {cm.user?.name || cm.user?.email || 'Unknown'}
-//                       </Typography>
-//                       <Typography ml={1} variant="caption" color="text.secondary">
-//                         • {dayjs(cm.createdAt).from(currentTime)}
-//                       </Typography>
-//                       {cm.user?.email === currentUserEmail && (
-//                         <IconButton
-//                           size="small"
-//                           onClick={() => handleDeleteComment(cm._id)}
-//                         >
-//                           <DeleteIcon fontSize="small" />
-//                         </IconButton>
+//                   <Box key={cm._id} mt={2}>
+//                     <Box display="flex" alignItems="center" justifyContent="space-between">
+//                       <Box display="flex" alignItems="center">
+//                         <Avatar sx={{ width: 30, height: 30 }} />
+//                         <Typography ml={1} fontWeight="bold">{cm.user?.name || cm.user?.email}</Typography>
+//                         <Typography ml={1} variant="caption" color="text.secondary">• {dayjs(cm.createdAt).fromNow()}</Typography>
+//                       </Box>
+//                       {(cm.user?.email === currentUserEmail || userType === 'admin') && (
+//                         <>
+//                           <IconButton onClick={(e) => handleMenuOpen(e, cm._id)}>
+//                             <MoreVertIcon fontSize="small" />
+//                           </IconButton>
+//                           <Menu
+//                             anchorEl={anchorEls[cm._id]}
+//                             open={Boolean(anchorEls[cm._id])}
+//                             onClose={() => handleMenuClose(cm._id)}
+//                           >
+//                             <MenuItem onClick={() => { handleEditComment(cm); handleMenuClose(cm._id); }}>
+//                               <EditIcon fontSize="small" sx={{ mr: 1 }} /> Edit
+//                             </MenuItem>
+//                             <MenuItem onClick={() => { handleDeleteComment(cm._id); handleMenuClose(cm._id); }}>
+//                               <DeleteIcon fontSize="small" sx={{ mr: 1 }} /> Delete
+//                             </MenuItem>
+//                           </Menu>
+//                         </>
 //                       )}
 //                     </Box>
 //                     <Typography ml={4}>{cm.text}</Typography>
 //                   </Box>
 //                 ))}
-//               </Box>
+//               </>
 //             )}
 //           </Box>
 //         </Box>
@@ -489,64 +301,71 @@
 // };
 
 // export default VideoPlayer;
-
-
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'; //last working code 4/08
 import {
-  Box, Typography, CircularProgress, IconButton,
-  Avatar, TextField, Button, Toolbar
+  Box, Typography, CircularProgress, IconButton, Avatar,
+  TextField, Button, Toolbar, Tooltip, Card, CardMedia,
+  Menu, MenuItem, Divider
 } from '@mui/material';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
+import BookmarkIcon from '@mui/icons-material/Bookmark';
 import { useParams } from 'react-router-dom';
 import jwt_decode from 'jwt-decode';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import './VideoPlayer.css';
 
 import Sidebar from '../Sidebar';
 import CommonNav from '../CommonNav';
 import axiosInstance from '../axiosInterceptor';
-
+import SendIcon from "@mui/icons-material/Send";
 dayjs.extend(relativeTime);
 
 const drawerWidthOpen = 240;
 const drawerWidthClosed = 60;
-
+const getEmailColor = (email) => {
+  let hash = 0;
+  for (let i = 0; i < email.length; i++) {
+    hash = email.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const color = `hsl(${hash % 360}, 70%, 45%)`; // HSL generates vibrant color
+  return color;
+};
 const VideoPlayer = () => {
   const { id } = useParams();
   const [video, setVideo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [likes, setLikes] = useState([]);
   const [comments, setComments] = useState([]);
+  const [saved, setSaved] = useState(false);
   const [showLikes, setShowLikes] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [commentText, setCommentText] = useState('');
-  const [currentTime, setCurrentTime] = useState(Date.now());
+  const [editingCommentId, setEditingCommentId] = useState(null);
+  const [anchorEls, setAnchorEls] = useState({});
+  const [showFullDesc, setShowFullDesc] = useState(false);
 
   const token = localStorage.getItem('token');
   const userType = localStorage.getItem('role');
-  let currentUserEmail = '';
-  let currentUserId = '';
+  let currentUserEmail = '', currentUserId = '';
 
   try {
     const decoded = jwt_decode(token);
     currentUserEmail = decoded.email;
     currentUserId = decoded.userId || decoded.id;
-  } catch (err) {
-    console.error('Invalid token');
-  }
-
-  useEffect(() => {
-    const interval = setInterval(() => setCurrentTime(Date.now()), 30000);
-    return () => clearInterval(interval);
-  }, []);
+  } catch {}
 
   useEffect(() => {
     fetchVideo();
     fetchLikes();
     fetchComments();
+    checkIfSaved();
   }, [id]);
 
   const fetchVideo = async () => {
@@ -578,16 +397,24 @@ const VideoPlayer = () => {
     }
   };
 
+  const checkIfSaved = async () => {
+    try {
+      const res = await axiosInstance.get(`save/saved/check/${id}`);
+      setSaved(res.data.isSaved);
+    } catch (err) {
+      console.error('Failed to check saved status:', err);
+    }
+  };
+
   const userLiked = likes.some((like) => like.user?.email === currentUserEmail);
 
-  // ✅ Like and track in user activity
   const handleLike = async () => {
     try {
       if (userLiked) {
         await axiosInstance.delete(`/admin/${id}/likes/${currentUserEmail}`);
       } else {
         await axiosInstance.post(`/admin/${id}/likes`, { email: currentUserEmail });
-        await axiosInstance.post(`/activity/like/${id}`); // Track like
+        await axiosInstance.post(`/activity/like/${id}`);
       }
       fetchLikes();
     } catch (err) {
@@ -595,19 +422,30 @@ const VideoPlayer = () => {
     }
   };
 
-  // ✅ Comment and track in user activity
+  const toggleLikesView = () => {
+    setShowLikes((prev) => !prev);
+    setShowComments(false);
+  };
+
   const handleCommentSubmit = async () => {
     if (!commentText.trim()) return;
+
     try {
-      await axiosInstance.post(`/admin/${id}/comments`, {
-        email: currentUserEmail,
-        text: commentText.trim(),
-      });
-      await axiosInstance.post(`/activity/comment/${id}`, { text: commentText.trim() }); // Track comment
+      if (editingCommentId) {
+        await axiosInstance.put(`/admin/${id}/comments/${editingCommentId}`, { text: commentText.trim() });
+        setEditingCommentId(null);
+      } else {
+        await axiosInstance.post(`/admin/${id}/comments`, {
+          email: currentUserEmail,
+          text: commentText.trim(),
+        });
+        await axiosInstance.post(`/activity/comment/${id}`, { text: commentText.trim() });
+      }
+
       setCommentText('');
       fetchComments();
     } catch (err) {
-      console.error('Comment post error:', err);
+      console.error('Comment error:', err);
     }
   };
 
@@ -622,122 +460,344 @@ const VideoPlayer = () => {
     }
   };
 
-  // ✅ Track watched video when play starts
-  const handleVideoPlay = async () => {
+  const handleEditComment = (comment) => {
+    setEditingCommentId(comment._id);
+    setCommentText(comment.text);
+  };
+
+  const handleToggleSave = async () => {
     try {
-      await axiosInstance.post(`/activity/watched/${id}`);
+      if (saved) {
+        await axiosInstance.delete(`save/saved/${id}`);
+      } else {
+        await axiosInstance.post(`save/saved/${id}`);
+      }
+      setSaved(!saved);
     } catch (err) {
-      console.error('Failed to track watched video:', err);
+      console.error('Failed to toggle save:', err);
     }
+  };
+
+  const handleMenuOpen = (event, commentId) => {
+    setAnchorEls((prev) => ({ ...prev, [commentId]: event.currentTarget }));
+  };
+
+  const handleMenuClose = (commentId) => {
+    setAnchorEls((prev) => ({ ...prev, [commentId]: null }));
   };
 
   if (loading) return <CircularProgress sx={{ mt: 10, ml: 10 }} />;
   if (!video) return <Typography mt={10} ml={10}>Video not found</Typography>;
 
   const videoUrl = `http://localhost:3000/${video.fileUrl.replace(/\\/g, '/')}`;
+  const pdfUrl = video.overviewPdf && `http://localhost:3000/${video.overviewPdf}`;
+  const cardLeft = sidebarOpen ? drawerWidthOpen + 16 : drawerWidthClosed + 16;
+const getInitials = (nameOrEmail) => {
+  const name = nameOrEmail?.split('@')[0] || '';
+  const words = name.split(/[.\s_-]+/);
+  if (words.length === 1) return words[0].charAt(0).toUpperCase();
+  return words[0].charAt(0).toUpperCase() + words[1].charAt(0).toUpperCase();
+};
+const getEmailColor = (email, alpha = 1) => {
+  if (!email) return `rgba(150,150,150,${alpha})`; // default gray
+
+  let hash = 0;
+  for (let i = 0; i < email.length; i++) {
+    hash = email.charCodeAt(i) + ((hash << 5) - hash);
+  }
+
+  const hue = hash % 360;
+  const [r, g, b] = hslToRgb(hue / 360, 0.6, 0.7); // light color
+
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+};
+
+// Convert HSL to RGB
+const hslToRgb = (h, s, l) => {
+  let r, g, b;
+
+  if (s === 0) {
+    r = g = b = l; // achromatic
+  } else {
+    const hue2rgb = (p, q, t) => {
+      if (t < 0) t += 1;
+      if (t > 1) t -= 1;
+      if (t < 1 / 6) return p + (q - p) * 6 * t;
+      if (t < 1 / 2) return q;
+      if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+      return p;
+    };
+
+    const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+    const p = 2 * l - q;
+
+    r = hue2rgb(p, q, h + 1 / 3);
+    g = hue2rgb(p, q, h);
+    b = hue2rgb(p, q, h - 1 / 3);
+  }
+
+  return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+};
 
   return (
     <Box sx={{ display: 'flex' }}>
       <Sidebar open={sidebarOpen} userType={userType} />
-      <Box
-        sx={{
-          flexGrow: 1,
-          ml: sidebarOpen ? `${drawerWidthOpen}px` : `${drawerWidthClosed}px`,
-          transition: 'margin 0.3s'
-        }}
-      >
+      <Box sx={{ flexGrow: 1, ml: `${cardLeft}px`, transition: 'margin 0.3s' }}>
         <CommonNav onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
         <Toolbar />
-        <Box sx={{ display: 'flex', p: 3 }}>
-          <Box sx={{ flex: 3 }}>
-            <Typography variant="h5">{video.title}</Typography>
-            {videoUrl && (
-              <video
-                width="100%"
-                height="auto"
-                controls
-                controlsList="nodownload"
-                onContextMenu={(e) => e.preventDefault()}
-                src={videoUrl}
-                onPlay={handleVideoPlay} // 🔥 Track watched
-              />
-            )}
-            <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
-              <IconButton
-                onClick={() => {
-                  handleLike();
-                  setShowLikes((prev) => !prev);
-                  setShowComments(false);
-                }}
-              >
-                <ThumbUpIcon color={userLiked ? 'primary' : 'action'} />
-                <Typography ml={1}>{likes.length}</Typography>
-              </IconButton>
-              <IconButton
-                onClick={() => {
-                  setShowComments((prev) => !prev);
-                  setShowLikes(false);
-                }}
-              >
-                <ChatBubbleOutlineIcon color={showComments ? 'primary' : 'action'} />
-                <Typography ml={1}>{comments.length}</Typography>
-              </IconButton>
+        <Box sx={{ display: 'flex', p: 2, gap: 2 , ml: sidebarOpen ? -28 : 8, mt: 4, px: 3 }}>
+          <Card sx={{ width: '50%', padding: 2, borderRadius: 3, background: '#fff', height: 'auto' }}>
+            <CardMedia
+              component="video"
+              src={videoUrl}
+              controls
+              controlsList="nodownload"
+              onContextMenu={(e) => e.preventDefault()}
+              onPlay={() => axiosInstance.post(`/activity/watched/${id}`)}
+              sx={{ borderRadius: 2, height: 250 }}
+            />
+            <Box display="flex" alignItems="center" justifyContent="space-between" mt={1}>
+              <Box display="flex" alignItems="center" gap={1.5}>
+                <IconButton onClick={handleLike}>
+                  <ThumbUpIcon color={userLiked ? 'primary' : 'action'} />
+                </IconButton>
+                <Typography sx={{ cursor: 'pointer' }} onClick={toggleLikesView}>{likes.length}</Typography>
+                <IconButton onClick={() => { setShowComments(true); setShowLikes(false); }}>
+                  <ChatBubbleOutlineIcon color={showComments ? 'primary' : 'action'} />
+                </IconButton>
+                <Typography >{comments.length}</Typography>
+              </Box>
+              {userType === 'user' && (
+                <Tooltip title={saved ? 'Unsave' : 'Save'}>
+                  <IconButton onClick={handleToggleSave}>
+                    {saved ? <BookmarkIcon color="primary" /> : <BookmarkBorderIcon />}
+                  </IconButton>
+                </Tooltip>
+              )}
             </Box>
-            <Typography mt={2}>{video.description}</Typography>
-          </Box>
 
-          <Box sx={{ flex: 2, ml: 4 }}>
+            <Typography variant="h6" fontWeight="bold" fontFamily='Poppins' mt={1}>{video.title}</Typography>
+
+            <Box sx={{ mt: 1, bgcolor: 'rgba(0,0,0,0.04)', p: 2, borderRadius: 2 }}>
+              <Typography
+                variant="body2"
+                sx={{
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  display: showFullDesc ? 'block' : '-webkit-box',
+                  WebkitLineClamp: showFullDesc ? 'none' : 3,
+                  WebkitBoxOrient: 'vertical',
+                  fontFamily:'Poppins'
+                }}
+              >
+                {video.description}
+              </Typography>
+              {video.description?.length > 100 && (
+                <Button onClick={() => setShowFullDesc(!showFullDesc)} size="small" sx={{ mt: 1 ,fontFamily:'Poppins'}}>
+                  {showFullDesc ? 'Show Less' : 'View More'}
+                </Button>
+              )}
+              {/* {video.videoUrl && (
+  <Typography mt={1} variant="body2" fontFamily="Poppins">
+    <strong>Video URL:</strong>{' '}
+    <a
+      href={`http://localhost:3000/${video.videoUrl?.replace(/\\/g, '/')}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      style={{ color: '#1976d2', textDecoration: 'none' }}
+    >
+      {video.videoUrl}
+    </a>
+  </Typography>
+)} */}
+{video.videoUrl && (
+  <Typography mt={1} variant="body2" fontFamily="Poppins">
+    <strong>Video URL:</strong>{' '}
+    <a
+      href={
+        video.videoUrl.startsWith('http')
+          ? video.videoUrl
+          : `http://localhost:3000/${video.videoUrl.replace(/\\/g, '/')}`
+      }
+      target="_blank"
+      rel="noopener noreferrer"
+      style={{ color: '#1976d2', textDecoration: 'none' }}
+    >
+      {video.videoUrl}
+    </a>
+  </Typography>
+)}
+
+              {/* {pdfUrl && (
+  <Typography mt={1} variant="body2" fontFamily='Poppins'>
+    <strong>Project Document:</strong>{' '}
+    <a
+      href={pdfUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      style={{ color: '#1976d2', textDecoration: 'none' }}
+    >
+      View PDF
+    </a>
+  </Typography>
+)} */}
+
+   {/* {pdfUrl && (
+  <Typography mt={1} variant="body2" fontFamily='Poppins'>
+    <strong>Project Document:</strong>{' '}
+    <a
+      href={pdfUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      style={{ color: '#1976d2', textDecoration: 'none', marginRight: 10 }}
+    >
+      View PDF
+    </a>
+    |
+    <a
+      href={pdfUrl}
+      download
+      style={{ color: '#1976d2', textDecoration: 'none', marginLeft: 10 }}
+    >
+      Download
+    </a>
+  </Typography>
+)} */}
+       {pdfUrl && (
+  <Typography mt={1} variant="body2" fontFamily="Poppins">
+    <strong>Project Document:</strong>{' '}
+    <a
+      href={pdfUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      style={{ color: '#1976d2', textDecoration: 'none' }}
+    >
+      View PDF
+    </a>
+  </Typography>
+)}
+ 
+            </Box>
+          </Card>
+
+          <Box sx={{ flex: 1 }}>
             {showLikes && (
-              <Box>
-                <Typography variant="h6">Liked by</Typography>
-                {likes.map((like, idx) => (
-                  <Box key={idx} sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
-                    <Avatar />
-                    <Typography ml={1}>
-                      {like.user?.name || like.user?.email || 'Unknown'}
-                    </Typography>
+              <>
+                <Typography variant="h6" style={{fontFamily:'Poppins'}}>Liked by</Typography>
+                {likes.map((like, i) => (
+                  <Box key={i} display="flex" alignItems="center" mt={1}>
+                    
+                    <Avatar
+  sx={{
+    width: 30,
+    height: 30,
+    bgcolor: getEmailColor(like.user?.email || '', 1), // Light background with 20% opacity
+    // color: getEmailColor(cm.user?.email || ''),        // Strong color for initials
+    fontSize: '0.8rem',
+    fontWeight: 'bold',
+    fontFamily: 'Poppins'
+  }}
+>
+  {getInitials(like.user?.name || like.user?.email)}
+</Avatar>
+                    <Typography ml={1}>{like.user?.name || like.user?.email}</Typography>
                   </Box>
                 ))}
-              </Box>
+              </>
             )}
-
+            
             {showComments && (
-              <Box>
-                <Typography variant="h6">{comments.length} Comments</Typography>
-                <TextField
-                  fullWidth
-                  size="small"
-                  placeholder="Add a comment"
-                  value={commentText}
-                  onChange={(e) => setCommentText(e.target.value)}
-                  sx={{ my: 1 }}
-                />
-                <Button variant="contained" size="small" onClick={handleCommentSubmit}>
-                  Post
-                </Button>
+              <>
+            <Typography variant="h6" style={{fontFamily:'Poppins'}}>{comments.length} Comments</Typography>
+              <TextField fullWidth placeholder="Add a comment..." size="small" style={{fontFamily:'Poppins'}} value={commentText} onChange={(e) => setCommentText(e.target.value)} sx={{ my: 1 }} />
+                {/* <Button onClick={handleCommentSubmit} variant="contained" size="small">{editingCommentId ? 'Update' : 'Post'}</Button> */}
+                <Button
+  onClick={handleCommentSubmit}
+  variant="contained"
+  size="small"
+  
+  endIcon={<SendIcon />}
+> 
+  {editingCommentId ? 'Update' : 'Post'}
+</Button>
+
                 {comments.map((cm) => (
-                  <Box key={cm._id} sx={{ mt: 2 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                      <Avatar sx={{ width: 30, height: 30 }} />
-                      <Typography ml={1} fontWeight="bold">
-                        {cm.user?.name || cm.user?.email || 'Unknown'}
-                      </Typography>
-                      <Typography ml={1} variant="caption" color="text.secondary">
-                        • {dayjs(cm.createdAt).from(currentTime)}
-                      </Typography>
-                      {cm.user?.email === currentUserEmail && (
-                        <IconButton
-                          size="small"
-                          onClick={() => handleDeleteComment(cm._id)}
-                        >
-                          <DeleteIcon fontSize="small" />
-                        </IconButton>
-                      )}
+                  <Box key={cm._id} mt={2}>
+                    <Box display="flex" alignItems="center" justifyContent="space-between">
+                      <Box display="flex" alignItems="center">
+                        {/* <Avatar sx={{ width: 30, height: 30 }} /> */}
+                        {/* <Avatar
+  sx={{
+    width: 30,
+    height: 30,
+    bgcolor: getEmailColor(cm.user?.email || ''),
+    fontSize: '0.8rem',
+    fontWeight: 'bold',
+  }}
+>
+  {getInitials(cm.user?.name || cm.user?.email)}
+</Avatar> */}
+<Avatar
+  sx={{
+    width: 30,
+    height: 30,
+    bgcolor: getEmailColor(cm.user?.email || '', 1), // Light background with 20% opacity
+    // color: getEmailColor(cm.user?.email || ''),        // Strong color for initials
+    fontSize: '0.8rem',
+    fontWeight: 'bold',
+  }}
+>
+  {getInitials(cm.user?.name || cm.user?.email)}
+</Avatar>
+
+
+                        <Typography ml={1} fontWeight="bold">{cm.user?.name || cm.user?.email}</Typography>
+                        <Typography ml={1} variant="caption" color="text.secondary">• {dayjs(cm.createdAt).fromNow()}</Typography>
+                      </Box>
+
+
+                      
+                      {(cm.user?.email === currentUserEmail || userType === 'admin') && (
+  <>
+    <IconButton onClick={(e) => handleMenuOpen(e, cm._id)}>
+      <MoreVertIcon fontSize="small" />
+    </IconButton>
+    <Menu
+      anchorEl={anchorEls[cm._id]}
+      open={Boolean(anchorEls[cm._id])}
+      onClose={() => handleMenuClose(cm._id)}
+    >
+      {/* Only show "Edit" if current user is the owner */}
+      {cm.user?.email === currentUserEmail && (
+        <MenuItem
+          onClick={() => {
+            handleEditComment(cm);
+            handleMenuClose(cm._id);
+          }}
+        >
+          <EditIcon fontSize="small" sx={{ mr: 1 }} /> Edit
+        </MenuItem>
+      )}
+
+      {/* Show "Delete" if admin or owner */}
+      <MenuItem
+        onClick={() => {
+          handleDeleteComment(cm._id);
+          handleMenuClose(cm._id);
+        }}
+      >
+        <DeleteIcon fontSize="small" sx={{ mr: 1 }} /> Delete
+      </MenuItem>
+    </Menu>
+  </>
+)}
+
+                     
                     </Box>
                     <Typography ml={4}>{cm.text}</Typography>
                   </Box>
                 ))}
-              </Box>
+              </>
             )}
           </Box>
         </Box>
@@ -750,460 +810,9 @@ export default VideoPlayer;
 
 
 
-// import React, { useEffect, useState, useRef } from 'react';
-// import {
-//   Box, Typography, CircularProgress, IconButton,
-//   Avatar, TextField, Button, Toolbar
-// } from '@mui/material';
-// import ThumbUpIcon from '@mui/icons-material/ThumbUp';
-// import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
-// import DeleteIcon from '@mui/icons-material/Delete';
-// import { useParams } from 'react-router-dom';
-// import axios from 'axios';
-// // import jwtDecode from 'jwt-decode';
-// // import { jwtDecode } from "jwt-decode";
-// import jwt_decode from "jwt-decode";
-
-
-// import dayjs from 'dayjs';
-// import relativeTime from 'dayjs/plugin/relativeTime';
-
-// import Sidebar from '../Sidebar';
-// import CommonNav from '../CommonNav';
-
-// dayjs.extend(relativeTime);
-// const token = localStorage.getItem("token");
-
-// const drawerWidthOpen = 240;
-// const drawerWidthClosed = 60;
-// const decoded = jwt_decode(token);
-
-// const VideoPlayer = () => {
-//   const { id } = useParams();
-//   const [video, setVideo] = useState(null);
-//   const [loading, setLoading] = useState(true);
-//   const [likes, setLikes] = useState([]);
-//   const [comments, setComments] = useState([]);
-//   const [showLikes, setShowLikes] = useState(false);
-//   const [showComments, setShowComments] = useState(false);
-//   const [sidebarOpen, setSidebarOpen] = useState(true);
-//   const [commentText, setCommentText] = useState('');
-//   const [deleteId, setDeleteId] = useState(null);
-//   const holdTimer = useRef(null);
-
-//   // ✅ Decode JWT to get user info
-//   const token = localStorage.getItem('token');
-//   let currentUserEmail = '';
-//   try {
-//     const decoded = jwtDecode(token);
-//     currentUserEmail = decoded.email;
-//   } catch (err) {
-//     console.error('Invalid token or not logged in');
-//   }
-
-//   useEffect(() => {
-//     fetchVideo();
-//     fetchLikes();
-//     fetchComments();
-//   }, [id]);
-
-//   const fetchVideo = async () => {
-//     try {
-//       const res = await axios.get(`http://localhost:3000/admin/video/${id}`);
-//       setVideo(res.data);
-//     } catch (err) {
-//       console.error('Failed to load video:', err);
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   const fetchLikes = async () => {
-//     try {
-//       const res = await axios.get(`http://localhost:3000/admin/${id}/likes`);
-//       setLikes(res.data);
-//     } catch (err) {
-//       console.error('Failed to load likes:', err);
-//     }
-//   };
-
-//   const fetchComments = async () => {
-//     try {
-//       const res = await axios.get(`http://localhost:3000/admin/${id}/comments`);
-//       setComments(res.data);
-//     } catch (err) {
-//       console.error('Failed to load comments:', err);
-//     }
-//   };
-
-//   const userLiked = likes.some(like => like.user?.email === currentUserEmail);
-
-//   const handleLike = async () => {
-//     try {
-//       await axios.post(`http://localhost:3000/admin/${id}/likes`, {
-//         email: currentUserEmail
-//       });
-//       fetchLikes();
-//     } catch (err) {
-//       console.error('Like toggle error:', err);
-//     }
-//   };
-
-//   const handleCommentSubmit = async () => {
-//     if (!commentText.trim()) return;
-//     try {
-//       await axios.post(`http://localhost:3000/admin/${id}/comments`, {
-//         email: currentUserEmail,
-//         text: commentText.trim()
-//       });
-//       setCommentText('');
-//       fetchComments();
-//     } catch (err) {
-//       console.error('Adding comment failed:', err);
-//     }
-//   };
-
-//   const handleDeleteComment = async (commentId) => {
-//     try {
-//       await axios.delete(`http://localhost:3000/admin/${id}/comments/${commentId}`, {
-//         data: { email: currentUserEmail }
-//       });
-//       setDeleteId(null);
-//       fetchComments();
-//     } catch (err) {
-//       console.error('Delete comment failed:', err);
-//     }
-//   };
-
-//   const handleCommentLongPress = (commentId) => {
-//     setDeleteId(commentId);
-//   };
-
-//   const handleCommentRelease = () => {
-//     setTimeout(() => {
-//       setDeleteId(null);
-//     }, 2000);
-//   };
-
-//   if (loading) return <CircularProgress sx={{ mt: 10, ml: 10 }} />;
-//   if (!video) return <Typography mt={10} ml={10}>Video not found</Typography>;
-
-//   const videoUrl = `http://localhost:3000/${video.fileUrl.replace(/\\/g, '/')}`;
-
-//   return (
-//     <Box sx={{ display: 'flex' }}>
-//       <Sidebar open={sidebarOpen} userType="admin" />
-//       <Box
-//         sx={{
-//           flexGrow: 1,
-//           ml: sidebarOpen ? `${drawerWidthOpen}px` : `${drawerWidthClosed}px`,
-//           transition: 'margin 0.3s'
-//         }}
-//       >
-//         <CommonNav onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
-//         <Toolbar />
-//         <Box sx={{ display: 'flex', p: 3 }}>
-//           {/* Left: Video and actions */}
-//           <Box sx={{ flex: 3 }}>
-//             <Typography variant="h5">{video.title}</Typography>
-//             {videoUrl && (
-//               <video width="100%" height="auto" controls src={videoUrl} />
-//             )}
-//             <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
-//               <IconButton onClick={() => {
-//                 handleLike();
-//                 setShowLikes(true);
-//                 setShowComments(false);
-//               }}>
-//                 <ThumbUpIcon color={userLiked ? 'primary' : 'action'} />
-//                 <Typography ml={1}>{likes.length}</Typography>
-//               </IconButton>
-//               <IconButton onClick={() => {
-//                 setShowComments(true);
-//                 setShowLikes(false);
-//               }}>
-//                 <ChatBubbleOutlineIcon color={showComments ? 'primary' : 'action'} />
-//                 <Typography ml={1}>{comments.length}</Typography>
-//               </IconButton>
-//             </Box>
-//             <Typography mt={2}>{video.description}</Typography>
-//           </Box>
-
-//           {/* Right: Likes or Comments */}
-//           <Box sx={{ flex: 2, ml: 4 }}>
-//             {showLikes && (
-//               <Box>
-//                 <Typography variant="h6">Liked by</Typography>
-//                 {likes.map((like, idx) => (
-//                   <Box key={idx} sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
-//                     <Avatar />
-//                     <Typography ml={1}>
-//                       {like.user?.name || like.user?.email || 'Unknown'}
-//                     </Typography>
-//                   </Box>
-//                 ))}
-//               </Box>
-//             )}
-
-//             {showComments && (
-//               <Box>
-//                 <Typography variant="h6">{comments.length} Comments</Typography>
-//                 <TextField
-//                   fullWidth
-//                   size="small"
-//                   placeholder="Add a comment"
-//                   value={commentText}
-//                   onChange={(e) => setCommentText(e.target.value)}
-//                   sx={{ my: 1 }}
-//                 />
-//                 <Button variant="contained" size="small" onClick={handleCommentSubmit}>
-//                   Post
-//                 </Button>
-//                 {comments.map((cm) => (
-//                   <Box
-//                     key={cm._id}
-//                     onMouseDown={() => {
-//                       if (cm.user?.email === currentUserEmail) {
-//                         holdTimer.current = setTimeout(() => handleCommentLongPress(cm._id), 600);
-//                       }
-//                     }}
-//                     onMouseUp={() => {
-//                       clearTimeout(holdTimer.current);
-//                       handleCommentRelease();
-//                     }}
-//                     sx={{ mt: 2 }}
-//                   >
-//                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
-//                       <Avatar sx={{ width: 30, height: 30 }} />
-//                       <Typography ml={1} fontWeight="bold">
-//                         {cm.user?.name || cm.user?.email || 'Unknown'}
-//                       </Typography>
-//                       <Typography ml={1} variant="caption" color="text.secondary">
-//                         • {dayjs(cm.createdAt).fromNow()}
-//                       </Typography>
-//                       {deleteId === cm._id && cm.user?.email === currentUserEmail && (
-//                         <IconButton size="small" onClick={() => handleDeleteComment(cm._id)}>
-//                           <DeleteIcon fontSize="small" />
-//                         </IconButton>
-//                       )}
-//                     </Box>
-//                     <Typography ml={4}>{cm.text}</Typography>
-//                   </Box>
-//                 ))}
-//               </Box>
-//             )}
-//           </Box>
-//         </Box>
-//       </Box>
-//     </Box>
-//   );
-// };
-
-// export default VideoPlayer;
 
 
 
 
-// import React, { useEffect, useState } from 'react';
-// import {
-//   Box, Typography, CircularProgress, IconButton,
-//   Avatar, TextField, Button, Toolbar
-// } from '@mui/material';
-// import ThumbUpIcon from '@mui/icons-material/ThumbUp';
-// import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
-// import DeleteIcon from '@mui/icons-material/Delete';
-// import { useParams } from 'react-router-dom';
-// import axios from 'axios';
-// import dayjs from 'dayjs';
-// import relativeTime from 'dayjs/plugin/relativeTime';
 
-// import Sidebar from '../Sidebar';
-// import CommonNav from '../CommonNav';
 
-// dayjs.extend(relativeTime);
-
-// const drawerWidthOpen = 240;
-// const drawerWidthClosed = 60;
-
-// const currentUserEmail = "shaluanupama16@gmail.com"; // Replace with dynamic user in real app
-
-// const VideoPlayer = () => {
-//   const { id } = useParams();
-//   const [video, setVideo] = useState(null);
-//   const [loading, setLoading] = useState(true);
-//   const [likes, setLikes] = useState([]);
-//   const [comments, setComments] = useState([]);
-//   const [showLikes, setShowLikes] = useState(false);
-//   const [showComments, setShowComments] = useState(true);
-//   const [sidebarOpen, setSidebarOpen] = useState(true);
-//   const [commentText, setCommentText] = useState('');
-
-//   const userLiked = likes.some(like => like.user?.email === currentUserEmail);
-
-//   useEffect(() => {
-//     fetchVideo();
-//     fetchLikes();
-//     fetchComments();
-//   }, [id]);
-
-//   const fetchVideo = async () => {
-//     try {
-//       const res = await axios.get(`http://localhost:3000/admin/video/${id}`);
-//       setVideo(res.data);
-//     } catch (err) {
-//       console.error('Failed to load video:', err);
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   const fetchLikes = async () => {
-//     try {
-//       const res = await axios.get(`http://localhost:3000/admin/${id}/likes`);
-//       setLikes(res.data);
-//     } catch (err) {
-//       console.error('Failed to load likes:', err);
-//     }
-//   };
-
-//   const fetchComments = async () => {
-//     try {
-//       const res = await axios.get(`http://localhost:3000/admin/${id}/comments`);
-//       setComments(res.data);
-//     } catch (err) {
-//       console.error('Failed to load comments:', err);
-//     }
-//   };
-
-//   const handleLike = async () => {
-//     try {
-//       await axios.post(`http://localhost:3000/admin/${id}/likes`, {
-//         email: currentUserEmail
-//       });
-//       fetchLikes();
-//     } catch (err) {
-//       console.error('Like toggle error:', err);
-//     }
-//   };
-
-//   const handleCommentSubmit = async () => {
-//     if (!commentText.trim()) return;
-//     try {
-//       await axios.post(`http://localhost:3000/admin/${id}/comments`, {
-//         email: currentUserEmail,
-//         text: commentText.trim()
-//       });
-//       setCommentText('');
-//       fetchComments();
-//     } catch (err) {
-//       console.error('Adding comment failed:', err);
-//     }
-//   };
-
-//   const handleDeleteComment = async (commentId) => {
-//     try {
-//       await axios.delete(`http://localhost:3000/admin/${id}/comments/${commentId}`, {
-//         data: { email: currentUserEmail }
-//       });
-//       fetchComments();
-//     } catch (err) {
-//       console.error('Delete comment failed:', err);
-//     }
-//   };
-
-//   if (loading) return <CircularProgress sx={{ mt: 10, ml: 10 }} />;
-//   if (!video) return <Typography mt={10} ml={10}>Video not found</Typography>;
-
-//   const videoUrl = `http://localhost:3000/${video.fileUrl.replace(/\\/g, '/')}`;
-
-//   return (
-//     <Box sx={{ display: 'flex' }}>
-//       <Sidebar open={sidebarOpen} userType="admin" />
-//       <Box
-//         sx={{
-//           flexGrow: 1,
-//           ml: sidebarOpen ? `${drawerWidthOpen}px` : `${drawerWidthClosed}px`,
-//           transition: 'margin 0.3s'
-//         }}
-//       >
-//         <CommonNav onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
-//         <Toolbar />
-//         <Box sx={{ display: 'flex', p: 3 }}>
-//           {/* Video and actions */}
-//           <Box sx={{ flex: 3 }}>
-//             <Typography variant="h5">{video.title}</Typography>
-//             {videoUrl && (
-//               <video width="100%" height="auto" controls src={videoUrl} />
-//             )}
-//             <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
-//               <IconButton onClick={handleLike}>
-//                 <ThumbUpIcon color={userLiked ? 'primary' : 'action'} />
-//                 <Typography ml={1}>{likes.length}</Typography>
-//               </IconButton>
-//               <IconButton onClick={() => { setShowComments(true); setShowLikes(false); }}>
-//                 <ChatBubbleOutlineIcon color={showComments ? 'primary' : 'action'} />
-//                 <Typography ml={1}>{comments.length}</Typography>
-//               </IconButton>
-//             </Box>
-//             <Typography mt={2}>{video.description}</Typography>
-//           </Box>
-
-//           {/* Likes or Comments panel */}
-//           <Box sx={{ flex: 2, ml: 4 }}>
-//             {showLikes && (
-//               <Box>
-//                 <Typography variant="h6">Liked by</Typography>
-//                 {likes.map((like, idx) => (
-//                   <Box key={idx} sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
-//                     <Avatar />
-//                     <Typography ml={1}>
-//                       {like.user?.name || like.user?.email || 'Unknown'}
-//                     </Typography>
-//                   </Box>
-//                 ))}
-//               </Box>
-//             )}
-
-//             {showComments && (
-//               <Box>
-//                 <Typography variant="h6">{comments.length} Comments</Typography>
-//                 <TextField
-//                   fullWidth
-//                   size="small"
-//                   placeholder="Add a comment"
-//                   value={commentText}
-//                   onChange={(e) => setCommentText(e.target.value)}
-//                   sx={{ my: 1 }}
-//                 />
-//                 <Button variant="contained" size="small" onClick={handleCommentSubmit}>
-//                   Post
-//                 </Button>
-//                 {comments.map((cm) => (
-//                   <Box key={cm._id} sx={{ mt: 2 }}>
-//                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
-//                       <Avatar sx={{ width: 30, height: 30 }} />
-//                       <Typography ml={1} fontWeight="bold">
-//                         {cm.user?.name || cm.user?.email || 'Unknown'}
-//                       </Typography>
-//                       <Typography ml={1} variant="caption" color="text.secondary">
-//                         • {dayjs(cm.createdAt).fromNow()}
-//                       </Typography>
-//                       {cm.user?.email === currentUserEmail && (
-//                         <IconButton size="small" onClick={() => handleDeleteComment(cm._id)}>
-//                           <DeleteIcon fontSize="small" />
-//                         </IconButton>
-//                       )}
-//                     </Box>
-//                     <Typography ml={4}>{cm.text}</Typography>
-//                   </Box>
-//                 ))}
-//               </Box>
-//             )}
-//           </Box>
-//         </Box>
-//       </Box>
-//     </Box>
-//   );
-// };
-
-// export default VideoPlayer;

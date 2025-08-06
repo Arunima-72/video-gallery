@@ -1,0 +1,326 @@
+// import React, { useEffect, useState } from "react";
+// import {
+//   Box, Typography, Table, TableBody, TableCell, TableContainer,
+//   TableHead, TableRow, Paper, CircularProgress
+// } from "@mui/material";
+// import axios from "axios";
+// import axiosInstance from "../axiosInterceptor";
+// import Sidebar from "./Sidebar";
+// import CommonNav from "./CommonNav";
+// const AdminContact = () => {
+//   const [contacts, setContacts] = useState([]);
+//   const [loading, setLoading] = useState(true);
+
+//   const fetchContacts = async () => {
+//     try {
+//       const res = await axiosInstance.get("http://localhost:3000/save/contact");
+//       setContacts(res.data);
+//     } catch (error) {
+//       console.error("Error fetching contacts:", error);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   useEffect(() => {
+//     fetchContacts();
+//   }, []);
+
+//   return (
+//     <Box sx={{ p: 4 }}>
+//       <Typography variant="h4" gutterBottom>
+//         Contact Submissions
+//       </Typography>
+
+//       {loading ? (
+//         <CircularProgress />
+//       ) : (
+//         <TableContainer component={Paper}>
+//           <Table>
+//             <TableHead>
+//               <TableRow>
+//                 <TableCell><strong>Name</strong></TableCell>
+//                 <TableCell><strong>Email</strong></TableCell>
+//                 <TableCell><strong>Message</strong></TableCell>
+//                 <TableCell><strong>Submitted At</strong></TableCell>
+//               </TableRow>
+//             </TableHead>
+//             <TableBody>
+//               {contacts.map((contact) => (
+//                 <TableRow key={contact._id}>
+//                   <TableCell>{contact.name}</TableCell>
+//                   <TableCell>{contact.email}</TableCell>
+//                   <TableCell>{contact.message}</TableCell>
+//                   <TableCell>
+//                     {new Date(contact.createdAt).toLocaleString()}
+//                   </TableCell>
+//                 </TableRow>
+//               ))}
+//             </TableBody>
+//           </Table>
+//         </TableContainer>
+//       )}
+//     </Box>
+//   );
+// };
+
+// export default AdminContact;
+// import React, { useEffect, useState } from "react";
+// import {
+//   Box,
+//   Typography,
+//   Table,
+//   TableBody,
+//   TableCell,
+//   TableContainer,
+//   TableHead,
+//   TableRow,
+//   Paper,
+//   CircularProgress
+// } from "@mui/material";
+// import axiosInstance from "../axiosInterceptor";
+
+// import CommonNav from "../CommonNav";
+// import Sidebar from "../Sidebar";
+
+// const AdminContact = () => {
+//   const [contacts, setContacts] = useState([]);
+//   const [loading, setLoading] = useState(true);
+//   const [sidebarOpen, setSidebarOpen] = useState(true);
+
+//   const fetchContacts = async () => {
+//     try {
+//       const res = await axiosInstance.get("http://localhost:3000/save/contact");
+//       setContacts(res.data);
+//     } catch (error) {
+//       console.error("Error fetching contacts:", error);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   useEffect(() => {
+//     fetchContacts();
+//   }, []);
+
+//   return (
+//     <>
+//       {/* Navbar */}
+//       <CommonNav onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
+
+//       {/* Sidebar + Main Layout */}
+//       <Box sx={{ display: "flex" }}>
+//         {/* Sidebar */}
+//         <Sidebar open={sidebarOpen} userType="admin" />
+
+//         {/* Content Area */}
+//         <Box
+//           component="main"
+//           sx={{
+//             flexGrow: 1,
+//             bgcolor: "#f9f9f9",
+//             minHeight: "100vh",
+//             p: 4,
+//             mt: 8 // height of AppBar (64px)
+//           }}
+//         >
+//           <Typography variant="h4" gutterBottom>
+//             Contact Submissions
+//           </Typography>
+
+//           {loading ? (
+//             <CircularProgress />
+//           ) : (
+//             <TableContainer component={Paper}>
+//               <Table>
+//                 <TableHead>
+//                   <TableRow>
+//                     <TableCell><strong>Name</strong></TableCell>
+//                     <TableCell><strong>Email</strong></TableCell>
+//                     <TableCell><strong>Message</strong></TableCell>
+//                     <TableCell><strong>Submitted At</strong></TableCell>
+//                   </TableRow>
+//                 </TableHead>
+//                 <TableBody>
+//                   {contacts.map((contact) => (
+//                     <TableRow key={contact._id}>
+//                       <TableCell>{contact.name}</TableCell>
+//                       <TableCell>{contact.email}</TableCell>
+//                       <TableCell>{contact.message}</TableCell>
+//                       <TableCell>
+//                         {new Date(contact.createdAt).toLocaleString()}
+//                       </TableCell>
+//                     </TableRow>
+//                   ))}
+//                 </TableBody>
+//               </Table>
+//             </TableContainer>
+//           )}
+//         </Box>
+//       </Box>
+//     </>
+//   );
+// };
+
+// export default AdminContact;
+import React, { useEffect, useState } from "react";
+import {
+  Box,
+  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  CircularProgress,
+  IconButton,
+  TextField,
+  Button,
+} from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import ClearAllIcon from "@mui/icons-material/DeleteSweep";
+
+import axiosInstance from "../axiosInterceptor";
+import CommonNav from "../CommonNav";
+import Sidebar from "../Sidebar";
+
+const AdminContact = () => {
+  const [contacts, setContacts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const fetchContacts = async () => {
+    try {
+      const res = await axiosInstance.get("http://localhost:3000/save/contact");
+      setContacts(res.data || []);
+    } catch (error) {
+      console.error("Error fetching contacts:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await axiosInstance.delete(`http://localhost:3000/save/contact/${id}`);
+      setContacts(contacts.filter((c) => c._id !== id));
+    } catch (err) {
+      console.error("Error deleting contact:", err);
+    }
+  };
+
+  const handleClearAll = async () => {
+    if (window.confirm("Are you sure you want to delete all contact entries?")) {
+      try {
+        await axiosInstance.delete("http://localhost:3000/save/all");
+        setContacts([]);
+      } catch (err) {
+        console.error("Error clearing all contacts:", err);
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchContacts();
+  }, []);
+
+  const filteredContacts = contacts.filter(
+    (c) =>
+      c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      c.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      c.message.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  return (
+    <>
+      <CommonNav onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
+      <Box sx={{ display: "flex" }}>
+        <Sidebar open={sidebarOpen} userType="admin" />
+        <Box
+          component="main"
+          sx={{
+            flexGrow: 1,
+            bgcolor: "#f9f9f9",
+            minHeight: "100vh",
+            p: 4,
+            mt: 8,
+          }}
+        >
+          <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+            <Typography variant="h4">Contact Submissions</Typography>
+            <Button
+              variant="contained"
+              color="error"
+              startIcon={<ClearAllIcon />}
+              onClick={handleClearAll}
+              size="small"
+            >
+              Clear All
+            </Button>
+          </Box>
+
+          <TextField
+            label="Search by name, email or message"
+            variant="outlined"
+            fullWidth
+            size="small"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            sx={{ mb: 2 }}
+          />
+
+          {loading ? (
+            <CircularProgress />
+          ) : (
+            <TableContainer component={Paper}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell><strong>Name</strong></TableCell>
+                    <TableCell><strong>Email</strong></TableCell>
+                    <TableCell><strong>Message</strong></TableCell>
+                    <TableCell><strong>Submitted At</strong></TableCell>
+                    <TableCell><strong>Actions</strong></TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {filteredContacts.length > 0 ? (
+                    filteredContacts.map((contact) => (
+                      <TableRow key={contact._id}>
+                        <TableCell>{contact.name}</TableCell>
+                        <TableCell>{contact.email}</TableCell>
+                        <TableCell>{contact.message}</TableCell>
+                        <TableCell>
+                          {new Date(contact.createdAt).toLocaleString()}
+                        </TableCell>
+                        <TableCell>
+                          <IconButton
+                            color="error"
+                            onClick={() => handleDelete(contact._id)}
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={5} align="center">
+                        No matching contacts found.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
+        </Box>
+      </Box>
+    </>
+  );
+};
+
+export default AdminContact;

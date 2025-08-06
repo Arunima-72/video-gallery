@@ -289,7 +289,7 @@
 // };
 
 // export default Sidebar;
-import React from 'react';
+import React from 'react';                           //last working code 
 import {
   Drawer,
   List,
@@ -304,7 +304,10 @@ import {
   Save as SaveIcon,
   Lock as PasswordIcon,
   Add as AddUserIcon,
-  History as LogsIcon
+  History as LogsIcon,
+  Backup as UploadIcon,
+  Email as ContactIcon
+  
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 
@@ -315,16 +318,17 @@ const Sidebar = ({ open, userType }) => {
   const adminLinks = [
     { text: 'Dashboard', icon: <DashboardIcon />, path: '/admin/dashboard' },
     { text: 'Videos', icon: <VideoIcon />, path: '/admin/videos' },
-    { text: 'Upload', icon: <VideoIcon />, path: '/admin/upload' },
+    { text: 'Upload', icon: <UploadIcon />, path: '/admin/upload' },
     { text: 'User Logs', icon: <LogsIcon />, path: '/admin/logs' },
     { text: 'Add Users', icon: <AddUserIcon />, path: '/admin/adduser' },
     { text: 'Change Password', icon: <PasswordIcon />, path: '/admin/password' },
+    { text: 'Contact ', icon: <ContactIcon />, path: '/admin/contact' }
   ];
 
   const userLinks = [
     { text: 'My Videos', icon: <VideoIcon />, path: '/admin/videos' },
-    { text: 'Saved Videos', icon: <SaveIcon />, path: '/user/bookmarks' },
-    { text: 'Change Password', icon: <PasswordIcon />, path: '/user/password' },
+    { text: 'Saved Videos', icon: <SaveIcon />, path: '/save/saved' },
+    { text: 'Change Password', icon: <PasswordIcon />, path: '/admin/password' },
   ];
 
   const linksToRender = userType === 'admin' ? adminLinks : userLinks;
@@ -335,43 +339,79 @@ const Sidebar = ({ open, userType }) => {
       sx={{
         width: drawerWidth,
         flexShrink: 0,
-        '& .MuiDrawer-paper': {
+        "& .MuiDrawer-paper": {
           width: drawerWidth,
-          boxSizing: 'border-box',
-          top: 64, // Align below AppBar
-          height: 'calc(100% - 64px)',
-          transition: 'width 0.3s',
-          overflowX: 'hidden',
+          boxSizing: "border-box",
+          top: 64,
+          height: "calc(100% - 64px)",
+          background: "#ffffff", // White background
+          color: "#333",
+          transition: "width 0.3s",
+          overflowX: "hidden",
+          boxShadow: "2px 0 8px rgba(0,0,0,0.05)",
         },
       }}
     >
       <List>
-        {linksToRender.map((item, index) => (
-          <Tooltip key={item.text} title={!open ? item.text : ''} placement="right">
-            <ListItem
-              button
-              onClick={() => navigate(item.path)}
-              sx={{
-                justifyContent: open ? 'flex-start' : 'center',
-                px: open ? 2 : 1,
-              }}
+        {linksToRender.map((item) => {
+          const isActive = location.pathname === item.path;
+          return (
+            <Tooltip
+              key={item.text}
+              title={!open ? item.text : ""}
+              
+              placement="right"
             >
-              <ListItemIcon
+              <ListItem
+                button
+                onClick={() => navigate(item.path)}
                 sx={{
-                  minWidth: 0,
-                  mr: open ? 2 : 'auto',
-                  justifyContent: 'center',
+                  justifyContent: open ? "flex-start" : "center",
+                  px: open ? 2 : 1,
+                  backgroundColor: isActive ? "#E3F2FD" : "transparent",
+                  "&:hover": {
+                    backgroundColor: "#E3F2FD",
+                    fontWeight: "bold",
+                  },
+                  transition: "background-color 0.2s, font-weight 0.2s",
+                  borderRadius: "8px",
+                  margin: "4px 8px",
                 }}
               >
-                {item.icon}
-              </ListItemIcon>
-              {open && <ListItemText primary={item.text} />}
-            </ListItem>
-          </Tooltip>
-        ))}
+                <ListItemIcon
+                  sx={{
+                    minWidth: 0,
+                    mr: open ? 2 : "auto",
+                    justifyContent: "center",
+                    color: isActive ? "#1976D2" : "#757575",
+                  }}
+                >
+                  {item.icon}
+                </ListItemIcon>
+                {open && (
+                  <ListItemText
+                    primary={item.text}
+                    sx={{
+                      "& .MuiTypography-root": {
+                        fontWeight: isActive ? "bold" : "normal",
+                        color: isActive ? "#1976D2" : "#333",
+                        fontFamily: 'Poppins', // Custom font family
+                      },
+                    }}
+                  />
+                )}
+              </ListItem>
+            </Tooltip>
+          );
+        })}
       </List>
     </Drawer>
   );
 };
+
+
+
+
+
 
 export default Sidebar;
