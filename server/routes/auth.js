@@ -209,7 +209,11 @@ router.post('/login', async (req, res) => {
     if (!isPasswordValid) {
       return res.status(401).json({ message: 'Incorrect password' });
     }
-
+    // Inside POST /login
+if (!user.isActive) {
+  return res.status(403).json({ message: 'Your account is inactive. Contact admin.' });
+}
+ 
     // Generate token
     const token = jwt.sign(
       { userId: user._id, email: user.email, role: user.role },
@@ -224,6 +228,7 @@ router.post('/login', async (req, res) => {
         userId: user._id,
         name: user.name,
         email: user.email,
+        role: user.role,
         sessions: [{ loginAt: new Date() }]
       });
     } else {
@@ -266,98 +271,166 @@ router.post('/logout', async (req, res) => {
 /**
  * ✅ Forgot Password (Send Reset Link)
  */
+// router.post("/forgot-password", async (req, res) => {
+//   const { email } = req.body;
+
+//   if (!email) {
+//     return res.status(400).json({ message: "Email is required" });
+//   }
+
+//   try {
+//     const user = await User.findOne({ email });
+//     if (!user) {
+//       return res.status(404).json({ message: "No user found with this email" });
+//     }
+
+//     // Generate reset token (valid for 15 min)
+//     const resetToken = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, {
+//       expiresIn: "15m",
+//     });
+
+//     const resetLink = `http://localhost:3000/reset-password/${resetToken}`;
+//       console.log("RESET LINK:", resetLink); 
+//     await sendResetEmail(user.email, resetLink);
+
+//     res.status(200).json({ message: "Reset link sent to your email" });
+//   } catch (err) {
+//     console.error("Forgot Password Error:", err);
+//     res.status(500).json({ message: "Server error" });
+//   }
+// });
+
+// /**
+//  * ✅ Reset Password (via Reset Link)
+//  */
+// router.post("/reset-password/:token", async (req, res) => {
+//   const { token } = req.params;
+//   const { newPassword, confirmPassword } = req.body;
+
+//   if (!newPassword || !confirmPassword) {
+//     return res.status(400).json({ message: "All fields are required" });
+//   }
+
+//   if (newPassword !== confirmPassword) {
+//     return res.status(400).json({ message: "Passwords do not match" });
+//   }
+
+//   try {
+//     const decoded = jwt.verify(token, JWT_SECRET);
+//     const user = await User.findById(decoded.id);
+
+//     if (!user) {
+//       return res.status(404).json({ message: "User not found" });
+//     }
+
+//     user.password = await bcrypt.hash(newPassword, 10);
+//     await user.save();
+
+//     res.status(200).json({ message: "Password reset successfully" });
+//   } catch (err) {
+//     console.error("Reset Password Error:", err);
+//     if (err.name === "TokenExpiredError") {
+//       return res.status(400).json({ message: "Reset link expired" });
+//     }
+//     res.status(500).json({ message: "Invalid or expired reset token" });
+//   }
+// });
+
+// /**
+//  * 📧 Send Reset Email
+//  */
+// async function sendResetEmail(to, resetLink) {
+//   const transporter = nodemailer.createTransport({
+//     service: "gmail",
+//     auth: {
+//       user: process.env.ADMIN_EMAIL,
+//       pass: process.env.ADMIN_EMAIL_PASSWORD,
+//     },
+//   });
+
+//   const mailOptions = {
+//     from: `"Support" <${process.env.ADMIN_EMAIL}>`,
+//     to,
+//     subject: "Reset Your Password",
+//     html: `
+//       <h3>Password Reset</h3>
+//       <p>Click below to reset your password:</p>
+//       <a href="${resetLink}" target="_blank">${resetLink}</a>
+//       <p>This link is valid for 15 minutes.</p>
+//     `,
+//   };
+
+//   await transporter.sendMail(mailOptions);
+// }
+const otpStore = {};
+
 router.post("/forgot-password", async (req, res) => {
   const { email } = req.body;
+  if (!email) return res.status(400).json({ message: "Email is required" });
 
-  if (!email) {
-    return res.status(400).json({ message: "Email is required" });
-  }
+  const user = await User.findOne({ email });
+  if (!user) return res.status(404).json({ message: "No user found with this email" });
 
-  try {
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(404).json({ message: "No user found with this email" });
-    }
+  const otp = Math.floor(100000 + Math.random() * 900000);
+  otpStore[email] = { otp, verified: false, expires: Date.now() + 10 * 60 * 1000 };
 
-    // Generate reset token (valid for 15 min)
-    const resetToken = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, {
-      expiresIn: "15m",
-    });
-
-    const resetLink = `http://localhost:3000/reset-password/${resetToken}`;
-      console.log("RESET LINK:", resetLink); 
-    await sendResetEmail(user.email, resetLink);
-
-    res.status(200).json({ message: "Reset link sent to your email" });
-  } catch (err) {
-    console.error("Forgot Password Error:", err);
-    res.status(500).json({ message: "Server error" });
-  }
-});
-
-/**
- * ✅ Reset Password (via Reset Link)
- */
-router.post("/reset-password/:token", async (req, res) => {
-  const { token } = req.params;
-  const { newPassword, confirmPassword } = req.body;
-
-  if (!newPassword || !confirmPassword) {
-    return res.status(400).json({ message: "All fields are required" });
-  }
-
-  if (newPassword !== confirmPassword) {
-    return res.status(400).json({ message: "Passwords do not match" });
-  }
-
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    const user = await User.findById(decoded.id);
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    user.password = await bcrypt.hash(newPassword, 10);
-    await user.save();
-
-    res.status(200).json({ message: "Password reset successfully" });
-  } catch (err) {
-    console.error("Reset Password Error:", err);
-    if (err.name === "TokenExpiredError") {
-      return res.status(400).json({ message: "Reset link expired" });
-    }
-    res.status(500).json({ message: "Invalid or expired reset token" });
-  }
-});
-
-/**
- * 📧 Send Reset Email
- */
-async function sendResetEmail(to, resetLink) {
   const transporter = nodemailer.createTransport({
     service: "gmail",
-    auth: {
-      user: process.env.ADMIN_EMAIL,
-      pass: process.env.ADMIN_EMAIL_PASSWORD,
-    },
+    auth: { user: process.env.ADMIN_EMAIL, pass: process.env.ADMIN_EMAIL_PASSWORD },
   });
 
-  const mailOptions = {
+  await transporter.sendMail({
     from: `"Support" <${process.env.ADMIN_EMAIL}>`,
-    to,
-    subject: "Reset Your Password",
-    html: `
-      <h3>Password Reset</h3>
-      <p>Click below to reset your password:</p>
-      <a href="${resetLink}" target="_blank">${resetLink}</a>
-      <p>This link is valid for 15 minutes.</p>
-    `,
-  };
+    to: email,
+    subject: "Password Reset OTP",
+    html: `<h3>Your OTP is: ${otp}</h3><p>Valid for 10 minutes.</p>`,
+  });
 
-  await transporter.sendMail(mailOptions);
-}
+  res.status(200).json({ message: "OTP sent to your email" });
+});
 
+router.post("/verify-otp", (req, res) => {
+  const { email, otp } = req.body;
+
+  if (!email || !otp)
+    return res.status(400).json({ message: "Email and OTP are required" });
+
+  const storedOtp = otpStore[email];
+  if (!storedOtp || storedOtp.otp != otp)
+    return res.status(400).json({ message: "Invalid OTP" });
+
+  if (Date.now() > storedOtp.expires)
+    return res.status(400).json({ message: "OTP expired" });
+
+  otpStore[email].verified = true;
+
+  res.status(200).json({ message: "OTP verified successfully" });
+});
+
+
+router.post("/set-new-password", async (req, res) => {
+  const { email, newPassword, confirmPassword } = req.body;
+
+  if (!email || !newPassword || !confirmPassword)
+    return res.status(400).json({ message: "All fields are required" });
+
+  if (newPassword !== confirmPassword)
+    return res.status(400).json({ message: "Passwords do not match" });
+
+  const storedOtp = otpStore[email];
+  if (!storedOtp || !storedOtp.verified)
+    return res.status(400).json({ message: "OTP not verified" });
+
+  const user = await User.findOne({ email });
+  if (!user) return res.status(404).json({ message: "User not found" });
+
+  user.password = await bcrypt.hash(newPassword, 10);
+  await user.save();
+
+  delete otpStore[email]; // cleanup
+
+  res.status(200).json({ message: "Password updated successfully" });
+});
 
 
 

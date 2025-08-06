@@ -262,14 +262,48 @@ router.delete('/category/:id', authenticateAdmin, async (req, res) => {
 });
 
 
+// router.put(
+//   '/edit/category/:id',
+//   authenticateAdmin,
+//   upload.single("image"),
+//   async (req, res) => {
+//     try {
+//       const { name } = req.body;
+//       const updateData = { name };
+
+//       if (req.file) {
+//         updateData.image = req.file.filename;
+//       }
+
+//       const updatedCategory = await Category.findByIdAndUpdate(
+//         req.params.id,
+//         updateData,
+//         { new: true, runValidators: true }
+//       );
+
+//       if (!updatedCategory) {
+//         return res.status(404).json({ message: "Category not found" });
+//       }
+
+//       res.json({ message: "Category updated", category: updatedCategory });
+//     } catch (err) {
+//       console.error(err);
+//       res.status(400).json({ error: err.message });
+//     }
+//   }
+// );
 router.put(
   '/edit/category/:id',
   authenticateAdmin,
   upload.single("image"),
   async (req, res) => {
     try {
-      const { name } = req.body;
+      const { name, stack } = req.body; // ✅ include stack
       const updateData = { name };
+
+      if (stack) {
+        updateData.stack = stack; // ✅ update stack field
+      }
 
       if (req.file) {
         updateData.image = req.file.filename;
@@ -294,60 +328,185 @@ router.put(
 );
 
 
+// router.get('/category', authenticateAdmin, async (req, res) => {
+//   try {
+//     const categories = await Category.find().populate('stack'); // ✅ populate stack
+//     res.json(categories);
+//   } catch (err) {
+//     res.status(500).json({ error: err.message });
+//   }
+// });
+
+router.get('/category', async (req, res) => {
+  const { stackId } = req.query;
+
+  try {
+    const filter = stackId ? { stack: stackId } : {};
+    const categories = await Category.find(filter);
+    res.json(categories);
+  } catch (err) {
+    console.error("Error fetching categories:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
 
 
-// ------------------ SubCategory Routes ------------------
-// router.post('/sub-category', authenticateAdmin, async (req, res) => {
+
+// // ------------------ SubCategory Routes ------------------
+// // router.post('/sub-category', authenticateAdmin, async (req, res) => {
+// //   try {
+// //     const { name, category } = req.body;
+// //     const subCategory = new SubCategory({ name, category });
+// //     await subCategory.save();
+// //     res.status(201).json(subCategory);
+// //   } catch (err) {
+// //     res.status(400).json({ error: err.message });
+// //   }
+// // });
+// router.post('/sub-category', authenticateAdmin, uploadImage.single('image'), async (req, res) => {
 //   try {
 //     const { name, category } = req.body;
-//     const subCategory = new SubCategory({ name, category });
+
+//     if (!name || !category) {
+//       return res.status(400).json({ error: "Name and category are required" });
+//     }
+
+//     const subCategory = new SubCategory({
+//       name,
+//       category,
+//       image: req.file ? req.file.filename : undefined
+//     });
+
 //     await subCategory.save();
 //     res.status(201).json(subCategory);
 //   } catch (err) {
 //     res.status(400).json({ error: err.message });
 //   }
 // });
-router.post('/sub-category', authenticateAdmin, uploadImage.single('image'), async (req, res) => {
-  try {
-    const { name, category } = req.body;
+// router.delete('/sub-category/:id', authenticateAdmin, async (req, res) => {
+//   try {
+//     await SubCategory.findByIdAndDelete(req.params.id);
+//     res.json({ message: 'SubCategory deleted' });
+//   } catch (err) {
+//     res.status(400).json({ error: err.message });
+//   }
+// });
 
-    if (!name || !category) {
-      return res.status(400).json({ error: "Name and category are required" });
+// router.put(
+//   '/edit/sub-category/:id',
+//   authenticateAdmin,
+//   upload.single("image"),
+//   async (req, res) => {
+//     try {
+//       const { name } = req.body;
+//       const updateData = { name };
+
+//       if (req.file) {
+//         updateData.image = req.file.filename;
+//       }
+
+//       const updatedSubCategory = await SubCategory.findByIdAndUpdate(
+//         req.params.id,
+//         updateData,
+//         { new: true, runValidators: true }
+//       );
+
+//       if (!updatedSubCategory) {
+//         return res.status(404).json({ message: "Sub-category not found" });
+//       }
+
+//       res.json({
+//         message: "Sub-category updated",
+//         subCategory: updatedSubCategory,
+//       });
+//     } catch (err) {
+//       console.error(err);
+//       res.status(400).json({ error: err.message });
+//     }
+//   }
+// );
+
+// =======================
+// CREATE SUB-CATEGORY
+// =======================
+router.post(
+  '/sub-category',
+  authenticateAdmin,
+  uploadImage.single('image'),
+  async (req, res) => {
+    try {
+      const { name, category } = req.body;
+
+      if (!name || !category) {
+        return res
+          .status(400)
+          .json({ error: 'Name and category are required' });
+      }
+
+      const subCategory = new SubCategory({
+        name,
+        category,
+        image: req.file ? req.file.filename : undefined,
+      });
+
+      await subCategory.save();
+      res.status(201).json({ message: 'Sub-category created', subCategory });
+    } catch (err) {
+      console.error('Create error:', err);
+      res.status(400).json({ error: err.message });
     }
-
-    const subCategory = new SubCategory({
-      name,
-      category,
-      image: req.file ? req.file.filename : undefined
-    });
-
-    await subCategory.save();
-    res.status(201).json(subCategory);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
   }
-});
-router.delete('/sub-category/:id', authenticateAdmin, async (req, res) => {
-  try {
-    await SubCategory.findByIdAndDelete(req.params.id);
-    res.json({ message: 'SubCategory deleted' });
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-});
+);
 
+// =======================
+// UPDATE SUB-CATEGORY
+// =======================
+// router.put(
+//   '/edit/sub-category/:id',
+//   authenticateAdmin,
+//   uploadImage.single('image'),
+//   async (req, res) => {
+//     try {
+//       const { name } = req.body;
+//       const updateData = { name };
+
+//       if (req.file) {
+//         updateData.image = req.file.filename;
+//       }
+
+//       const updatedSubCategory = await SubCategory.findByIdAndUpdate(
+//         req.params.id,
+//         updateData,
+//         { new: true, runValidators: true }
+//       );
+
+//       if (!updatedSubCategory) {
+//         return res.status(404).json({ message: 'Sub-category not found' });
+//       }
+
+//       res.json({
+//         message: 'Sub-category updated',
+//         subCategory: updatedSubCategory,
+//       });
+//     } catch (err) {
+//       console.error('Update error:', err);
+//       res.status(400).json({ error: err.message });
+//     }
+//   }
+// );
 router.put(
   '/edit/sub-category/:id',
   authenticateAdmin,
-  upload.single("image"),
+  uploadImage.single('image'),
   async (req, res) => {
     try {
-      const { name } = req.body;
-      const updateData = { name };
+      const { name, category, stack } = req.body;
 
-      if (req.file) {
-        updateData.image = req.file.filename;
-      }
+      const updateData = {};
+      if (name) updateData.name = name;
+      if (category) updateData.category = category;
+      if (stack) updateData.stack = stack;
+      if (req.file) updateData.image = req.file.filename;
 
       const updatedSubCategory = await SubCategory.findByIdAndUpdate(
         req.params.id,
@@ -356,21 +515,35 @@ router.put(
       );
 
       if (!updatedSubCategory) {
-        return res.status(404).json({ message: "Sub-category not found" });
+        return res.status(404).json({ message: 'Sub-category not found' });
       }
 
       res.json({
-        message: "Sub-category updated",
+        message: 'Sub-category updated',
         subCategory: updatedSubCategory,
       });
     } catch (err) {
-      console.error(err);
+      console.error('Sub-category update failed:', err);
+      res.status(500).json({ error: 'Server error during update' });
+    }
+  }
+);
+// =======================
+// DELETE SUB-CATEGORY
+// =======================
+router.delete(
+  '/sub-category/:id',
+  authenticateAdmin,
+  async (req, res) => {
+    try {
+      await SubCategory.findByIdAndDelete(req.params.id);
+      res.json({ message: 'Sub-category deleted' });
+    } catch (err) {
+      console.error('Delete error:', err);
       res.status(400).json({ error: err.message });
     }
   }
 );
-
-
 
 // ------------------ Video Routes ------------------
 router.post(
@@ -379,7 +552,7 @@ router.post(
   uploadFiles, // should handle 'file', 'overviewPdf', and 'thumbnail'
   async (req, res) => {
     try {
-      const { title, description, stack, category, subCategory } = req.body;
+      const { title, description, stack, category, subCategory,videoUrl } = req.body;
 
       const videoFile = req.files['file']?.[0];
       const pdfFile = req.files['overviewPdf']?.[0];
@@ -399,6 +572,7 @@ router.post(
         stack,
         category,
         subCategory,
+        videoUrl,
         
         image: thumbFile ? thumbFile.path : null,
         overviewPdf: pdfFile ? pdfFile.path : null
@@ -673,6 +847,36 @@ router.get('/public/video/:id', async (req, res) => {
   res.json(video);
 });
 
+router.get('/videodetails/:id', async (req, res) => {
+  try {
+    const video = await Video.findById(req.params.id)
+      .populate('stack', 'name')
+      .populate('category', 'name')
+      .populate('subCategory', 'name'); // ✅ correct field name
+
+    if (!video) return res.status(404).json({ message: 'Video not found' });
+
+    res.json({
+      _id: video._id,
+      title: video.title,
+      description: video.description,
+      image: video.image, 
+      videoUrl: video.videoUrl , // fallback support
+      overviewPdf: video.overviewPdf || null,
+      stack: video.stack?._id,
+      stackName: video.stack?.name,
+      category: video.category?._id,
+      categoryName: video.category?.name,
+      subCategory: video.subCategory?._id,
+      subCategoryName: video.subCategory?.name,
+    });
+  } catch (err) {
+    console.error('Error fetching video:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
 // ------------------ Comments and Likes ------------------
 
 
@@ -808,6 +1012,36 @@ router.delete("/:id/comments/:commentId", authenticate, async (req, res) => {
   }
 });
 
+router.put("/:id/comments/:commentId", authenticate, async (req, res) => {
+  const { id: videoId, commentId } = req.params;
+  const { text } = req.body;
+
+  try {
+    // ✅ Find video
+    const video = await Video.findById(videoId);
+    if (!video) return res.status(404).json({ message: "Video not found" });
+
+    // ✅ Find comment
+    const comment = video.comments.id(commentId);
+    if (!comment) return res.status(404).json({ message: "Comment not found" });
+
+    // ✅ Allow edit if admin or comment owner
+    if (req.user.role !== "admin" && comment.user.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
+
+    // ✅ Update comment text
+    comment.text = text;
+    comment.updatedAt = new Date(); // Optional: track updates
+
+    await video.save();
+
+    res.status(200).json({ message: "Comment updated successfully", comment });
+  } catch (error) {
+    console.error("Comment edit failed:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
 
 
 router.post("/:id/likes",authenticate, async (req, res) => {
@@ -980,20 +1214,20 @@ router.get('/sub-category/:id', authenticateAdmin, async (req, res) => {
 
 
 // Get all stacks
-router.get('/stacks', authenticateAdmin, async (req, res) => {
+router.get('/stacks', authenticate, async (req, res) => {
   const stacks = await Stack.find();
   res.json(stacks);
 });
 
 // Get categories by stack
-router.get('/categories', authenticateAdmin, async (req, res) => {
+router.get('/categories', authenticate, async (req, res) => {
   const { stackId } = req.query;
   const categories = await Category.find({ stack: stackId });
   res.json(categories);
 });
 
 // Get subcategories by category
-router.get('/sub-categories', authenticateAdmin, async (req, res) => {
+router.get('/sub-categories', authenticate, async (req, res) => {
   const { categoryId } = req.query;
   const subCategories = await SubCategory.find({ category: categoryId });
   res.json(subCategories);

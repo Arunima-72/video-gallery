@@ -28,7 +28,7 @@ const activityRoutes = require('./routes/userActivity');
 app.use('/upload', uploadroutes);
 app.use('/change', userRoutes);
 
-app.use('/editprofile', routesUser);
+app.use('/save', routesUser);
 
 app.use('/admin', adminroutes);
 app.use('/activity', activityRoutes);

@@ -32,6 +32,7 @@ const userActivitySchema = new mongoose.Schema(
     userId: { type: mongoose.Schema.Types.ObjectId, ref: "userdb", required: true },
     name: { type: String, required: true },
     email: { type: String, required: true },
+    role: { type: String, default: "user" },
     sessions: [sessionSchema],
   },
   { timestamps: true }

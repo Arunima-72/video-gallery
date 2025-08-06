@@ -217,23 +217,110 @@ router.post("/like/:videoId", authenticate, async (req, res) => {
   }
 });
 
+// router.get("/all-activities", authenticate, async (req, res) => {
+//   if (req.user.role !== "admin") {
+//     return res.status(403).json({ message: "Access denied" });
+//   }
+
+//   try {
+//     const activities = await UserActivity.find()
+//       .populate("sessions.watchedVideos.videoId", "title")
+//       .populate("sessions.comments.videoId", "title")
+//       .populate("sessions.likes.videoId", "title");
+
+//     res.status(200).json(activities);
+//   } catch (err) {
+//     res.status(500).json({ error: err.message });
+//   }
+// });
+
+// router.get("/all-activities", authenticate, async (req, res) => {           // working with admin activities
+//   if (req.user.role !== "admin") {
+//     return res.status(403).json({ message: "Access denied" });
+//   }
+
+//   try {
+//     const activities = await UserActivity.find(); // no populate needed
+//     res.status(200).json(activities);
+//   } catch (err) {
+//     console.error("Error fetching activities:", err);
+//     res.status(500).json({ error: err.message });
+//   }
+// });
+
 router.get("/all-activities", authenticate, async (req, res) => {
   if (req.user.role !== "admin") {
     return res.status(403).json({ message: "Access denied" });
   }
 
   try {
-    const activities = await UserActivity.find()
-      .populate("sessions.watchedVideos.videoId", "title")
-      .populate("sessions.comments.videoId", "title")
-      .populate("sessions.likes.videoId", "title");
-
+    // ✅ Filter out activities where the user role is not 'admin'
+    const activities = await UserActivity.find({ role: { $ne: "admin" } });
     res.status(200).json(activities);
   } catch (err) {
+    console.error("Error fetching activities:", err);
     res.status(500).json({ error: err.message });
   }
 });
 
+
+
+
+
+
+router.get("/activity-summary", authenticate, async (req, res) => {
+  if (req.user.role !== "admin") {
+    return res.status(403).json({ message: "Access denied" });
+  }
+
+  try {
+    const activities = await UserActivity.find();
+
+    const summary = activities.map(user => {
+      const totalSessions = user.sessions.length;
+      let totalLogins = 0;
+      let totalWatched = 0;
+      let totalLikes = 0;
+      let totalComments = 0;
+
+      user.sessions.forEach(session => {
+        if (session.loginAt) totalLogins += 1;
+        if (session.watchedVideos) totalWatched += session.watchedVideos.length;
+        if (session.likes) totalLikes += session.likes.length;
+        if (session.comments) totalComments += session.comments.length;
+      });
+
+      return {
+        userId: user.userId,
+        name: user.name,
+        email: user.email,
+        totalSessions,
+        totalLogins,
+        totalWatched,
+        totalLikes,
+        totalComments,
+      };
+    });
+
+    res.status(200).json(summary);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+// DELETE all activities - only admin
+router.delete("/clear-all", authenticate, async (req, res) => {
+  if (req.user.role !== "admin") {
+    return res.status(403).json({ message: "Access denied" });
+  }
+
+  try {
+    await UserActivity.deleteMany({});
+    res.status(200).json({ message: "All user activities cleared" });
+  } catch (err) {
+    console.error("Error clearing activities:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
 
 
 module.exports=router

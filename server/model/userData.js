@@ -21,6 +21,14 @@ const userSchema = new mongoose.Schema({
     enum: ['user', 'admin'],
     default: 'user',
   },
+  isActive: { type: Boolean, default: true },
+
+
+  // ✅ New field: array of saved videos
+  savedVideos: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'video' // assuming your video model is named 'video'
+  }],
   // lastLoginAt: {
   //   type: Date,
   //   default: null,

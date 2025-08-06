@@ -324,7 +324,9 @@ async function sendEmail(to, password) {
  */
 router.get('/get-users', authenticateAdmin, async (req, res) => {
   try {
-    const users = await User.find({role:'user'}, 'name email '); // Only needed fields
+    // const users = await User.find({role:'user'}, 'name email '); // Only needed fields
+    const users = await User.find({ role: 'user' }, 'name email isActive');
+
     res.json({ users });
   } catch (err) {
     console.error('Error fetching users:', err);
@@ -332,6 +334,52 @@ router.get('/get-users', authenticateAdmin, async (req, res) => {
   }
 });
 
+router.delete('/deleteuser/:userId',  async (req, res) => {
+  const { userId } = req.params;
 
+  try {
+    const deleted = await User.findByIdAndDelete(userId);
+    if (!deleted) return res.status(404).json({ message: 'User not found' });
+
+    res.status(200).json({ message: 'User deleted successfully' });
+  } catch (err) {
+    console.error('Error deleting user:', err);
+    res.status(500).json({ message: 'Failed to delete user' });
+  }
+});
+router.delete('/clear-all-users', authenticateAdmin, async (req, res) => {
+  try {
+    await User.deleteMany({ role: 'user' });
+    res.status(200).json({ message: 'All users deleted successfully' });
+  } catch (err) {
+    console.error('Clear all users error:', err);
+    res.status(500).json({ message: 'Failed to delete all users' });
+  }
+});
+
+// router.put('/toggle-status/:userId', authenticateAdmin, async (req, res) => {
+//   const { userId } = req.params;
+//   const { isActive } = req.body;
+
+//   try {
+//     const user = await User.findByIdAndUpdate(userId, { isActive }, { new: true });
+//     if (!user) return res.status(404).json({ message: 'User not found' });
+
+//     res.status(200).json({ message: `User status updated to ${isActive ? 'Active' : 'Inactive'}` });
+//   } catch (error) {
+//     console.error('Toggle status error:', error);
+//     res.status(500).json({ message: 'Failed to update user status' });
+//   }
+// });
+// Toggle user active status
+router.put('/toggle-status/:id', async (req, res) => {
+  try {
+    const user = await User.findByIdAndUpdate(req.params.id, { isActive: req.body.isActive }, { new: true });
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.status(200).json({ message: 'Status updated', user });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to update status' });
+  }
+});
 
 module.exports = router;
