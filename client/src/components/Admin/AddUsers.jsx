@@ -780,29 +780,48 @@ const AddUser = () => {
   };
 
   const handleIconClick = () => fileInputRef.current.click();
+const [skippedUsers, setSkippedUsers] = useState([]);
+  // const handleUpload = async () => {
+  //   if (!file) return setMessage('Please select a file.');
 
-  const handleUpload = async () => {
-    if (!file) return setMessage('Please select a file.');
+  //   const formData = new FormData();
+  //   formData.append('file', file);
 
-    const formData = new FormData();
-    formData.append('file', file);
+  //   try {
+  //     const res = await axiosInstance.post('/upload/upload-users', formData);
+  //     const { existingUsers = [], failedEmails = [], successCount = 0 } = res.data;
 
-    try {
-      const res = await axiosInstance.post('/upload/upload-users', formData);
-      const { existingUsers = [], failedEmails = [], successCount = 0 } = res.data;
+  //     let statusMsg = `${successCount} email(s) sent successfully.`;
+  //     if (existingUsers.length) statusMsg += ` ${existingUsers.length} already existed.`;
+  //     if (failedEmails.length) statusMsg += ` ${failedEmails.length} failed to send.`;
 
-      let statusMsg = `${successCount} email(s) sent successfully.`;
-      if (existingUsers.length) statusMsg += ` ${existingUsers.length} already existed.`;
-      if (failedEmails.length) statusMsg += ` ${failedEmails.length} failed to send.`;
+  //     setMessage(statusMsg);
+  //     setFile(null);
+  //     fetchUsers(); // reload after upload
+  //   } catch (error) {
+  //     setMessage(error.response?.data?.message || 'Upload failed.');
+  //   }
+  // };
+const handleUpload = async () => {
+  if (!file) return setMessage('Please select a file.');
 
-      setMessage(statusMsg);
-      setFile(null);
-      fetchUsers(); // reload after upload
-    } catch (error) {
-      setMessage(error.response?.data?.message || 'Upload failed.');
-    }
-  };
+  const formData = new FormData();
+  formData.append('file', file);
 
+  try {
+    const res = await axiosInstance.post('/upload/upload-users', formData);
+    const { created = [], skipped = [] } = res.data;
+
+    setSkippedUsers(skipped); // 👈 Save skipped emails
+
+    let statusMsg = `${created.length} user(s) uploaded successfully. ${skipped.length} skipped.`;
+    setMessage(statusMsg);
+    setFile(null);
+    fetchUsers(); // Reload users
+  } catch (error) {
+    setMessage(error.response?.data?.message || 'Upload failed.');
+  }
+};
   const fetchUsers = async () => {
     try {
       const res = await axiosInstance.get('/upload/get-users');
@@ -875,9 +894,9 @@ const AddUser = () => {
            ml: isSidebarOpen ? 9 : 8, mt: 2, px: 3 
         }}
       >
-        <Typography variant="h5" gutterBottom fontWeight="bold"  color=''style={{ fontFamily: '-moz-initial' }} sx={{
-    fontWeight: 700,
-    fontSize: '1.8rem',
+        <Typography variant="h5" gutterBottom fontWeight="bold"  color=''style={{ fontFamily: 'Poppins' }} sx={{
+    fontWeight: 600,
+    fontSize: '1.7rem',
     color: '#3f7cb5ff',
     textShadow: '1px 1px 2px rgba(0,0,0,0.1)',
     letterSpacing: '0.5px',
@@ -904,7 +923,7 @@ const AddUser = () => {
             <IconButton>
               <CloudUploadIcon sx={{ fontSize: 40, color: '#888' }} />
             </IconButton>
-            <Typography>{file ? file.name : 'Browse files'}</Typography>
+            <Typography style={{fontFamily:'Poppins'}}>{file ? file.name : 'Browse files'}</Typography>
             <input
               ref={fileInputRef}
               type="file"
@@ -917,9 +936,9 @@ const AddUser = () => {
 
         {/* Upload + Display + Clear */}
         <Stack direction="row" spacing={2} mb={2}>
-          <Button variant="contained" onClick={handleUpload} sx={{ borderRadius: '24px', px: 3, fontFamily: '-moz-initial' }} >Add Users</Button>
-          <Button variant="contained" onClick={fetchUsers} sx={{ borderRadius: '24px', px: 3, fontFamily: '-moz-initial' }}>Display Users</Button>
-          <Button variant="outlined" color="error" onClick={handleClearAll}  startIcon={<ClearAllIcon />} sx={{ borderRadius: '24px', px: 3, fontFamily: '-moz-initial' }}>
+          <Button variant="contained" onClick={handleUpload} sx={{ borderRadius: '24px', px: 3, fontFamily: 'Poppins' }} >Add Users</Button>
+          <Button variant="contained" onClick={fetchUsers} sx={{ borderRadius: '24px', px: 3, fontFamily: 'Poppins' }}>Display Users</Button>
+          <Button variant="outlined" color="error" onClick={handleClearAll}  startIcon={<ClearAllIcon />} sx={{ borderRadius: '24px', px: 3, fontFamily: 'Poppins' }}>
             Clear All
           </Button>
         </Stack>
@@ -936,30 +955,31 @@ const AddUser = () => {
             <Table size="small">
               <TableHead>
                 <TableRow sx={{ backgroundColor: '#f0f0f0' }}>
-                  <TableCell><strong>Sl No</strong></TableCell>
-                  <TableCell><strong>Name</strong></TableCell>
-                  <TableCell><strong>Email</strong></TableCell>
-                  <TableCell><strong>Status</strong></TableCell>
-                  <TableCell><strong>Actions</strong></TableCell>
+                  <TableCell style={{fontFamily:'Poppins'}}><strong>Sl No</strong></TableCell>
+                  <TableCell style={{fontFamily:'Poppins'}}><strong>Name</strong></TableCell>
+                  <TableCell style={{fontFamily:'Poppins'}}><strong>Email</strong></TableCell>
+                  <TableCell style={{fontFamily:'Poppins'}}><strong>Status</strong></TableCell>
+                  <TableCell style={{fontFamily:'Poppins'}}><strong>Actions</strong></TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {currentUsers.map((user, index) => (
                   <TableRow key={user._id || index}>
-                    <TableCell>{indexOfLastRow - rowsPerPage + index + 1}</TableCell>
-                    <TableCell>{user.name}</TableCell>
-                    <TableCell>{user.email}</TableCell>
+                    <TableCell style={{fontFamily:'Poppins'}}>{indexOfLastRow - rowsPerPage + index + 1}</TableCell>
+                    <TableCell style={{fontFamily:'Poppins'}}>{user.name}</TableCell>
+                    <TableCell style={{fontFamily:'Poppins'}}>{user.email}</TableCell>
                     <TableCell>
                       <Chip
                         label={user.isActive ? 'Active' : 'Inactive'}
                         color={user.isActive ? 'success' : 'default'}
                         size="small"
+                        style={{fontFamily:'Poppins'}}
                       />
                     </TableCell>
                     <TableCell>
                       <Stack direction="row" spacing={1}>
                         <IconButton onClick={() => handleToggleStatus(user._id, user.isActive)}>
-                          {user.isActive ? <ToggleOffIcon color="warning" /> : <ToggleOnIcon color="primary" />}
+                          {user.isActive ? <ToggleOffIcon color="primary" /> : <ToggleOnIcon color="primary" />}
                         </IconButton>
                         <IconButton color="error" onClick={() => handleDeleteUser(user._id)}>
                           <DeleteIcon />
@@ -980,6 +1000,41 @@ const AddUser = () => {
             </Box>
           </TableContainer>
         )}
+        {skippedUsers.length > 0 && (
+  <>
+    <Typography variant="h6" sx={{ mt: 4, fontFamily: 'Poppins', color: 'black' }}>
+      Skipped Users (Already Exists or Invalid)
+    </Typography>
+    <TableContainer component={Paper} sx={{ maxWidth: 900, mt: 1 }}>
+      <Table size="small">
+        <TableHead>
+          <TableRow sx={{ backgroundColor: '#f0f0f0' }}>
+            <TableCell style={{ fontFamily: 'Poppins' }}><strong>Sl No</strong></TableCell>
+            <TableCell style={{ fontFamily: 'Poppins' }}><strong>Email</strong></TableCell>
+            <TableCell style={{ fontFamily: 'Poppins' }}><strong>Status</strong></TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {skippedUsers.map((email, index) => (
+            <TableRow key={email}>
+              <TableCell style={{ fontFamily: 'Poppins' }}>{index + 1}</TableCell>
+              <TableCell style={{ fontFamily: 'Poppins' }}>{email}</TableCell>
+              <TableCell>
+                <Chip
+                  label="Skipped"
+                  color="error"
+                  size="small"
+                  style={{ fontFamily: 'Poppins' }}
+                />
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  </>
+)}
+
       </Box>
     </Box>
   );

@@ -243,17 +243,25 @@ const AdminContact = () => {
           component="main"
           sx={{
             flexGrow: 1,
-            bgcolor: "#f9f9f9",
+            bgcolor: "white",
             minHeight: "100vh",
             p: 4,
             mt: 8,
           }}
         >
           <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-            <Typography variant="h4">Contact Submissions</Typography>
+            <Typography variant="h4"  sx={{
+    fontWeight: 700,
+    fontSize: '1.8rem',
+    color: '#3f7cb5ff',
+    textShadow: '1px 1px 2px rgba(0,0,0,0.1)',
+    letterSpacing: '0.5px',
+    fontFamily: 'Poppins',
+    mb: 3,
+  }} >Contact Submissions</Typography>
             <Button
               variant="contained"
-              color="error"
+              color="primary"
               startIcon={<ClearAllIcon />}
               onClick={handleClearAll}
               size="small"
@@ -263,13 +271,20 @@ const AdminContact = () => {
           </Box>
 
           <TextField
-            label="Search by name, email or message"
-            variant="outlined"
+            label="Search "
+            fontFamily="Poppins"
+            // variant="outlined"
             fullWidth
             size="small"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            sx={{ mb: 2 }}
+            sx={{ mb: 2,'& .MuiOutlinedInput-root': {
+      borderRadius: '50px',       // makes the corners rounded
+      backgroundColor: 'rgba(245, 245, 245, 1)', // light gray background
+      paddingLeft: '12px',
+      fontFamily: 'Poppins', 
+
+    }, }}
           />
 
           {loading ? (
@@ -279,20 +294,20 @@ const AdminContact = () => {
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell><strong>Name</strong></TableCell>
-                    <TableCell><strong>Email</strong></TableCell>
-                    <TableCell><strong>Message</strong></TableCell>
-                    <TableCell><strong>Submitted At</strong></TableCell>
-                    <TableCell><strong>Actions</strong></TableCell>
+                    <TableCell style={{fontFamily:'Poppins'}}><strong>Name</strong></TableCell>
+                    <TableCell style={{fontFamily:'Poppins'}}><strong>Email</strong></TableCell>
+                    <TableCell style={{fontFamily:'Poppins'}}><strong>Message</strong></TableCell>
+                    <TableCell style={{fontFamily:'Poppins'}}><strong>Submitted At</strong></TableCell>
+                    <TableCell style={{fontFamily:'Poppins'}}><strong>Actions</strong></TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {filteredContacts.length > 0 ? (
                     filteredContacts.map((contact) => (
                       <TableRow key={contact._id}>
-                        <TableCell>{contact.name}</TableCell>
-                        <TableCell>{contact.email}</TableCell>
-                        <TableCell>{contact.message}</TableCell>
+                        <TableCell style={{fontFamily:'Poppins'}}>{contact.name}</TableCell>
+                        <TableCell style={{fontFamily:'Poppins'}}>{contact.email}</TableCell>
+                        <TableCell style={{fontFamily:'Poppins'}}>{contact.message}</TableCell>
                         <TableCell>
                           {new Date(contact.createdAt).toLocaleString()}
                         </TableCell>

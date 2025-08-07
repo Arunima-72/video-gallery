@@ -808,21 +808,21 @@ const ContactModal = ({ open, onClose }) => {
           }}
         >
           <Box>
-            <Typography variant="h6" fontWeight="bold" gutterBottom>
+            <Typography variant="h6" fontWeight="bold" gutterBottom style={{ fontFamily: 'Poppins' }}>
               Contact Information
             </Typography>
-            <Typography mb={2}>
+            <Typography mb={2} style={{ fontFamily: 'Poppins' }}>
               We’re here to help you with your queries. Reach out to us for inquiries, support, or collaborations.
             </Typography>
             <Box display="flex" alignItems="center" mb={1}>
-              <PhoneIcon sx={{ mr: 1 }} /> +91 7594839356
+              <PhoneIcon sx={{ mr: 1 ,fontFamily:'Poppins'}} /> +91 7594839356
             </Box>
             <Box display="flex" alignItems="center" mb={1}>
-              <EmailIcon sx={{ mr: 1 }} /> arunimasuresh0072@gmail.com
+              <EmailIcon sx={{ mr: 1,fontFamily:'Poppins' }} /> arunimasuresh0072@gmail.com
             </Box>
             <Box display="flex" alignItems="center">
-              <LocationOnIcon sx={{ mr: 1 }} />
-              Head Quarters, G1, Ground Floor, Thejaswini, Technopark Campus, Thiruvananthapuram, Kerala , 695 581
+              <LocationOnIcon sx={{ mr: 1 ,fontFamily:'Poppins'}} />
+           Technopark Campus, Thiruvananthapuram, Kerala 
             </Box>
           </Box>
         </Box>
@@ -833,7 +833,7 @@ const ContactModal = ({ open, onClose }) => {
             <CloseIcon />
           </IconButton>
 
-          <Typography variant="h6" fontWeight="bold" gutterBottom>
+          <Typography variant="h6" fontWeight="bold" gutterBottom style={{ fontFamily: 'Poppins' }}>
             Get In Touch
           </Typography>
 
@@ -848,6 +848,7 @@ const ContactModal = ({ open, onClose }) => {
                 value={formData.name}
                 onChange={handleChange}
                 required
+                style={{ fontFamily: 'Poppins' }}
               />
               <TextField
                 fullWidth
@@ -856,6 +857,7 @@ const ContactModal = ({ open, onClose }) => {
                 value={formData.email}
                 onChange={handleChange}
                 required
+                style={{ fontFamily: 'Poppins' }}
               />
             </Box>
 
@@ -867,7 +869,7 @@ const ContactModal = ({ open, onClose }) => {
               rows={4}
               value={formData.message}
               onChange={handleChange}
-              sx={{ mb: 3 }}
+              sx={{ mb: 3, fontFamily: 'Poppins' }}
             />
 
             <Button
@@ -882,7 +884,8 @@ const ContactModal = ({ open, onClose }) => {
                 fontWeight: "bold",
                 py: 1.2,
                 '&:hover': {
-                  bgcolor: "#00bcd4"
+                  bgcolor: "#00bcd4",
+                  fontFamily: 'Poppins'
                 }
               }}
             >

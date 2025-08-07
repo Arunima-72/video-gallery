@@ -263,7 +263,7 @@
 // };
 
 // export default AdminVideo;
-import React, { useEffect, useState } from 'react';                          // fully working code 
+import React, { useEffect, useState } from 'react';                          // fully working code 7/8
 import {
   Box, Grid, Typography, Card, CardMedia, CardContent,
   TextField, Button, Collapse, Select, InputLabel, FormControl,
@@ -319,9 +319,9 @@ const AdminVideo = () => {
     }
   };
 
-  const fetchCategories = async (stackId) => {
+  const fetchCategories = async () => {
     try {
-      const res = await axiosInstance.get(`/admin/categories?stackId=${stackId}`);
+      const res = await axiosInstance.get(`/admin/categories`);
       setCategories(res.data);
     } catch (err) {
       console.error('Error fetching categories:', err);
@@ -337,24 +337,44 @@ const AdminVideo = () => {
     }
   };
 
-  const handleStackChange = async (e) => {
-    const selected = e.target.value;
-    setSelectedStack(selected);
-    setSelectedCategory('');
-    setSelectedSubcategory('');
-    setCategories([]);
-    setSubcategories([]);
-    await fetchCategories(selected);
-  };
+  // const handleStackChange = async (e) => {
+  //   const selected = e.target.value;
+  //   setSelectedStack(selected);
+  //   setSelectedCategory('');
+  //   setSelectedSubcategory('');
+  //   setCategories([]);
+  //   setSubcategories([]);
+  //   await fetchCategories(selected);
+  // };
+const handleStackChange = async (e) => {
+  const selected = e.target.value;
+  setSelectedStack(selected);
+  setSelectedCategory('');
+  setSelectedSubcategory('');
+  setCategories([]);
+  setSubcategories([]);
 
-  const handleCategoryChange = async (e) => {
-    const selected = e.target.value;
-    setSelectedCategory(selected);
-    setSelectedSubcategory('');
-    setSubcategories([]);
-    await fetchSubcategories(selected);
-  };
+  if (selected) {
+    await fetchCategories(selected); // Fetch all categories in the selected stack
+  }
+};
+  // const handleCategoryChange = async (e) => {
+  //   const selected = e.target.value;
+  //   setSelectedCategory(selected);
+  //   setSelectedSubcategory('');
+  //   setSubcategories([]);
+  //   await fetchSubcategories(selected);
+  // };
+const handleCategoryChange = async (e) => {
+  const selected = e.target.value;
+  setSelectedCategory(selected);
+  setSelectedSubcategory('');
+  setSubcategories([]);
 
+  if (selected) {
+    await fetchSubcategories(selected); // Fetch subcategories for selected category
+  }
+};
   const handleResetFilters = () => {
     setSelectedStack('');
     setSelectedCategory('');
@@ -566,101 +586,65 @@ const handleClearFilters = () => {
 </Box>
 
         {/* Filters */}
-        <Collapse in={filterOpen}>
+   <Collapse in={filterOpen}>
   <Box
     sx={{
       display: 'flex',
       gap: 2,
       flexWrap: 'wrap',
-      mb: 3,           // Reduce bottom margin
-      p: 2,            // Add some padding for inner spacing
-      alignItems: 'center',  // Vertically center controls
-      backgroundColor: 'white',  // Optional: light background to distinguish
-      borderRadius: '10px', 
-            // Optional: rounded corners
+      mb: 3,
+      p: 2,
+      alignItems: 'center',
+      backgroundColor: 'white',
+      borderRadius: '10px',
     }}
   >
-    <FormControl sx={{ minWidth: 160, maxHeight: 40 }} size="small">
-  <InputLabel
-    sx={{
-      top: '1px', // adjust vertical position
-      fontSize: '1 rem',
-      fontFamily:'Poppins'
-    }}
-  >
-    Stack
-  </InputLabel>
-  <Select
-    value={selectedStack}
-    onChange={handleStackChange}
-    label="Stack"
-  >
-    {stacks.map((s) => (
-      <MenuItem key={s._id} value={s._id}>
-        {s.name}
-      </MenuItem>
-    ))}
-  </Select>
-</FormControl>
-
-    {/* <FormControl sx={{ minWidth: 160, maxHeight: 40 }}>
-      <InputLabel >Stack</InputLabel>
-      <Select
-        value={selectedStack}
-        onChange={handleStackChange}
-        label="Stack"
-        size="small"
-       
-      >
+    {/* Stack Dropdown */}
+    <FormControl sx={{ minWidth: 160 }} size="small">
+      <InputLabel sx={{ fontFamily: 'Poppins' }}>Stack</InputLabel>
+      <Select value={selectedStack} onChange={handleStackChange} label="Stack">
         {stacks.map((s) => (
-          <MenuItem key={s._id} value={s._id}>{s.name}</MenuItem>
+          <MenuItem key={s._id} value={s._id}>
+            {s.name}
+          </MenuItem>
         ))}
       </Select>
-    </FormControl> */}
+    </FormControl>
 
-    {categories.length > 0 && (
-      <FormControl sx={{ minWidth: 160, maxHeight: 40 }}>
-        <InputLabel
-         sx={{
-      top: '-5px', // adjust vertical position
-      fontSize: '1 rem',
-      fontFamily:'Poppins'
-    }}>Category</InputLabel>
-        <Select
-          value={selectedCategory}
-          onChange={handleCategoryChange}
-          label="Category"
-          size="small"
-        >
+    {/* Category Dropdown - show only if stack is selected */}
+    {selectedStack && categories.length > 0 && (
+      <FormControl sx={{ minWidth: 160 }} size="small">
+        <InputLabel sx={{ fontFamily: 'Poppins' }}>Category</InputLabel>
+        <Select value={selectedCategory} onChange={handleCategoryChange} label="Category">
           {categories.map((c) => (
-            <MenuItem key={c._id} value={c._id}>{c.name}</MenuItem>
+            <MenuItem key={c._id} value={c._id}>
+              {c.name}
+            </MenuItem>
           ))}
         </Select>
       </FormControl>
     )}
 
-    {subcategories.length > 0 && (
-      <FormControl sx={{ minWidth: 160, maxHeight: 40 }}>
-        <InputLabel
-         sx={{
-      top: '-6px', // adjust vertical position
-      fontSize: '1 rem',
-      fontFamily:'Poppins'
-    }}>Subcategory</InputLabel>
+    {/* Subcategory Dropdown - show only if category is selected */}
+    {selectedCategory && subcategories.length > 0 && (
+      <FormControl sx={{ minWidth: 160 }} size="small">
+        <InputLabel sx={{ fontFamily: 'Poppins' }}>Subcategory</InputLabel>
         <Select
           value={selectedSubcategory}
           onChange={(e) => setSelectedSubcategory(e.target.value)}
           label="Subcategory"
-          size="small"
         >
           {subcategories.map((sub) => (
-            <MenuItem key={sub._id} value={sub._id}>{sub.name}</MenuItem>
+            <MenuItem key={sub._id} value={sub._id}>
+              {sub.name}
+            </MenuItem>
           ))}
         </Select>
       </FormControl>
     )}
   </Box>
 </Collapse>
+
 
     <Grid container spacing={2} justifyContent="center">
   {filterVideos().map((video) => (
@@ -728,6 +712,7 @@ const handleClearFilters = () => {
               <VisibilityIcon fontSize="small" sx={{ mr: 1 ,fontFamily:'Poppins'}} />
               View Details
             </MenuItem>
+            
           </Menu>
         )}
       </Card>

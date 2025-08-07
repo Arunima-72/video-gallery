@@ -305,7 +305,8 @@ import React, { useEffect, useState } from 'react'; //last working code 4/08
 import {
   Box, Typography, CircularProgress, IconButton, Avatar,
   TextField, Button, Toolbar, Tooltip, Card, CardMedia,
-  Menu, MenuItem, Divider
+  Menu, MenuItem, Divider,
+  Chip
 } from '@mui/material';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
@@ -325,6 +326,7 @@ import CommonNav from '../CommonNav';
 import axiosInstance from '../axiosInterceptor';
 import SendIcon from "@mui/icons-material/Send";
 dayjs.extend(relativeTime);
+import VisibilityIcon from '@mui/icons-material/Visibility';
 
 const drawerWidthOpen = 240;
 const drawerWidthClosed = 60;
@@ -350,6 +352,8 @@ const VideoPlayer = () => {
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [anchorEls, setAnchorEls] = useState({});
   const [showFullDesc, setShowFullDesc] = useState(false);
+   const [views, setViews] = useState([]);
+const [hasTrackedView, setHasTrackedView] = useState(false);
 
   const token = localStorage.getItem('token');
   const userType = localStorage.getItem('role');
@@ -477,6 +481,30 @@ const VideoPlayer = () => {
       console.error('Failed to toggle save:', err);
     }
   };
+useEffect(() => {
+  const fetchViews = async () => {
+    try {
+      const res = await axiosInstance.get(`/video-views/video/${id}`);
+      setViews(res.data);
+    } catch (err) {
+      console.error('Error fetching views:', err);
+    }
+  };
+
+  fetchViews();
+}, [id]);
+const trackVideoView = async () => {
+  if (hasTrackedView || !currentUserId) return;
+
+  try {
+    await axiosInstance.post(`view/video/${id}/track`, {
+      userId: currentUserId
+    });
+    setHasTrackedView(true);
+  } catch (err) {
+    console.error('Failed to record view:', err);
+  }
+};
 
   const handleMenuOpen = (event, commentId) => {
     setAnchorEls((prev) => ({ ...prev, [commentId]: event.currentTarget }));
@@ -553,30 +581,91 @@ const hslToRgb = (h, s, l) => {
               controls
               controlsList="nodownload"
               onContextMenu={(e) => e.preventDefault()}
-              onPlay={() => axiosInstance.post(`/activity/watched/${id}`)}
+            //   onPlay={() => axiosInstance.post(`/activity/watched/${id}`)
+            // }
+            onPlay={() => {
+  axiosInstance.post(`/activity/watched/${id}`);
+  trackVideoView(); // ✅ Call view tracking logic
+}}
+
               sx={{ borderRadius: 2, height: 250 }}
             />
             <Box display="flex" alignItems="center" justifyContent="space-between" mt={1}>
-              <Box display="flex" alignItems="center" gap={1.5}>
-                <IconButton onClick={handleLike}>
-                  <ThumbUpIcon color={userLiked ? 'primary' : 'action'} />
-                </IconButton>
-                <Typography sx={{ cursor: 'pointer' }} onClick={toggleLikesView}>{likes.length}</Typography>
-                <IconButton onClick={() => { setShowComments(true); setShowLikes(false); }}>
-                  <ChatBubbleOutlineIcon color={showComments ? 'primary' : 'action'} />
-                </IconButton>
-                <Typography >{comments.length}</Typography>
-              </Box>
-              {userType === 'user' && (
-                <Tooltip title={saved ? 'Unsave' : 'Save'}>
-                  <IconButton onClick={handleToggleSave}>
-                    {saved ? <BookmarkIcon color="primary" /> : <BookmarkBorderIcon />}
-                  </IconButton>
-                </Tooltip>
-              )}
-            </Box>
+  {/* Left Group: Views, Likes, Comments */}
+  <Box display="flex" alignItems="center" gap={1}>
+    {/* 👁 Views */}
+    <Box display="flex" alignItems="center" gap={0.5}>
+      <Typography variant="body2" fontFamily="Poppins" sx={{ color: '#757575' }}>
+        {views.length} view{views.length === 1 ? '' : 's'}
+      </Typography>
+    </Box>
+
+    {/* 👍 Like */}
+    <Box display="flex" alignItems="center" gap={0.5}>
+      <IconButton onClick={handleLike}>
+        <ThumbUpIcon color={userLiked ? 'primary' : 'action'} />
+      </IconButton>
+      <Typography sx={{ cursor: 'pointer' }} onClick={toggleLikesView}>
+        {likes.length}
+      </Typography>
+    </Box>
+
+    {/* 💬 Comment */}
+    <Box display="flex" alignItems="center" gap={0.5}>
+      <IconButton onClick={() => {
+        setShowComments(true);
+        setShowLikes(false);
+      }}>
+        <ChatBubbleOutlineIcon color={showComments ? 'primary' : 'action'} />
+      </IconButton>
+      <Typography>{comments.length}</Typography>
+    </Box>
+  </Box>
+
+  {/* Right: Bookmark for users */}
+  {userType === 'user' && (
+    <Tooltip title={saved ? 'Unsave' : 'Save'}>
+      <IconButton onClick={handleToggleSave}>
+        {saved ? <BookmarkIcon color="primary" /> : <BookmarkBorderIcon />}
+      </IconButton>
+    </Tooltip>
+  )}
+</Box>
+
 
             <Typography variant="h6" fontWeight="bold" fontFamily='Poppins' mt={1}>{video.title}</Typography>
+            {/* <Box display="flex" gap={1} mt={1}>
+  {video.stack && (
+    <Chip
+      label={video.stack}
+      size="small"
+      sx={{ fontFamily: 'Poppins', bgcolor: '#e3f2fd', color: '#1976d2' }}
+    />
+  )}
+  {video.category && (
+    <Chip
+      label={video.category}
+      size="small"
+      sx={{ fontFamily: 'Poppins', bgcolor: '#fce4ec', color: '#d81b60' }}
+    />
+  )}
+</Box> */}
+<Box display="flex" gap={1} mt={1}>
+  {video.stack?.name && (
+    <Chip
+      label={video.stack.name}
+      size="small"
+      sx={{ fontFamily: 'Poppins', bgcolor: '#e3f2fd', color: '#457fb9ff' }}
+    />
+  )}
+  {video.category?.name && (
+    <Chip
+      label={video.category.name}
+      size="small"
+      sx={{ fontFamily: 'Poppins', bgcolor: '#fce4ec', color: '#a84c6eff' }}
+    />
+  )}
+</Box>
 
             <Box sx={{ mt: 1, bgcolor: 'rgba(0,0,0,0.04)', p: 2, borderRadius: 2 }}>
               <Typography
@@ -610,9 +699,9 @@ const hslToRgb = (h, s, l) => {
     </a>
   </Typography>
 )} */}
-{video.videoUrl && (
-  <Typography mt={1} variant="body2" fontFamily="Poppins">
-    <strong>Video URL:</strong>{' '}
+{/* {video.videoUrl && (
+  <Typography mt={1} variant="body2"   fontWeight="normal"fontFamily="Poppins">
+    Video URL:{' '}
     <a
       href={
         video.videoUrl.startsWith('http')
@@ -626,7 +715,22 @@ const hslToRgb = (h, s, l) => {
       {video.videoUrl}
     </a>
   </Typography>
-)}
+)} */}
+<Typography mt={1} variant="body2" fontWeight="normal" fontFamily="Poppins">
+   Video URL:{' '}
+  <a
+    href={
+      video.videoUrl.startsWith('http')
+        ? video.videoUrl
+        : `http://localhost:3000/${video.videoUrl.replace(/\\/g, '/')}`
+    }
+    target="_blank"
+    rel="noopener noreferrer"
+    style={{ color: '#1976d2', textDecoration: 'none' }}
+  >
+      Reference Link
+  </a>
+</Typography>
 
               {/* {pdfUrl && (
   <Typography mt={1} variant="body2" fontFamily='Poppins'>
@@ -664,8 +768,8 @@ const hslToRgb = (h, s, l) => {
   </Typography>
 )} */}
        {pdfUrl && (
-  <Typography mt={1} variant="body2" fontFamily="Poppins">
-    <strong>Project Document:</strong>{' '}
+  <Typography mt={1} variant="body2" fontFamily="Poppins"  fontWeight="normal">
+    Project Document:{' '}
     <a
       href={pdfUrl}
       target="_blank"
@@ -816,3 +920,28 @@ export default VideoPlayer;
 
 
 
+// <Box display="flex" alignItems="center" justifyContent="space-between" mt={1}>
+//               <Box display="flex" alignItems="center" gap={0.5}>
+//                 <IconButton onClick={handleLike}>
+//                   <ThumbUpIcon color={userLiked ? 'primary' : 'action'} />
+//                 </IconButton>
+//                 <Typography sx={{ cursor: 'pointer' }} onClick={toggleLikesView}>{likes.length}</Typography>
+//                 <IconButton onClick={() => { setShowComments(true); setShowLikes(false); }}>
+//                   <ChatBubbleOutlineIcon color={showComments ? 'primary' : 'action'} />
+//                 </IconButton>
+//                 <Typography >{comments.length}</Typography>
+//               </Box>
+//                   {/* ✅ Views Badge */}
+//     <Box display="flex" alignItems="center" gap={0.5}>
+//       <Typography variant="body2" fontFamily="Poppins" sx={{ color: '#757575' }}>
+//          {views.length} view{views.length === 1 ? '' : 's'}
+//       </Typography>
+//     </Box>
+//               {userType === 'user' && (
+//                 <Tooltip title={saved ? 'Unsave' : 'Save'}>
+//                   <IconButton onClick={handleToggleSave}>
+//                     {saved ? <BookmarkIcon color="primary" /> : <BookmarkBorderIcon />}
+//                   </IconButton>
+//                 </Tooltip>
+//               )}
+//             </Box>

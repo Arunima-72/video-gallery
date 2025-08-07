@@ -720,8 +720,8 @@ const hslToRgb = (h, s, l) => {
                 <Card sx={{ borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 2, py: 2, minHeight: 110 }}>
                   {item.icon}
                   <CardContent sx={{ textAlign: 'right' }}>
-                    <Typography variant="h6" sx={{fontFamily:'Poppins'}}>{item.value}</Typography>
-                    <Typography variant="body2">{item.label}</Typography>
+                    <Typography variant="h6" style={{fontFamily:'Poppins'}}>{item.value}</Typography>
+                    <Typography variant="body2" style={{fontFamily:'Poppins'}}>{item.label}</Typography>
                   </CardContent>
                 </Card>
               </Grow>
@@ -730,11 +730,12 @@ const hslToRgb = (h, s, l) => {
         </Grid>
 
         {/* Search Bar + Export & Clear */}
-        <Grid container spacing={2} alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
+        <Grid container spacing={2} alignItems="center" justifyContent="space-between" >
           <Grid item xs={12} sm={6} md={4}>
             <TextField
               className="search-field"
               label="Search by name or email"
+              font-Family='Poppins'
               fullWidth
               variant="outlined"
               value={searchTerm}
@@ -755,6 +756,7 @@ const hslToRgb = (h, s, l) => {
             <TextField
               className="search-field"
               label="Search by date"
+              fontFamily='Poppins'
               type="date"
               fullWidth
               InputLabelProps={{ shrink: true }}
@@ -774,7 +776,7 @@ const hslToRgb = (h, s, l) => {
             />
           </Grid>
           <Grid item xs={12} md={4} className="export-clear-buttons">
-            <Button onClick={handleClear} color="warning" variant="outlined">Clear All</Button>
+            <Button onClick={handleClear} color="warning" variant="outlined" style={{fontFamily:'Poppins'}}>Clear All</Button>
             {/* <CSVLink data={csvData} filename="user-activity.csv" style={{ textDecoration: 'none' }}>
               <Button variant="contained" color="success">Export CSV</Button>
             </CSVLink> */}
@@ -790,10 +792,10 @@ const hslToRgb = (h, s, l) => {
           <Table>
             <TableHead>
               <TableRow sx={{ bgcolor: '#f1eaeaff' }}>
-                <TableCell><strong>User</strong></TableCell>
-                <TableCell><strong>Login</strong></TableCell>
-                <TableCell><strong>Logout</strong></TableCell>
-                <TableCell align="center"><strong>Details</strong></TableCell>
+                <TableCell sx={{fontFamily:'Poppins'}}><strong>User</strong></TableCell>
+                <TableCell sx={{fontFamily:'Poppins'}}><strong>Login</strong></TableCell>
+                <TableCell sx={{fontFamily:'Poppins'}}><strong>Logout</strong></TableCell>
+                <TableCell align="center" sx={{fontFamily:'Poppins'}}><strong>Details</strong></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -810,13 +812,14 @@ const hslToRgb = (h, s, l) => {
                           // color: getEmailColor(cm.user?.email || ''),        // Strong color for initials
                           fontSize: '0.8rem',
                           fontWeight: 'bold',
+                          fontFamily: 'Poppins',
                         }}
                       >
                         {getInitials(session.user?.name || session.user?.email)}
                       </Avatar>
                       <Box>
-                        <Typography>{session.user.name}</Typography>
-                        <Typography variant="caption">{session.user.email}</Typography>
+                        <Typography style={{fontFamily:'Poppins'}}>{session.user.name}</Typography>
+                        <Typography variant="caption" style={{fontFamily:'Poppins'}}>{session.user.email}</Typography>
                       </Box>
                     </Stack>
                   </TableCell>
@@ -824,7 +827,7 @@ const hslToRgb = (h, s, l) => {
                   <TableCell>
                     {session.logoutAt
                       ? new Date(session.logoutAt).toLocaleString()
-                      : <Typography color="warning.main">Active</Typography>}
+                      : <Typography color="warning.main" >Active</Typography>}
                   </TableCell>
                   <TableCell align="center">
                     <IconButton color="primary" onClick={() => handleViewSession(session)}>
@@ -849,13 +852,14 @@ const hslToRgb = (h, s, l) => {
 
       {/* Detail Dialog */}
       <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-        <DialogTitle>Session Activities</DialogTitle>
+        <DialogTitle style={{fontFamily:'Poppins'}}>Session Activities</DialogTitle>
         <DialogContent dividers>
           {selectedSession ? (
             <List>
               {selectedSession.watchedVideos.map((video, i) => (
                 <ListItem key={`watch-${i}`}>
                   <ListItemText
+                   style={{fontFamily:'Poppins'}}
                     primary={`🎬 Watched: ${video.title}`}
                     secondary={new Date(video.watchedAt).toLocaleString()}
                   />
@@ -864,6 +868,7 @@ const hslToRgb = (h, s, l) => {
               {selectedSession.likes.map((video, i) => (
                 <ListItem key={`like-${i}`}>
                   <ListItemText
+                   sx={{fontFamily:'Poppins'}}
                     primary={`👍 Liked: ${video.title}`}
                     secondary={new Date(video.likedAt).toLocaleString()}
                   />
@@ -872,6 +877,7 @@ const hslToRgb = (h, s, l) => {
               {selectedSession.comments.map((video, i) => (
                 <ListItem key={`comment-${i}`}>
                   <ListItemText
+                   sx={{fontFamily:'Poppins'}}
                     primary={`💬 Commented: ${video.title}`}
                     secondary={`${video.comment} — ${new Date(video.commentedAt).toLocaleString()}`}
                   />
@@ -880,7 +886,7 @@ const hslToRgb = (h, s, l) => {
               {(selectedSession.watchedVideos.length === 0 &&
                 selectedSession.likes.length === 0 &&
                 selectedSession.comments.length === 0) && (
-                  <Typography sx={{ mt: 2 }}>No activity during this session.</Typography>
+                  <Typography sx={{ mt: 2,fontFamily:'Poppins' }}>No activity during this session.</Typography>
                 )}
             </List>
           ) : null}

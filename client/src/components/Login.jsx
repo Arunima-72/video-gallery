@@ -465,7 +465,7 @@ localStorage.setItem('userId', response.data.userId);
         </IconButton>
 
         {/* Logo */}
-        <Box sx={{ mb: 1 }}>
+        {/* <Box sx={{ mb: 2 }}>
           <img
             src={logo}
             alt="App Logo"
@@ -473,12 +473,38 @@ localStorage.setItem('userId', response.data.userId);
             height={100}
             style={{ borderRadius: '12px' }}
           />
-        </Box>
+        </Box> */}
+       <Box sx={{ mb: 2, width: 120, height: 120, mx: 'auto' }}>
+  <img
+    src={logo}
+    alt="App Logo"
+    style={{
+      width: '100%',
+      height: '100%',
+      objectFit: 'cover',
+      borderRadius: '12px',
+    }}
+  />
+</Box>
 
         {/* Title */}
-        <Typography variant="h4" fontWeight="bold" style={{fontFamily:'-moz-initial',color:'#3e91daff'}} gutterBottom>
+        {/* <Typography variant="h4" fontWeight="bold" style={{fontFamily:'-moz-initial',color: '#4facfe'}}  gutterBottom>
           Login
-        </Typography>
+        </Typography> */}
+<Typography
+  variant="h4"
+  fontWeight="bold"
+  sx={{
+    fontFamily: 'Poppins',
+    background: 'linear-gradient(to right, #2182d6ff, #09afb8ff)',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    display: 'inline-block',
+  }}
+  gutterBottom
+>
+  Login
+</Typography>
 
         {/* Server Error */}
         {serverError && (
@@ -534,7 +560,7 @@ localStorage.setItem('userId', response.data.userId);
         </Button>
 
         {/* Forgot Password */}
-        <Box sx={{ textAlign: 'right', fontSize: 14 }}>
+        <Box sx={{ textAlign: 'right', fontSize: 14 ,fontFamily: 'Poppins' }}>
           <Link href="/forgot-password" underline="hover">
             Forgot password?
           </Link>

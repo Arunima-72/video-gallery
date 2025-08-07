@@ -834,6 +834,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import logo from "../assets/download.png";
 import img1 from "../assets/techstack1.jpg";
 import img2 from "../assets/img1.jpg"; // Add a second image
+import img3 from "../assets/img2.webp"; // Add a third image
 import { useNavigate } from "react-router-dom";
 import Login from "../components/Login";
 import ContactMailIcon from "@mui/icons-material/ContactMail";
@@ -927,10 +928,10 @@ const [openModal, setOpenModal] = useState(false);
 
           <Box sx={{ flexGrow: 1 }} />
 
-          <Button startIcon={<HomeIcon />} onClick={() => navigate("/")} sx={{ color: "#fff" }}>
+          <Button startIcon={<HomeIcon />} onClick={() => navigate("/")} sx={{ color: "#fff",fontFamily: 'Poppins' }}>
             Home
           </Button>
-          <Button startIcon={<InfoIcon />} onClick={() => scrollToSection(aboutRef)} sx={{ color: "#fff" }}>
+          <Button startIcon={<InfoIcon />} onClick={() => scrollToSection(aboutRef)} sx={{ color: "#fff",fontFamily: 'Poppins' }}>
             About
           </Button>
           {/* <Button startIcon={<MailIcon />} onClick={() => scrollToSection(contactRef)} sx={{ color: "#fff" }}>
@@ -943,13 +944,13 @@ const [openModal, setOpenModal] = useState(false);
         startIcon={<MailIcon />}
         onClick={() => setOpenModal(true)}
         
-        sx={{  color: "#fff",borderRadius: "20px",}}
+        sx={{  color: "#fff",borderRadius: "20px",fontFamily: 'Poppins' }}
       >
         Contact
       </Button>
 
       <ContactModal open={openModal} onClose={() => setOpenModal(false)} />
-          <Button startIcon={<LoginIcon />} onClick={() => setLoginDialogOpen(true)} sx={{ color: "#fff", ml: 1 }}>
+          <Button startIcon={<LoginIcon />} onClick={() => setLoginDialogOpen(true)} sx={{ color: "#fff", ml: 1 ,fontFamily: 'Poppins' }}>
             Login
           </Button>
         </Toolbar>
@@ -1059,7 +1060,7 @@ const [openModal, setOpenModal] = useState(false);
         </Box>
 
         {/* Animated Image Slider */}
-        <Box sx={{ flex: 1, display: "flex", justifyContent: "center", minHeight: 300 }}>
+        <Box sx={{ flex: 1, display: "flex", justifyContent: "center", minHeight: 300 ,overflow: "hidden"}}>
           <AnimatePresence mode="wait">
             <motion.img
               key={currentImageIndex}
@@ -1137,7 +1138,7 @@ const [openModal, setOpenModal] = useState(false);
         }}
       >
         <img
-          src={img1}
+          src={img3}
           alt="About FSD"
           style={{
             width: "80%",
@@ -1195,14 +1196,15 @@ const [openModal, setOpenModal] = useState(false);
             flexDirection: { xs: "column", md: "row" },
             gap: 4,
             justifyContent: "space-between",
+            fontFamily: 'Poppins',
           }}
         >
           <Box sx={{ display: "flex", alignItems: "center", minWidth: 200 }}>
             <img src={logo} alt="ICT Logo" style={{ height: 60 }} />
             <Box sx={{ display: "flex", flexDirection: "column", marginLeft: 1 }}>
-              <Typography fontWeight="bold" sx={{ color: "#003b6f" }}>ICT</Typography>
-              <Typography fontWeight="bold" sx={{ color: "#003b6f" }}>ACADEMY</Typography>
-              <Typography fontWeight="bold" sx={{ color: "#003b6f" }}>OF KERALA</Typography>
+              <Typography fontWeight="bold" sx={{ color: "#003b6f" ,fontFamily:'Poppins'}}>ICT</Typography>
+              <Typography fontWeight="bold" sx={{ color: "#003b6f" ,fontFamily:'Poppins'}}>ACADEMY</Typography>
+              <Typography fontWeight="bold" sx={{ color: "#003b6f" ,fontFamily:'Poppins'}}>OF KERALA</Typography>
             </Box>
           </Box>
 
@@ -1235,12 +1237,12 @@ const [openModal, setOpenModal] = useState(false);
                 borderRadius: 2,
               }}
             >
-              <Typography fontWeight="bold" gutterBottom>
+              <Typography fontWeight="bold" gutterBottom style={{ fontFamily: 'Poppins' }}>
                 <LocationOnIcon sx={{ verticalAlign: "middle", mr: 1 }} />
                 {branch.title}
               </Typography>
-              <Typography fontSize={14}>{branch.address}</Typography>
-              <Typography fontSize={14} sx={{ mt: 1 }}>
+              <Typography fontSize={14} style={{fontFamily:'Poppins'}}>{branch.address}</Typography>
+              <Typography fontSize={14} sx={{ mt: 1 ,fontFamily:'Poppins' }}>
                 Phone: {branch.phone}
               </Typography>
             </Box>
@@ -1250,8 +1252,8 @@ const [openModal, setOpenModal] = useState(false);
 
       {/* Footer */}
       <Box sx={{ backgroundColor: "#031E34", color: "white", py: 3 }}>
-        <Typography align="center" fontSize={14}>© 2024 ICT Academy of Kerala</Typography>
-        <Typography align="center" fontSize={13}>Terms of Use | Privacy & Security | Cookie Policy</Typography>
+        <Typography align="center" fontSize={14} fontFamily={'Poppins'}>© 2024 ICT Academy of Kerala</Typography>
+        <Typography align="center" fontSize={13} fontFamily={'Poppins'}>Terms of Use | Privacy & Security | Cookie Policy</Typography>
         <Box sx={{ mt: 2, display: "flex", justifyContent: "center", gap: 2 }}>
           <IconButton href="https://www.linkedin.com" target="_blank" color="inherit"><LinkedInIcon /></IconButton>
           <IconButton href="https://www.facebook.com" target="_blank" color="inherit"><FacebookIcon /></IconButton>

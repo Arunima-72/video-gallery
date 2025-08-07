@@ -337,7 +337,7 @@ import HomeIcon from "@mui/icons-material/Home";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import logo from "../assets/download.png";
+import logo from "../assets/download.png"; // Ensure this path is correct
 
 const CommonNav = ({ onToggleSidebar }) => {
   const navigate = useNavigate();

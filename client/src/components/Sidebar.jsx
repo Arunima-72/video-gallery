@@ -321,8 +321,9 @@ const Sidebar = ({ open, userType }) => {
     { text: 'Upload', icon: <UploadIcon />, path: '/admin/upload' },
     { text: 'User Logs', icon: <LogsIcon />, path: '/admin/logs' },
     { text: 'Add Users', icon: <AddUserIcon />, path: '/admin/adduser' },
+     { text: 'Message ', icon: <ContactIcon />, path: '/admin/contact' },
     { text: 'Change Password', icon: <PasswordIcon />, path: '/admin/password' },
-    { text: 'Contact ', icon: <ContactIcon />, path: '/admin/contact' }
+   
   ];
 
   const userLinks = [

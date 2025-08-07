@@ -377,31 +377,48 @@ const validateForm = () => {
   }, []);
 
   // Fetch categories based on stack
-  useEffect(() => {
-    if (selectedStack) {
-      axiosInstance
-        .get(`http://localhost:3000/admin/categories?stackId=${selectedStack}`)
-        .then((res) => setCategories(res.data))
-        .catch((err) => console.error("Error fetching categories:", err));
-    } else {
-      setCategories([]);
-    }
-    setSelectedCategory("");
-    setSelectedSubCategory("");
-  }, [selectedStack]);
+  // useEffect(() => {
+  //   if (selectedStack) {
+  //     axiosInstance
+  //       .get(`http://localhost:3000/admin/categories?stackId=${selectedStack}`)
+  //       .then((res) => setCategories(res.data))
+  //       .catch((err) => console.error("Error fetching categories:", err));
+  //   } else {
+  //     setCategories([]);
+  //   }
+  //   setSelectedCategory("");
+  //   setSelectedSubCategory("");
+  // }, [selectedStack]);
+useEffect(() => {
+  axiosInstance
+    .get("http://localhost:3000/admin/categories")
+    .then((res) => setCategories(res.data))
+    .catch((err) => console.error("Error fetching categories:", err));
+}, []);
 
   // Fetch subcategories based on category
-  useEffect(() => {
-    if (selectedCategory) {
-      axiosInstance
-        .get(`http://localhost:3000/admin/sub-categories?categoryId=${selectedCategory}`)
-        .then((res) => setSubCategories(res.data))
-        .catch((err) => console.error("Error fetching subcategories:", err));
-    } else {
-      setSubCategories([]);
-    }
-    setSelectedSubCategory("");
-  }, [selectedCategory]);
+  // useEffect(() => {
+  //   if (selectedCategory) {
+  //     axiosInstance
+  //       .get(`http://localhost:3000/admin/sub-categories?categoryId=${selectedCategory}`)
+  //       .then((res) => setSubCategories(res.data))
+  //       .catch((err) => console.error("Error fetching subcategories:", err));
+  //   } else {
+  //     setSubCategories([]);
+  //   }
+  //   setSelectedSubCategory("");
+  // }, [selectedCategory]);
+useEffect(() => {
+  if (selectedCategory) {
+    axiosInstance
+      .get(`http://localhost:3000/admin/sub-categories?categoryId=${selectedCategory}`)
+      .then((res) => setSubCategories(res.data))
+      .catch((err) => console.error("Error fetching subcategories:", err));
+  } else {
+    setSubCategories([]);
+  }
+  setSelectedSubCategory("");
+}, [selectedCategory]);
 
   // Fetch video details if editing
   useEffect(() => {
@@ -539,8 +556,22 @@ const handleSubmit = async () => {
             </MenuItem>
           ))}
         </TextField>
-
-        <TextField
+<TextField
+  select
+  label="Select Category"
+  value={selectedCategory}
+  onChange={(e) => setSelectedCategory(e.target.value)}
+  error={!!errors.category}
+  helperText={errors.category}
+  className="form-field"
+>
+  {categories.map((cat) => (
+    <MenuItem key={cat._id} value={cat._id} style={{ fontFamily: 'Poppins' }}>
+      {cat.name}
+    </MenuItem>
+  ))}
+</TextField>
+        {/* <TextField
           select
           label="Select Category"
           value={selectedCategory}
@@ -555,11 +586,12 @@ const handleSubmit = async () => {
               {cat.name}
             </MenuItem>
           ))}
-        </TextField>
+        </TextField> */}
 
         <TextField
           select
           label="Select SubCategory"
+          font-famiyy='Poppins'
           value={selectedSubCategory}
           onChange={(e) => setSelectedSubCategory(e.target.value)}
           disabled={!selectedCategory}
@@ -590,6 +622,7 @@ const handleSubmit = async () => {
           error={!!errors.videoSource}
           helperText={errors.videoSource}
           className="form-field"
+          style={{ fontFamily: 'Poppins' }}
         />
 
         <TextField
@@ -609,8 +642,8 @@ const handleSubmit = async () => {
         <Box className="upload-box" onClick={() => videoInputRef.current.click()}>
           <Stack spacing={1} alignItems="center">
             <IconButton><CloudUploadIcon className="upload-icon" /></IconButton>
-            <Typography>{videoFile ? videoFile.name : "Browse Video"}</Typography>
-            <Typography fontSize="14px" color="text.secondary">Drag and drop here</Typography>
+            <Typography style={{fontFamily:'Poppins'}}>{videoFile ? videoFile.name : "Browse Video"}</Typography>
+            <Typography fontSize="14px" color="text.secondary" style={{fontFamily:'Poppins'}}> Drag and drop here</Typography>
             <input
               ref={videoInputRef}
               type="file"
@@ -620,13 +653,13 @@ const handleSubmit = async () => {
             />
           </Stack>
         </Box>
-        {errors.videoFile && <Typography color="error" className="form-error">{errors.videoFile}</Typography>}
+        {errors.videoFile && <Typography color="error" className="form-error" style={{fontFamily:'Poppins'}}>{errors.videoFile}</Typography>}
 
         <Box className="upload-box" onClick={() => pdfInputRef.current.click()}>
           <Stack spacing={1} alignItems="center">
             <IconButton><CloudUploadIcon className="upload-icon" /></IconButton>
-            <Typography>{pdfFile ? pdfFile.name : "Upload Document"}</Typography>
-            <Typography fontSize="14px" color="text.secondary">Drag and drop here</Typography>
+            <Typography style={{fontFamily:'Poppins'}}>{pdfFile ? pdfFile.name : "Upload Document"}</Typography>
+            <Typography fontSize="14px" color="text.secondary" style={{fontFamily:'Poppins'}}>Drag and drop here</Typography>
             <input
               ref={pdfInputRef}
               type="file"
@@ -636,13 +669,13 @@ const handleSubmit = async () => {
             />
           </Stack>
         </Box>
-        {errors.pdfFile && <Typography color="error" className="form-error">{errors.pdfFile}</Typography>}
+        {errors.pdfFile && <Typography color="error" className="form-error" style={{fontFamily:'Poppins'}}>{errors.pdfFile}</Typography>}
 
         <Box className="upload-box" onClick={() => thumbnailInputRef.current.click()}>
           <Stack spacing={1} alignItems="center">
             <IconButton><CloudUploadIcon className="upload-icon" /></IconButton>
-            <Typography>{thumbnail ? thumbnail.name : "Upload Thumbnail"}</Typography>
-            <Typography fontSize="14px" color="text.secondary">Drag and drop here</Typography>
+            <Typography style={{fontFamily:'Poppins'}}>{thumbnail ? thumbnail.name : "Upload Thumbnail"}</Typography>
+            <Typography fontSize="14px" color="text.secondary" style={{fontFamily:'Poppins'}}>Drag and drop here</Typography>
             <input
               ref={thumbnailInputRef}
               type="file"
@@ -652,14 +685,14 @@ const handleSubmit = async () => {
             />
           </Stack>
         </Box>
-        {errors.thumbnail && <Typography color="error" className="form-error">{errors.thumbnail}</Typography>}
+        {errors.thumbnail && <Typography color="error" className="form-error" style={{fontFamily:'Poppins'}}>{errors.thumbnail}</Typography>}
       </Box>
 
-      <Button variant="contained" onClick={handleSubmit} className="form-submit-btn">
+      <Button variant="contained" onClick={handleSubmit} className="form-submit-btn" style={{fontFamily:'Poppins'}}>
         {isEditMode ? "Update Video" : "Submit"}
       </Button>
 
-      {message && <Alert severity="info" className="form-alert">{message}</Alert>}
+      {message && <Alert severity="info" className="form-alert" style={{fontFamily:'Poppins'}}>{message}</Alert>}
     </CardContent>
   </Card>
 </Box>

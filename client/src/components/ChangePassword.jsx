@@ -109,7 +109,7 @@ const ChangePassword = () => {
           >
             <Typography
               variant="h5"
-              sx={{ fontWeight:"lighter", mb: 2 }}
+              sx={{ fontWeight:"normal", mb: 2 ,color: '#3f7cb5ff',fontFamily: 'Poppins'}}
             >
               Change Password
             </Typography>
