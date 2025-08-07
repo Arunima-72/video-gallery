@@ -36,7 +36,7 @@ function authenticate(req, res, next) {
     return res.status(401).json({ message: "Invalid or expired token" });
   }
 }
-router.post('/video/:videoId/track', authMiddleware, async (req, res) => {
+router.post('/video/:videoId/track', authenticate, async (req, res) => {
   const userId = req.user.id;
   const videoId = req.params.videoId;
 
