@@ -5,11 +5,11 @@ const categorySchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  stack: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Stack",
-    required: true
-  },
+  // stack: {
+  //   type: mongoose.Schema.Types.ObjectId,
+  //   ref: "Stack",
+  //   required: true
+  // },
     image: {
     type: String, // store image URL or filename
     required: false

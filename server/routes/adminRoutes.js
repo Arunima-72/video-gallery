@@ -234,18 +234,27 @@ router.put(
 // });
 router.post('/category', authenticateAdmin, uploadImage.single('image'), async (req, res) => {
   try {
-    const { name, stack } = req.body;
+    // const { name, stack } = req.body;
 
-    if (!name || !stack) {
-      return res.status(400).json({ error: "Name and stack are required" });
-    }
+    // if (!name || !stack) {
+    //   return res.status(400).json({ error: "Name and stack are required" });
+    // }
 
-    const category = new Category({
-      name,
-      stack,
-      image: req.file ? req.file.filename : undefined
-    });
+    // const category = new Category({
+    //   name,
+    //   stack,
+    //   image: req.file ? req.file.filename : undefined
+    // });
+const { name } = req.body;
 
+if (!name) {
+  return res.status(400).json({ error: "Name is required" });
+}
+
+const category = new Category({
+  name,
+  image: req.file ? req.file.filename : undefined
+});
     await category.save();
     res.status(201).json(category);
   } catch (err) {
@@ -298,13 +307,16 @@ router.put(
   upload.single("image"),
   async (req, res) => {
     try {
-      const { name, stack } = req.body; // ✅ include stack
-      const updateData = { name };
+      // const { name, stack } = req.body; // ✅ include stack
+      // const updateData = { name };
 
-      if (stack) {
-        updateData.stack = stack; // ✅ update stack field
-      }
+      // if (stack) {
+      //   updateData.stack = stack; // ✅ update stack field
+      // }
+const { name } = req.body;
+const updateData = {};
 
+if (name) updateData.name = name;
       if (req.file) {
         updateData.image = req.file.filename;
       }
@@ -338,11 +350,12 @@ router.put(
 // });
 
 router.get('/category', async (req, res) => {
-  const { stackId } = req.query;
+  // const { stackId } = req.query;
 
   try {
-    const filter = stackId ? { stack: stackId } : {};
-    const categories = await Category.find(filter);
+    // const filter = stackId ? { stack: stackId } : {};
+    // const categories = await Category.find(filter);
+    const categories = await Category.find(); 
     res.json(categories);
   } catch (err) {
     console.error("Error fetching categories:", err);
@@ -500,12 +513,12 @@ router.put(
   uploadImage.single('image'),
   async (req, res) => {
     try {
-      const { name, category, stack } = req.body;
-
+      // const { name, category, stack } = req.body;
+const { name, category } = req.body;
       const updateData = {};
       if (name) updateData.name = name;
       if (category) updateData.category = category;
-      if (stack) updateData.stack = stack;
+      // if (stack) updateData.stack = stack;
       if (req.file) updateData.image = req.file.filename;
 
       const updatedSubCategory = await SubCategory.findByIdAndUpdate(
@@ -826,9 +839,24 @@ router.get('/videos',  async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+// router.get('/video/:id', async (req, res) => {
+//   try {
+//     const video = await Video.findById(req.params.id);
+    
+//     if (!video) return res.status(404).json({ message: 'Video not found' });
+
+//     res.json(video);
+//   } catch (err) {
+//     res.status(500).json({ error: err.message });
+//   }
+// });
 router.get('/video/:id', async (req, res) => {
   try {
-    const video = await Video.findById(req.params.id);
+    const video = await Video.findById(req.params.id)
+      .populate('stack', 'name')
+      .populate('category', 'name')
+      // .populate('subcategory', 'name');
+
     if (!video) return res.status(404).json({ message: 'Video not found' });
 
     res.json(video);
@@ -836,6 +864,7 @@ router.get('/video/:id', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
 router.get('/public/videos', async (req, res) => {
   const videos = await Video.find();
   res.json(videos);
@@ -1232,6 +1261,7 @@ router.get('/sub-categories', authenticate, async (req, res) => {
   const subCategories = await SubCategory.find({ category: categoryId });
   res.json(subCategories);
 });
+
 
 
 

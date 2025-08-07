@@ -64,8 +64,13 @@ const commentSchema = new Schema({
   date: {
     type: Date,
     default: Date.now
-  }
+  
+  },
+  hidden: { type: Boolean, default: false }
+
 });
+
+
 
 // ❤️ Like Schema
 const likeSchema = new Schema({
@@ -130,8 +135,8 @@ videoUrl:String,
 
   // 💬 Comments and ❤️ Likes (embedded)
   comments: [commentSchema],
-  likes: [likeSchema]
-
+  likes: [likeSchema],
+ 
 }, { timestamps: true });
 
 

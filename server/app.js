@@ -24,7 +24,7 @@ const userRoutes= require('./routes/userRoutes')
 const routesUser = require('./routes/routesUser');
 const authRoutes = require('./routes/auth');
 const activityRoutes = require('./routes/userActivity');
-
+const videoViewRoutes = require('./routes/videoviewRoutes');
 app.use('/upload', uploadroutes);
 app.use('/change', userRoutes);
 
@@ -33,7 +33,7 @@ app.use('/save', routesUser);
 app.use('/admin', adminroutes);
 app.use('/activity', activityRoutes);
 
-
+app.use('/view', videoViewRoutes);
 app.use('/user', authRoutes);
 app.listen(3000,() => {
     console.log(`Server running on port 3000`);
