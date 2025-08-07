@@ -921,6 +921,7 @@ const [openModal, setOpenModal] = useState(false);
             onClick={() => navigate("/")}
           >
             <img src={logo} alt="ICT Academy" style={{ height: 40, marginRight: 10 }} />
+            
             <Typography variant="h6" sx={{ fontWeight: "bold", color: "#fff" }}>
          
             </Typography>

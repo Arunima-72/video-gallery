@@ -484,7 +484,7 @@ const [hasTrackedView, setHasTrackedView] = useState(false);
 useEffect(() => {
   const fetchViews = async () => {
     try {
-      const res = await axiosInstance.get(`/video-views/video/${id}`);
+      const res = await axiosInstance.get(`/view/video/${id}`);
       setViews(res.data);
     } catch (err) {
       console.error('Error fetching views:', err);

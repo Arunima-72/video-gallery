@@ -375,6 +375,10 @@ const handleCategoryChange = async (e) => {
     await fetchSubcategories(selected); // Fetch subcategories for selected category
   }
 };
+
+
+
+
   const handleResetFilters = () => {
     setSelectedStack('');
     setSelectedCategory('');
