@@ -1,19 +1,4 @@
-// import { useParams } from "react-router-dom";
-// import AddForm from "./AddForm";
 
-// const AddFormWrapper = () => {
-//   const { type } = useParams();
-
-//   // Validate type to avoid invalid routes
-//   const validTypes = ["stack", "category", "sub-category"];
-//   if (!validTypes.includes(type)) {
-//     return <h2>Invalid type</h2>;
-//   }
-
-//   return <AddForm type={type} />;
-// };
-
-// export default AddFormWrapper;
 
 
 import { useParams } from "react-router-dom";
