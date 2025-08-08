@@ -29,80 +29,7 @@ function authenticate(req, res, next) {
     return res.status(401).json({ message: "Invalid or expired token" });
   }
 }
-// router.post("/watched/:videoId", authenticate, async (req, res) => {
-//   try {
-//     const { videoId } = req.params;
 
-//     const video = await Video.findById(videoId);
-//     if (!video) return res.status(404).json({ message: "Video not found" });
-
-//     const activity = await UserActivity.findOneAndUpdate(
-//       { userId: req.user.id },
-//       {
-//         $push: {
-//           watchedVideos: {
-//             videoId,
-//             watchedAt: new Date(),
-//           },
-//         },
-//         $setOnInsert: {
-//           name: req.user.name || "Unknown",
-//           email: req.user.email,
-//         },
-//       },
-//       { upsert: true, new: true }
-//     );
-
-//     res.status(200).json({ message: "Video marked as watched", activity });
-//   } catch (err) {
-//     res.status(500).json({ error: err.message });
-//   }
-// });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// ✅ Save Comment
-// router.post("/comment/:videoId", authenticate, async (req, res) => {
-//   try {
-//     const { text } = req.body;
-//     const { videoId } = req.params;
-
-//     await UserActivity.findOneAndUpdate(
-//       { userId: req.user.id },
-//       {
-//         $push: {
-//           comments: {
-//             videoId,
-//             comment: text,
-//             commentedAt: new Date(),
-//           },
-//         },
-//         $setOnInsert: {
-//           name: req.user.name || "Unknown",
-//           email: req.user.email,
-//         },
-//       },
-//       { upsert: true, new: true }
-//     );
-
-//     res.status(200).json({ message: "Comment added to user activity" });
-//   } catch (err) {
-//     res.status(500).json({ error: err.message });
-//   }
-// });
 router.post("/login-activity", authenticate, async (req, res) => {
   try {
     const activity = await UserActivity.findOneAndUpdate(
@@ -217,36 +144,6 @@ router.post("/like/:videoId", authenticate, async (req, res) => {
   }
 });
 
-// router.get("/all-activities", authenticate, async (req, res) => {
-//   if (req.user.role !== "admin") {
-//     return res.status(403).json({ message: "Access denied" });
-//   }
-
-//   try {
-//     const activities = await UserActivity.find()
-//       .populate("sessions.watchedVideos.videoId", "title")
-//       .populate("sessions.comments.videoId", "title")
-//       .populate("sessions.likes.videoId", "title");
-
-//     res.status(200).json(activities);
-//   } catch (err) {
-//     res.status(500).json({ error: err.message });
-//   }
-// });
-
-// router.get("/all-activities", authenticate, async (req, res) => {           // working with admin activities
-//   if (req.user.role !== "admin") {
-//     return res.status(403).json({ message: "Access denied" });
-//   }
-
-//   try {
-//     const activities = await UserActivity.find(); // no populate needed
-//     res.status(200).json(activities);
-//   } catch (err) {
-//     console.error("Error fetching activities:", err);
-//     res.status(500).json({ error: err.message });
-//   }
-// });
 
 router.get("/all-activities", authenticate, async (req, res) => {
   if (req.user.role !== "admin") {
