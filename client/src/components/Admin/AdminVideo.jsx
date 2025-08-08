@@ -653,7 +653,14 @@ const handleClearFilters = () => {
     <Grid container spacing={2} justifyContent="center">
   {filterVideos().map((video) => (
     <Grid item xs={12} sm={6} md={3} key={video._id}>
-      <Card sx={{ width: 280, height: userType === 'admin' ? 230 : 230 }}>
+      <Card sx={{ width: 280,  width: 280,
+    height: userType === 'admin' ? 230 : 230,
+    transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+    '&:hover': {
+      transform: 'scale(1.03)',
+      boxShadow: '0 8px 20px rgba(0,0,0,0.2)',
+      cursor: 'pointer'
+    }}}>
         <CardMedia
           component="img"
           height="160"

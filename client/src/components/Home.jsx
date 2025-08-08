@@ -831,7 +831,7 @@ import FacebookIcon from "@mui/icons-material/Facebook";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import YouTubeIcon from "@mui/icons-material/YouTube";
 import { motion, AnimatePresence } from "framer-motion";
-import logo from "../assets/download.png";
+import logo from "../assets/LOGO_ICTAK-ENG-.png";
 import img1 from "../assets/techstack1.jpg";
 import img2 from "../assets/img1.jpg"; // Add a second image
 import img3 from "../assets/img2.webp"; // Add a third image
@@ -910,7 +910,8 @@ const [openModal, setOpenModal] = useState(false);
       <AppBar
         position="static"
         sx={{
-          background: "linear-gradient(to right, #4886b8ff, #21CBF3)",
+          // background: "linear-gradient(to right, #4886b8ff, #21CBF3)",
+               background: "linear-gradient(to right, #bed9efff, #227ae5ff)",
           color: "#fff",
           boxShadow: "0 3px 10px rgba(0,0,0,0.1)",
         }}

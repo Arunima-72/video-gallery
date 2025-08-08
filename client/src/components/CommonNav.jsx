@@ -337,7 +337,7 @@ import HomeIcon from "@mui/icons-material/Home";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import logo from "../assets/download.png"; // Ensure this path is correct
+import logo from "../assets/LOGO_ICTAK-ENG-.png"; // Ensure this path is correct
 
 const CommonNav = ({ onToggleSidebar }) => {
   const navigate = useNavigate();
@@ -365,7 +365,8 @@ const CommonNav = ({ onToggleSidebar }) => {
       position="fixed"
       sx={{
         zIndex: (theme) => theme.zIndex.drawer + 1,
-        background: "linear-gradient(to right, #4886b8ff, #21CBF3)",
+        // background: "linear-gradient(to right, #4886b8ff, #21CBF3)",
+        background: "linear-gradient(to right, #bed9efff, #227ae5ff)",
         color: "#fff",
         boxShadow: "0 3px 10px rgba(0,0,0,0.1)",
       }}
